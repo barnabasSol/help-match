@@ -3,18 +3,18 @@ package db
 import (
 	"context"
 	"fmt"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"hm.barney-host.site/internals/config"
 )
 
 func InitPostgres() (*pgxpool.Pool, error) {
-	connectionString := os.Getenv("DATABASE_CONNECTION_STRING")
-	maxIdleConnectionsStr := os.Getenv("DATABASE_MAX_IDLE_CONNECTIONS")
-	maxOpenConnectionsStr := os.Getenv("DATABASE_MAX_OPEN_CONNECTIONS")
-	connectionMaxLifetimeStr := os.Getenv("DATABASE_CONNECTION_MAX_LIFETIME")
+	connectionString := config.GetConf("DATABASE_CONNECTION_STRING")
+	maxIdleConnectionsStr := config.GetConf("DATABASE_MAX_IDLE_CONNECTIONS")
+	maxOpenConnectionsStr := config.GetConf("DATABASE_MAX_OPEN_CONNECTIONS")
+	connectionMaxLifetimeStr := config.GetConf("DATABASE_CONNECTION_MAX_LIFETIME")
 
 	if connectionString == "" {
 		return nil, fmt.Errorf("database connection string is missing")

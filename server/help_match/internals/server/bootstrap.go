@@ -11,10 +11,14 @@ import (
 func (as *AppServer) bootStrapHandlers(pool *pgxpool.Pool) {
 	//repository
 	userRepository := repository.NewUserRepository(pool)
+
 	//services
 	userService := user_services.NewUsersService(userRepository)
 	_ = userService
 	authService := auth_services.NewAuthService(userRepository)
+
 	//handlers
+	as.staticHandler = handlers.NewStaticHandler()
 	as.authHandler = handlers.NewAuthHandler(authService)
+
 }

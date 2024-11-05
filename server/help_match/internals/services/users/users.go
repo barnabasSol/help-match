@@ -1,6 +1,8 @@
 package services
 
-import "hm.barney-host.site/internals/repository"
+import (
+	"hm.barney-host.site/internals/repository"
+)
 
 type Users struct {
 	usersRepo *repository.User

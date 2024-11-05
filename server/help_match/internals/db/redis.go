@@ -3,17 +3,17 @@ package db
 import (
 	"context"
 	"fmt"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"hm.barney-host.site/internals/config"
 )
 
 func InitRedis() (*redis.Client, error) {
-	redisAddr := os.Getenv("REDIS_ADDRESS")
-	redisPassword := os.Getenv("REDIS_PASSWORD")
-	redisDB := os.Getenv("REDIS_DB")
+	redisAddr := config.GetConf("REDIS_ADDRESS")
+	redisPassword := config.GetConf("REDIS_PASSWORD")
+	redisDB := config.GetConf("REDIS_DB")
 
 	if redisAddr == "" {
 		return nil, fmt.Errorf("Redis address is missing")

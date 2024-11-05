@@ -12,11 +12,13 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"hm.barney-host.site/internals/config"
 	"hm.barney-host.site/internals/handlers"
 )
 
 type AppServer struct {
-	authHandler *handlers.Auth
+	authHandler   *handlers.Auth
+	staticHandler handlers.StaticHandler
 }
 
 func New() *AppServer {
@@ -25,7 +27,7 @@ func New() *AppServer {
 
 func (as *AppServer) Serve(pgPool *pgxpool.Pool) error {
 	as.bootStrapHandlers(pgPool)
-	port := os.Getenv("PORT")
+	port := config.GetConf("PORT")
 	shutdownError := make(chan error)
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%v", port),
@@ -43,6 +45,7 @@ func (as *AppServer) Serve(pgPool *pgxpool.Pool) error {
 		defer cancel()
 		shutdownError <- srv.Shutdown(ctx)
 	}()
+
 	log.Printf("starting server %v", srv.Addr)
 
 	err := srv.ListenAndServe()
@@ -53,6 +56,6 @@ func (as *AppServer) Serve(pgPool *pgxpool.Pool) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("stopped server %v", srv.Addr)
+	log.Printf("stopped server gracefully %v", srv.Addr)
 	return nil
 }

@@ -1,4 +1,3 @@
 package repository
 
-type OrgRepository struct {
-}
+type OrgRepository struct{}
