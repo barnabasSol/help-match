@@ -21,6 +21,7 @@ dependencies:
   smooth_page_indicator: ^1.2.0+3
   fpdart: ^1.1.1
   google_fonts: ^6.2.1
+  dio: ^5.7.0
 
 dev_dependencies:
   flutter_test:
