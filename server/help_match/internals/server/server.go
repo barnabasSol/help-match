@@ -13,12 +13,11 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"hm.barney-host.site/internals/config"
-	"hm.barney-host.site/internals/handlers"
+	"hm.barney-host.site/internals/features/auth/handlers"
 )
 
 type AppServer struct {
-	authHandler   *handlers.Auth
-	staticHandler handlers.StaticHandler
+	authHandler *handlers.Auth
 }
 
 func New() *AppServer {

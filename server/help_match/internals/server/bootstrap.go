@@ -2,23 +2,21 @@ package server
 
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
-	"hm.barney-host.site/internals/handlers"
-	"hm.barney-host.site/internals/repository"
-	auth_services "hm.barney-host.site/internals/services/auth"
-	user_services "hm.barney-host.site/internals/services/users"
+	"hm.barney-host.site/internals/features/auth/handlers"
+	auth_service "hm.barney-host.site/internals/features/auth/service"
+	user_repository "hm.barney-host.site/internals/features/users/repository"
+	user_service "hm.barney-host.site/internals/features/users/service"
 )
 
 func (as *AppServer) bootStrapHandlers(pool *pgxpool.Pool) {
 	//repository
-	userRepository := repository.NewUserRepository(pool)
+	userRepository := user_repository.NewUserRepository(pool)
 
 	//services
-	userService := user_services.NewUsersService(userRepository)
+	userService := user_service.NewUserService(userRepository)
 	_ = userService
-	authService := auth_services.NewAuthService(userRepository)
+	authService := auth_service.NewAuthService(userRepository)
 
 	//handlers
-	as.staticHandler = handlers.NewStaticHandler()
 	as.authHandler = handlers.NewAuthHandler(authService)
-
 }
