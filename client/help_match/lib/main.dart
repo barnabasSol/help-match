@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:help_match/common/theme/colors.dart';
+import 'package:help_match/common/theme/cubit/theme_cubit.dart';
+import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(
+        create: (context) => ThemeCubit(),
+      ),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.red,
-        ),
-      ),
+    return BlocBuilder<ThemeCubit, ThemeMode>(
+      builder: (context, state) {
+        return MaterialApp(
+          title: 'ShareSpace',
+          debugShowCheckedModeBanner: false,
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: state,
+          home: const OnBoardingScreen(),
+        );
+      },
     );
   }
 }
