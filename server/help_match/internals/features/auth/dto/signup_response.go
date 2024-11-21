@@ -1,10 +1,12 @@
 package dto
 
 import (
-	"hm.barney-host.site/internals/features/users/dto"
+	org_dto "hm.barney-host.site/internals/features/organization/dto"
+	user_dto "hm.barney-host.site/internals/features/users/dto"
 )
 
 type SignupResponse struct {
-	User   dto.User `json:"user"`
-	Tokens Tokens   `json:"tokens"`
+	OrgResponse *org_dto.OrgResponse `json:"org,omitempty"`
+	User        user_dto.User        `json:"user"`
+	Tokens      Tokens               `json:"tokens"`
 }

@@ -13,7 +13,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"hm.barney-host.site/internals/config"
-	"hm.barney-host.site/internals/features/auth/handlers"
+	handlers "hm.barney-host.site/internals/features/auth/handler"
 )
 
 type AppServer struct {

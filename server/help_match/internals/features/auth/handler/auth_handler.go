@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"time"
@@ -34,7 +33,7 @@ func (ah *Auth) Login(
 
 	err := utils.ReadJSON(w, r, &loginDto)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
 		return
 	}
 
@@ -42,31 +41,21 @@ func (ah *Auth) Login(
 
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
-			http.Error(w, "request timed out", http.StatusRequestTimeout)
+			utils.CreateResponse(w, err, nil, http.StatusRequestTimeout, "")
 			return
 		}
 		if errors.Is(err, user_errors.ErrRecordNotFound) {
-			http.Error(w, err.Error(), http.StatusNotFound)
+			utils.CreateResponse(w, err, nil, http.StatusNotFound, "")
 			return
 		}
 		if errors.Is(err, auth_errors.ErrIncorrectUsernamePassword) {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
+			utils.CreateResponse(w, err, nil, http.StatusUnauthorized, "")
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
 		return
 	}
-
-	response := map[string]any{
-		"auth_result": tokenResult,
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "")
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "could not encode response", http.StatusInternalServerError)
-		return
-	}
+	utils.CreateResponse(w, nil, tokenResult, http.StatusOK, "successfuly logged in")
 }
 
 func (ah *Auth) SignUp(
@@ -81,28 +70,22 @@ func (ah *Auth) SignUp(
 	err := utils.ReadJSON(w, r, &signupDto)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
 		return
 	}
-
 	signupResponse, err := ah.authService.Signup(ctx, signupDto)
 
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
-			http.Error(w, "request timed out sadly", http.StatusRequestTimeout)
+			utils.CreateResponse(w, err, nil, http.StatusRequestTimeout, "")
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if errors.Is(err, context.Canceled) {
+			utils.CreateResponse(w, err, nil, http.StatusGone, "")
+			return
+		}
+		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
-	response := map[string]any{
-		"message":  "user created successfully",
-		"response": signupResponse,
-	}
-
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "could not encode response", http.StatusInternalServerError)
-		return
-	}
+	utils.CreateResponse(w, nil, signupResponse, http.StatusOK, "successfully created account")
 }

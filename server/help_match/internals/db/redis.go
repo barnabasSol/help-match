@@ -29,6 +29,7 @@ func InitRedis() (*redis.Client, error) {
 		Password:     redisPassword,
 		DB:           db,
 		PoolSize:     10,
+		MaxRetries:   3,
 		MinIdleConns: 5,
 		IdleTimeout:  30 * time.Second,
 	})
@@ -40,6 +41,5 @@ func InitRedis() (*redis.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to Redis: %w", err)
 	}
-
 	return rdb, nil
 }

@@ -18,7 +18,6 @@ func main() {
 		log.Printf("failed to init postgres: %v", err)
 		return
 	}
-
 	appServer := server.New()
 	if err := appServer.Serve(pgPool); err != nil {
 		log.Printf("failed to serve: %v", err)
