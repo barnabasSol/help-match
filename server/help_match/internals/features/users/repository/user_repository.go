@@ -30,17 +30,31 @@ func (ur *User) WithTransaction(ctx context.Context, fn func(pgx.Tx) error) erro
 	return utils.TransactionScope(ctx, ur.pgPool, fn)
 }
 func (ur *User) Insert(ctx context.Context, tx pgx.Tx, user *model.User) error {
-	query := `INSERT INTO users (name, username, email, password_hash, is_organization)
-             VALUES ($1, $2, $3, $4, $5)
-             RETURNING id, created_at, version, is_organization, activated`
-	args := []any{user.Name, user.Username, user.Email, user.PasswordHash, user.IsOrganization}
-	return tx.QueryRow(ctx, query, args...).Scan(
+	query := `INSERT INTO users (name, username, email, password_hash, user_role, interests)
+			  VALUES ($1, $2, $3, $4, $5, ARRAY[$6]::interest_type[])
+			  RETURNING id, created_at, version, user_role, activated`
+	args := []any{
+		user.Name,
+		user.Username,
+		user.Email,
+		user.PasswordHash,
+		user.Role,
+		user.Interests,
+	}
+
+	err := tx.QueryRow(ctx, query, args...).Scan(
 		&user.Id,
 		&user.CreatedAt,
 		&user.Version,
-		&user.IsOrganization,
+		&user.Role,
 		&user.IsActivated,
 	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (ur *User) Delete(ctx context.Context, user *model.User) error {
@@ -49,8 +63,9 @@ func (ur *User) Delete(ctx context.Context, user *model.User) error {
 
 func (ur *User) FindUserByUsername(ctx context.Context, username string) (*model.User, error) {
 	var userModel model.User
-	query := `SELECT id, name, username, created_at, activated, password_hash,
-			  email FROM users where username = $1`
+	query := `SELECT id, name, email, username, created_at, activated, password_hash
+			  FROM users where username = $1`
+
 	err := ur.pgPool.QueryRow(
 		ctx,
 		query,
@@ -58,11 +73,11 @@ func (ur *User) FindUserByUsername(ctx context.Context, username string) (*model
 	).Scan(
 		&userModel.Id,
 		&userModel.Name,
+		&userModel.Email,
 		&userModel.Username,
 		&userModel.CreatedAt,
 		&userModel.IsActivated,
 		&userModel.PasswordHash,
-		&userModel.Email,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

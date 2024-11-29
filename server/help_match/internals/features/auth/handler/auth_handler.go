@@ -36,9 +36,7 @@ func (ah *Auth) Login(
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
 		return
 	}
-
 	tokenResult, err := ah.authService.Login(ctx, loginDto)
-
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			utils.CreateResponse(w, err, nil, http.StatusRequestTimeout, "")
@@ -50,6 +48,10 @@ func (ah *Auth) Login(
 		}
 		if errors.Is(err, auth_errors.ErrIncorrectUsernamePassword) {
 			utils.CreateResponse(w, err, nil, http.StatusUnauthorized, "")
+			return
+		}
+		if errors.Is(err, auth_errors.ErrInvalidRole) {
+			utils.CreateResponse(w, err, nil, http.StatusBadRequest, "")
 			return
 		}
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")

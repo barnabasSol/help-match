@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"hm.barney-host.site/internals/config"
+	"hm.barney-host.site/internals/features/auth/dto"
 	"hm.barney-host.site/internals/features/users/model"
 )
 
@@ -16,9 +17,9 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
-func generateJWT(userModel *model.User, orgId string) (string, error) {
+func generateJWT(userModel model.User, orgId string) (string, error) {
 	var claims claims
-	if userModel.IsOrganization {
+	if userModel.Role == string(dto.Organization) {
 		claims.OrgId = orgId
 	}
 	claims.Username = userModel.Username

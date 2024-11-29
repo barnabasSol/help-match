@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/jackc/pgx/v5"
 	"hm.barney-host.site/internals/features/auth/dto"
@@ -46,7 +47,7 @@ func (as *Auth) Login(
 	var access_token string
 	var refresh_token string
 
-	if access_token, err = generateJWT(user, ""); err != nil {
+	if access_token, err = generateJWT(*user, ""); err != nil {
 		return nil, auth_errors.ErrFailedTokenGen
 	}
 
@@ -55,6 +56,10 @@ func (as *Auth) Login(
 	}
 
 	err = as.authRepo.InsertRefreshToken(ctx, nil, refresh_token, user)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
 	return &dto.Tokens{
 		AccessToken:  access_token,
 		RefreshToken: refresh_token,
@@ -66,18 +71,22 @@ func (as *Auth) Signup(
 	signupDto dto.Signup,
 ) (*dto.SignupResponse, error) {
 
+	if !signupDto.Role.IsValid() {
+		return nil, auth_errors.ErrInvalidRole
+	}
+
 	var ps password
 	err := ps.Set(signupDto.Password)
 	if err != nil {
 		return nil, err
 	}
 	userModel := model.User{
-		Username:       signupDto.Username,
-		ProfilePicUrl:  signupDto.ProfilePicUrl,
-		Name:           signupDto.Name,
-		Email:          signupDto.Email,
-		PasswordHash:   ps.hash,
-		IsOrganization: signupDto.IsOrganization,
+		Username:      signupDto.Username,
+		ProfilePicUrl: signupDto.ProfilePicUrl,
+		Name:          signupDto.Name,
+		Email:         signupDto.Email,
+		PasswordHash:  ps.hash,
+		Role:          string(signupDto.Role),
 	}
 	var orgModel org_model.Organization
 
@@ -90,7 +99,7 @@ func (as *Auth) Signup(
 			return err
 		}
 
-		if signupDto.IsOrganization {
+		if signupDto.Role == dto.Organization {
 			orgModel.Name = signupDto.OrgName
 			orgModel.UserId = userModel.Id
 			orgModel.Description = signupDto.Description
@@ -101,7 +110,7 @@ func (as *Auth) Signup(
 				return err
 			}
 		}
-		access_token, err = generateJWT(&userModel, orgModel.Id)
+		access_token, err = generateJWT(userModel, orgModel.Id)
 		if err != nil {
 			return auth_errors.ErrFailedTokenGen
 		}
@@ -121,7 +130,8 @@ func (as *Auth) Signup(
 		return nil, err
 	}
 	var signupResponse dto.SignupResponse
-	if !signupDto.IsOrganization {
+
+	if signupDto.Role != dto.Organization {
 		signupResponse.OrgResponse = nil
 	} else {
 		signupResponse.OrgResponse = &org_dto.OrgResponse{

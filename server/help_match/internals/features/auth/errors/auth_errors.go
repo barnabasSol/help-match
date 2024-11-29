@@ -7,4 +7,5 @@ var (
 	ErrFailedTokenGen            = errors.New("failed to generate token")
 	ErrTimeOut                   = errors.New("process took too long, try again")
 	ErrIncorrectUsernamePassword = errors.New("invalid username or password")
+	ErrInvalidRole               = errors.New("invalid role")
 )

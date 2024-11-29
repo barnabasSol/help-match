@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -46,10 +47,15 @@ func (ar *Auth) InsertRefreshToken(
 	INSERT INTO refresh_tokens (user_id, token, expires_at) 
 	VALUES($1, $2, $3)
 	`
-	args := []any{user.Id, token, time.Now().Add(time.Hour * 24 * 7)}
+	args := []any{
+		user.Id,
+		token,
+		time.Now().Add(time.Hour * 24 * 7),
+	}
 	if tx == nil {
 		_, err := ar.pgPool.Exec(ctx, cmd, args...)
 		if err != nil {
+			log.Println(err)
 			return err
 		}
 	} else {
