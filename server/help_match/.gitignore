@@ -1,5 +1,4 @@
 *.env
 docker-compose.yaml
-/migrations
 /public
 /.vscode
