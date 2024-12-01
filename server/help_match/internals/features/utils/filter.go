@@ -17,7 +17,7 @@ func (f Filter) Validate(v *Validator) {
 	v.Check(In(f.Sort, f.SortSafeList...), "sort", "invalid sort value")
 }
 
-func (f Filter) sortColumn() string {
+func (f Filter) SortColumn() string {
 	for _, safeValue := range f.SortSafeList {
 		if f.Sort == safeValue {
 			return strings.TrimPrefix(f.Sort, "-")
@@ -26,17 +26,17 @@ func (f Filter) sortColumn() string {
 	panic("unsafe sort parameter: " + f.Sort)
 }
 
-func (f Filter) sortDirection() string {
+func (f Filter) SortDirection() string {
 	if strings.HasPrefix(f.Sort, "-") {
 		return "DESC"
 	}
 	return "ASC"
 }
 
-func (f Filter) limit() int {
+func (f Filter) Limit() int {
 	return f.PageSize
 }
 
-func (f Filter) offset() int {
+func (f Filter) Offset() int {
 	return (f.Page - 1) * f.PageSize
 }

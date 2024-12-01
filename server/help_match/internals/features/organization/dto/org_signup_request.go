@@ -6,7 +6,6 @@ type OrgSignup struct {
 	Description string   `json:"description"`
 	Type        string   `json:"type"`
 	Location    Location `json:"location"`
-	UserId      string   `json:"user_id"`
 }
 
 type Location struct {

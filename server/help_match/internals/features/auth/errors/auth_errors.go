@@ -8,4 +8,5 @@ var (
 	ErrTimeOut                   = errors.New("process took too long, try again")
 	ErrIncorrectUsernamePassword = errors.New("invalid username or password")
 	ErrInvalidRole               = errors.New("invalid role")
+	ErrNotRequiredInput          = errors.New("unrequired extra input")
 )

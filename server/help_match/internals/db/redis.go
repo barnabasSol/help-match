@@ -11,9 +11,9 @@ import (
 )
 
 func InitRedis() (*redis.Client, error) {
-	redisAddr := config.GetConf("REDIS_ADDRESS")
-	redisPassword := config.GetConf("REDIS_PASSWORD")
-	redisDB := config.GetConf("REDIS_DB")
+	redisAddr := config.GetEnv("REDIS_ADDRESS")
+	redisPassword := config.GetEnv("REDIS_PASSWORD")
+	redisDB := config.GetEnv("REDIS_DB")
 
 	if redisAddr == "" {
 		return nil, fmt.Errorf("Redis address is missing")

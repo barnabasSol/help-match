@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"context"
@@ -71,8 +71,7 @@ func (ah *Auth) SignUp(
 
 	err := utils.ReadJSON(w, r, &signupDto)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
+		utils.CreateResponse(w, err, nil, http.StatusBadRequest, "")
 		return
 	}
 	signupResponse, err := ah.authService.Signup(ctx, signupDto)
@@ -80,6 +79,10 @@ func (ah *Auth) SignUp(
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			utils.CreateResponse(w, err, nil, http.StatusRequestTimeout, "")
+			return
+		}
+		if errors.Is(err, auth_errors.ErrNotRequiredInput) {
+			utils.CreateResponse(w, err, nil, http.StatusBadRequest, "")
 			return
 		}
 		if errors.Is(err, context.Canceled) {

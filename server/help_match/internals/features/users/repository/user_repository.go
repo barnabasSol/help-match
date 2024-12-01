@@ -61,7 +61,10 @@ func (ur *User) Delete(ctx context.Context, user *model.User) error {
 	panic("")
 }
 
-func (ur *User) FindUserByUsername(ctx context.Context, username string) (*model.User, error) {
+func (ur *User) FindUserByUsername(
+	ctx context.Context,
+	username string,
+) (*model.User, error) {
 	var userModel model.User
 	query := `SELECT id, name, email, username, created_at, activated, password_hash
 			  FROM users where username = $1`

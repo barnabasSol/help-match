@@ -11,10 +11,10 @@ import (
 )
 
 func InitPostgres() (*pgxpool.Pool, error) {
-	connectionString := config.GetConf("DATABASE_CONNECTION_STRING")
-	maxIdleConnectionsStr := config.GetConf("DATABASE_MAX_IDLE_CONNECTIONS")
-	maxOpenConnectionsStr := config.GetConf("DATABASE_MAX_OPEN_CONNECTIONS")
-	connectionMaxLifetimeStr := config.GetConf("DATABASE_CONNECTION_MAX_LIFETIME")
+	connectionString := config.GetEnv("DATABASE_CONNECTION_STRING")
+	maxIdleConnectionsStr := config.GetEnv("DATABASE_MAX_IDLE_CONNECTIONS")
+	maxOpenConnectionsStr := config.GetEnv("DATABASE_MAX_OPEN_CONNECTIONS")
+	connectionMaxLifetimeStr := config.GetEnv("DATABASE_CONNECTION_MAX_LIFETIME")
 
 	if connectionString == "" {
 		return nil, fmt.Errorf("database connection string is missing")

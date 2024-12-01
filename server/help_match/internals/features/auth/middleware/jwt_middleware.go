@@ -33,11 +33,11 @@ func checkAuth(r *http.Request) bool {
 	token, err := jwt.Parse(
 		tokenString,
 		func(token *jwt.Token) (any, error) {
-			return []byte(config.GetConf("SECRET_KEY")), nil
+			return []byte(config.GetEnv("SECRET_KEY")), nil
 		},
 		jwt.WithValidMethods([]string{"HS256"}),
-		jwt.WithAudience(config.GetConf("Aud")),
-		jwt.WithIssuer(config.GetConf("Iss")),
+		jwt.WithAudience(config.GetEnv("Aud")),
+		jwt.WithIssuer(config.GetEnv("Iss")),
 	)
 	switch {
 	case token.Valid:

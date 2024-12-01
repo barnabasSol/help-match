@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"log"
 
 	"github.com/jackc/pgx/v5"
 	"hm.barney-host.site/internals/features/auth/dto"
@@ -34,6 +33,10 @@ func (as *Auth) Login(
 	ctx context.Context,
 	loginDto dto.Login,
 ) (*dto.Tokens, error) {
+	err := loginDto.Validate()
+	if err != nil {
+		return nil, err
+	}
 	user, err := as.userRepo.FindUserByUsername(ctx, loginDto.Username)
 	if err != nil {
 		return nil, err
@@ -57,7 +60,6 @@ func (as *Auth) Login(
 
 	err = as.authRepo.InsertRefreshToken(ctx, nil, refresh_token, user)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &dto.Tokens{
@@ -70,23 +72,26 @@ func (as *Auth) Signup(
 	ctx context.Context,
 	signupDto dto.Signup,
 ) (*dto.SignupResponse, error) {
-
-	if !signupDto.Role.IsValid() {
-		return nil, auth_errors.ErrInvalidRole
+	err := signupDto.Validate()
+	if err != nil {
+		return nil, err
 	}
-
+	if signupDto.Role == dto.User {
+		if signupDto.OrgInfo != nil {
+			return nil, auth_errors.ErrNotRequiredInput
+		}
+	}
 	var ps password
-	err := ps.Set(signupDto.Password)
+	err = ps.Set(signupDto.Password)
 	if err != nil {
 		return nil, err
 	}
 	userModel := model.User{
-		Username:      signupDto.Username,
-		ProfilePicUrl: signupDto.ProfilePicUrl,
-		Name:          signupDto.Name,
-		Email:         signupDto.Email,
-		PasswordHash:  ps.hash,
-		Role:          string(signupDto.Role),
+		Username:     signupDto.Username,
+		Name:         signupDto.Name,
+		Email:        signupDto.Email,
+		PasswordHash: ps.hash,
+		Role:         string(signupDto.Role),
 	}
 	var orgModel org_model.Organization
 
@@ -100,13 +105,18 @@ func (as *Auth) Signup(
 		}
 
 		if signupDto.Role == dto.Organization {
-			orgModel.Name = signupDto.OrgName
+			orgModel.Name = signupDto.OrgInfo.OrgName
 			orgModel.UserId = userModel.Id
-			orgModel.Description = signupDto.Description
-			orgModel.Location = org_model.Location(signupDto.Location)
-			orgModel.Type = signupDto.Type
+			orgModel.Description = signupDto.OrgInfo.Description
+			orgModel.Location = org_model.Location(signupDto.OrgInfo.Location)
+			orgModel.Type = signupDto.OrgInfo.Type
 
-			if err := as.orgRepo.Insert(ctx, tx, &orgModel, userModel.Id); err != nil {
+			if err := as.orgRepo.Insert(
+				ctx,
+				tx,
+				&orgModel,
+				userModel.Id,
+			); err != nil {
 				return err
 			}
 		}
@@ -120,7 +130,12 @@ func (as *Auth) Signup(
 			return auth_errors.ErrFailedTokenGen
 		}
 
-		if err := as.authRepo.InsertRefreshToken(ctx, tx, refresh_token, &userModel); err != nil {
+		if err := as.authRepo.InsertRefreshToken(
+			ctx,
+			tx,
+			refresh_token,
+			&userModel,
+		); err != nil {
 			return err
 		}
 
@@ -129,6 +144,7 @@ func (as *Auth) Signup(
 	if err != nil {
 		return nil, err
 	}
+
 	var signupResponse dto.SignupResponse
 
 	if signupDto.Role != dto.Organization {
@@ -136,8 +152,9 @@ func (as *Auth) Signup(
 	} else {
 		signupResponse.OrgResponse = &org_dto.OrgResponse{
 			Name:        orgModel.Name,
-			Location:    signupDto.Location,
-			Description: signupDto.Description,
+			Location:    signupDto.OrgInfo.Location,
+			Description: signupDto.OrgInfo.Description,
+			Version:     orgModel.Version,
 		}
 	}
 	signupResponse.Tokens = dto.Tokens{

@@ -27,11 +27,11 @@ func generateJWT(userModel model.User, orgId string) (string, error) {
 		Subject:   userModel.Id,
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
-		Issuer:    config.GetConf("Iss"),
-		Audience:  jwt.ClaimStrings{config.GetConf("Aud")},
+		Issuer:    config.GetEnv("Iss"),
+		Audience:  jwt.ClaimStrings{config.GetEnv("Aud")},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(([]byte(config.GetConf("SECRET_KEY"))))
+	tokenString, err := token.SignedString(([]byte(config.GetEnv("SECRET_KEY"))))
 	if err != nil {
 		return "", err
 	}

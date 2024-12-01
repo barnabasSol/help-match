@@ -17,21 +17,30 @@ func CreateResponse(
 		Data    any    `json:"data"`
 	}
 	w.Header().Set("Content-Type", "application/json")
+
+	var res response
 	if err != nil {
-		res := response{
+		res = response{
 			Message: err.Error(),
+			Data:    nil,
+		}
+	} else {
+		res = response{
+			Message: message,
 			Data:    data,
 		}
-		r, _ := json.Marshal(res)
-		w.WriteHeader(status)
-		w.Write(r)
+	}
+
+	r, jsonErr := json.Marshal(res)
+	if jsonErr != nil {
+		http.Error(
+			w,
+			"Failed to marshal response",
+			http.StatusInternalServerError,
+		)
 		return
 	}
-	res := response{
-		Message: message,
-		Data:    data,
-	}
-	r, _ := json.Marshal(res)
+
 	w.WriteHeader(status)
 	w.Write(r)
 }

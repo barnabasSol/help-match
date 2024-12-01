@@ -13,11 +13,11 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"hm.barney-host.site/internals/config"
-	handlers "hm.barney-host.site/internals/features/auth/handler"
+	"hm.barney-host.site/internals/features/auth/handler"
 )
 
 type AppServer struct {
-	authHandler *handlers.Auth
+	authHandler *handler.Auth
 }
 
 func New() *AppServer {
@@ -26,7 +26,7 @@ func New() *AppServer {
 
 func (as *AppServer) Serve(pgPool *pgxpool.Pool) error {
 	as.bootStrapHandlers(pgPool)
-	port := config.GetConf("PORT")
+	port := config.GetEnv("PORT")
 	shutdownError := make(chan error)
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%v", port),
@@ -53,7 +53,8 @@ func (as *AppServer) Serve(pgPool *pgxpool.Pool) error {
 	}
 	err = <-shutdownError
 	if err != nil {
-		return err
+		log.Println(err.Error())
+		return errors.New("did not shutdown gracefully")
 	}
 	log.Printf("stopped server gracefully %v", srv.Addr)
 	return nil
