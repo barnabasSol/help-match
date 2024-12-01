@@ -25,7 +25,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: server/helpmatch
+          context: server/help_match
           push: true
           tags: barnabasdoc22/helpmatch-app:latest  
 
