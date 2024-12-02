@@ -1,0 +1,78 @@
+services:
+  helpmatch-app-1:
+    depends_on:
+      - db
+      - cache
+    image: barnabasdoc22/helpmatch-app:1.11
+    ports:
+      - 2000:2000
+    volumes:
+      - ./public:/app/public
+    networks:
+      - back-tier
+    restart: always
+  helpmatch-app-2:
+    depends_on:
+      - db
+      - cache
+    image: barnabasdoc22/helpmatch-app:1.11
+    ports:
+      - 2001:2000
+    volumes:
+      - ./public:/app/public
+    networks:
+      - back-tier
+    restart: always
+  helpmatch-app-3:
+    depends_on:
+      - db
+      - cache
+    image: barnabasdoc22/helpmatch-app:1.11
+    ports:
+      - 2002:2000
+    volumes:
+      - ./public:/app/public
+    networks:
+      - back-tier
+    restart: always
+
+  db:
+    image: postgres:16.4
+    environment:
+      DATABASE_URL: ${DATABASE_CONNECTION_STRING}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - back-tier
+    restart: always
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./migrations:/migrations   
+    command: [
+      "-path=/migrations",        
+      "-database=postgres://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}?sslmode=disable",
+      "up"
+    ]
+    depends_on:
+      - db
+    networks:
+      - back-tier                 
+    restart: on-failure
+  cache:
+    image: redis:7.4
+    command: redis-server --requirepass ${REDIS_PASSWORD} 
+    volumes:
+      - redis_data:/data
+    networks:
+      - back-tier 
+    restart: always
+volumes:
+  pg_data:
+  redis_data:
+
+networks:
+  back-tier:
