@@ -31,7 +31,7 @@ func (ur *User) WithTransaction(ctx context.Context, fn func(pgx.Tx) error) erro
 }
 func (ur *User) Insert(ctx context.Context, tx pgx.Tx, user *model.User) error {
 	query := `INSERT INTO users (name, username, email, password_hash, user_role, interests)
-			  VALUES ($1, $2, $3, $4, $5, ARRAY[$6]::interest_type[])
+			  VALUES ($1, $2, $3, $4, $5, $6::interest_type[])
 			  RETURNING id, created_at, version, user_role, activated`
 	args := []any{
 		user.Name,
@@ -53,7 +53,6 @@ func (ur *User) Insert(ctx context.Context, tx pgx.Tx, user *model.User) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 

@@ -53,7 +53,7 @@ services:
     volumes:
       - ./migrations:/migrations   
     command: [
-      "-path=/migrations",        
+      "-path=/migrations",
       "-database=postgres://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}?sslmode=disable",
       "up"
     ]

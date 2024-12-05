@@ -28,7 +28,7 @@ func (ah *Auth) Login(
 	_ httprouter.Params,
 ) {
 	var loginDto dto.Login
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 7*time.Second)
 	defer cancel()
 
 	err := utils.ReadJSON(w, r, &loginDto)
@@ -38,6 +38,10 @@ func (ah *Auth) Login(
 	}
 	tokenResult, err := ah.authService.Login(ctx, loginDto)
 	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			utils.CreateResponse(w, err, nil, http.StatusRequestTimeout, "")
+			return
+		}
 		if errors.Is(err, context.DeadlineExceeded) {
 			utils.CreateResponse(w, err, nil, http.StatusRequestTimeout, "")
 			return
@@ -46,12 +50,8 @@ func (ah *Auth) Login(
 			utils.CreateResponse(w, err, nil, http.StatusNotFound, "")
 			return
 		}
-		if errors.Is(err, auth_errors.ErrIncorrectUsernamePassword) {
-			utils.CreateResponse(w, err, nil, http.StatusUnauthorized, "")
-			return
-		}
-		if errors.Is(err, auth_errors.ErrInvalidRole) {
-			utils.CreateResponse(w, err, nil, http.StatusBadRequest, "")
+		if statusCode, ok := auth_errors.AuthErrors[err]; ok {
+			utils.CreateResponse(w, err, nil, statusCode, "")
 			return
 		}
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
@@ -77,16 +77,16 @@ func (ah *Auth) SignUp(
 	signupResponse, err := ah.authService.Signup(ctx, signupDto)
 
 	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			utils.CreateResponse(w, err, nil, http.StatusRequestTimeout, "")
+			return
+		}
 		if errors.Is(err, context.DeadlineExceeded) {
 			utils.CreateResponse(w, err, nil, http.StatusRequestTimeout, "")
 			return
 		}
-		if errors.Is(err, auth_errors.ErrNotRequiredInput) {
-			utils.CreateResponse(w, err, nil, http.StatusBadRequest, "")
-			return
-		}
-		if errors.Is(err, context.Canceled) {
-			utils.CreateResponse(w, err, nil, http.StatusGone, "")
+		if statusCode, ok := auth_errors.AuthErrors[err]; ok {
+			utils.CreateResponse(w, err, nil, statusCode, "")
 			return
 		}
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")

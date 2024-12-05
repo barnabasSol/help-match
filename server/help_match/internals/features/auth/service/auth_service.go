@@ -76,11 +76,6 @@ func (as *Auth) Signup(
 	if err != nil {
 		return nil, err
 	}
-	if signupDto.Role == dto.User {
-		if signupDto.OrgInfo != nil {
-			return nil, auth_errors.ErrNotRequiredInput
-		}
-	}
 	var ps password
 	err = ps.Set(signupDto.Password)
 	if err != nil {
@@ -90,6 +85,7 @@ func (as *Auth) Signup(
 		Username:     signupDto.Username,
 		Name:         signupDto.Name,
 		Email:        signupDto.Email,
+		Interests:    *signupDto.Interests,
 		PasswordHash: ps.hash,
 		Role:         string(signupDto.Role),
 	}
@@ -157,10 +153,12 @@ func (as *Auth) Signup(
 			Version:     orgModel.Version,
 		}
 	}
+
 	signupResponse.Tokens = dto.Tokens{
 		AccessToken:  access_token,
 		RefreshToken: refresh_token,
 	}
+
 	signupResponse.User = user_dto.User{
 		Name:          userModel.Name,
 		Username:      userModel.Username,
