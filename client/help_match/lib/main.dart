@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:help_match/common/theme/colors.dart';
-import 'package:help_match/common/theme/cubit/theme_cubit.dart';
+import 'package:help_match/core/theme/colors.dart';
+import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
 
 void main() {
