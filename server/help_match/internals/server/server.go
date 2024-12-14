@@ -13,11 +13,13 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"hm.barney-host.site/internals/config"
-	"hm.barney-host.site/internals/features/auth/handler"
+	auth_h "hm.barney-host.site/internals/features/auth/handler"
+	org_h "hm.barney-host.site/internals/features/organization/handler"
 )
 
 type AppServer struct {
-	authHandler *handler.Auth
+	authHandler *auth_h.Auth
+	orgHandler  *org_h.Organization
 }
 
 func New() *AppServer {
@@ -35,15 +37,8 @@ func (as *AppServer) Serve(pgPool *pgxpool.Pool) error {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
-	go func() {
-		quit := make(chan os.Signal, 1)
-		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-		s := <-quit
-		log.Printf("shutting down server %v", s.String())
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		shutdownError <- srv.Shutdown(ctx)
-	}()
+
+	go gracefulShutDown(shutdownError, srv)
 
 	log.Printf("starting server %v", srv.Addr)
 
@@ -58,4 +53,14 @@ func (as *AppServer) Serve(pgPool *pgxpool.Pool) error {
 	}
 	log.Printf("stopped server gracefully %v", srv.Addr)
 	return nil
+}
+
+func gracefulShutDown(shutdownError chan error, srv *http.Server) {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	s := <-quit
+	log.Printf("shutting down server %v", s.String())
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	shutdownError <- srv.Shutdown(ctx)
 }

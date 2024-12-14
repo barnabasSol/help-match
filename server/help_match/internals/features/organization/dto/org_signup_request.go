@@ -7,24 +7,19 @@ import (
 
 type OrgSignup struct {
 	OrgName     string   `json:"org_name"`
-	Password    string   `json:"password"`
 	Description string   `json:"description"`
 	Type        string   `json:"type"`
 	Location    Location `json:"location"`
 }
 
 type Location struct {
-	Latitude  float64
-	Longitude float64
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 func (o *OrgSignup) Validate() error {
 	if strings.TrimSpace(o.OrgName) == "" {
 		return errors.New("organization name cannot be empty")
-	}
-
-	if len(o.Password) < 8 {
-		return errors.New("password must be at least 8 characters long")
 	}
 
 	if len(o.Description) > 500 {

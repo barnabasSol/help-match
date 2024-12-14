@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash BYTEA NOT NULL,
     activated BOOLEAN DEFAULT FALSE,
-    user_role user_role_type NOT NULL DEFAULT 'user',  
-    interests interest_type[] NOT NULL DEFAULT '{}',
+    user_role user_role_type NOT NULL DEFAULT 'user',
+    interests interest_type [] DEFAULT '{}',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     version INTEGER NOT NULL DEFAULT 1,
     PRIMARY KEY (id)

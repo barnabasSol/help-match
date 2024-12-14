@@ -44,6 +44,9 @@ func (s *Signup) Validate() error {
 		if err := s.OrgInfo.Validate(); err != nil {
 			return auth_errors.ErrInvalidRole
 		}
+		if s.Interests != nil {
+			return auth_errors.ErrInvalidInutForThisRole
+		}
 	}
 
 	if s.Role == User {

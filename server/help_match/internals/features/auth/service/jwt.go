@@ -14,6 +14,7 @@ import (
 type claims struct {
 	Username string `json:"username"`
 	OrgId    string `json:"org_id,omitempty"`
+	Role     string `json:"role"`
 	jwt.RegisteredClaims
 }
 
@@ -22,6 +23,7 @@ func generateJWT(userModel model.User, orgId string) (string, error) {
 	if userModel.Role == string(dto.Organization) {
 		claims.OrgId = orgId
 	}
+	claims.Role = userModel.Role
 	claims.Username = userModel.Username
 	claims.RegisteredClaims = jwt.RegisteredClaims{
 		Subject:   userModel.Id,

@@ -85,9 +85,12 @@ func (as *Auth) Signup(
 		Username:     signupDto.Username,
 		Name:         signupDto.Name,
 		Email:        signupDto.Email,
-		Interests:    *signupDto.Interests,
 		PasswordHash: ps.hash,
 		Role:         string(signupDto.Role),
+	}
+
+	if signupDto.Role == dto.User {
+		userModel.Interests = *signupDto.Interests
 	}
 	var orgModel org_model.Organization
 
@@ -145,6 +148,7 @@ func (as *Auth) Signup(
 
 	if signupDto.Role != dto.Organization {
 		signupResponse.OrgResponse = nil
+		signupResponse.User.Interests = nil
 	} else {
 		signupResponse.OrgResponse = &org_dto.OrgResponse{
 			Name:        orgModel.Name,
@@ -163,6 +167,7 @@ func (as *Auth) Signup(
 		Name:          userModel.Name,
 		Username:      userModel.Username,
 		Email:         userModel.Email,
+		Interests:     (*user_dto.AllowedInterests)(signupDto.Interests),
 		CreatedAt:     userModel.CreatedAt,
 		ProfilePicUrl: userModel.ProfilePicUrl,
 		IsActivated:   userModel.IsActivated,

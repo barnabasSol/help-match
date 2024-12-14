@@ -14,8 +14,9 @@ CREATE TABLE organizations (
     id UUID NOT NULL DEFAULT uuid_generate_v1mc(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE, -- Each organization is a user
     organization_name VARCHAR(255) NOT NULL,
-    description TEXT,
-    location POINT, 
+    profile_icon TEXT DEFAULT '',
+    description TEXT DEFAULT '',
+    location POINT NOT NULL, 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_verified BOOLEAN DEFAULT FALSE,

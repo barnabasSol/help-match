@@ -18,6 +18,7 @@ var (
 	ErrPasswordRequired          = errors.New("password is required")
 	ErrOrgInfoRequiredForOrgRole = errors.New("org_info is required for organization role")
 	ErrOrgNameRequiredInOrgInfo  = errors.New("org_name is required in org_info")
+	ErrInvalidInutForThisRole    = errors.New("invalid input for this role")
 	ErrEmptyInterestsTopics      = errors.New("volunteer interests cannot be empty")
 )
 
