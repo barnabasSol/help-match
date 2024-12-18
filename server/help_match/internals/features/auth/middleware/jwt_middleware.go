@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"errors"
 	"log"
 	"net/http"
@@ -8,28 +9,36 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/julienschmidt/httprouter"
 	"hm.barney-host.site/internals/config"
+	"hm.barney-host.site/internals/features/utils"
 )
 
 func AuthMiddleware(next httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		authorized := checkAuth(r)
+		tokenString := r.Header.Get("Authorization")
+		if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
+			tokenString = tokenString[7:]
+		} else {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			log.Println("Invalid Authorization header format")
+			return
+		}
+		authorized := checkAuth(tokenString)
 		if !authorized {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-
+		claims, err := utils.ParseToken(tokenString)
+		if err != nil {
+			http.Error(w, "Maybe you gave some bullshit claims, you bad boy", http.StatusUnauthorized)
+			return
+		}
+		ctx := context.WithValue(r.Context(), "claimsKey", *claims)
+		r = r.WithContext(ctx)
 		next(w, r, ps)
 	}
 }
 
-func checkAuth(r *http.Request) bool {
-	tokenString := r.Header.Get("Authorization")
-	if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
-		tokenString = tokenString[7:]
-	} else {
-		log.Println("Invalid Authorization header format")
-		return false
-	}
+func checkAuth(tokenString string) bool {
 	token, err := jwt.Parse(
 		tokenString,
 		func(token *jwt.Token) (any, error) {

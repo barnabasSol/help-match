@@ -13,7 +13,7 @@ func CreateResponse(
 	message string,
 ) {
 	type response struct {
-		Message string `json:"message"`
+		Message string `json:"message,omitempty"`
 		Data    any    `json:"data"`
 	}
 	w.Header().Set("Content-Type", "application/json")

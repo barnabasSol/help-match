@@ -8,9 +8,9 @@ import (
 )
 
 type OrgResponse struct {
-	Id          string    `json:"org_id"`
+	Id          string    `json:"org_id,omitempty"`
 	Name        string    `json:"org_name"`
-	UserId      string    `json:"user_id"`
+	UserId      string    `json:"user_id,omitempty"`
 	ProfileIcon string    `json:"profile_icon"`
 	Description string    `json:"description"`
 	Location    Location  `json:"location"`

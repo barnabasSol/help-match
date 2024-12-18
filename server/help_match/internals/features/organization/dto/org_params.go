@@ -3,7 +3,7 @@ package dto
 import "hm.barney-host.site/internals/features/utils"
 
 type OrgParams struct {
-	utils.Filter
-	Title string   `json:"title"`
-	Type  []string `json:"type"`
+	Filters utils.Filter
+	OrgName string `json:"org_name"`
+	Type    string `json:"type"`
 }

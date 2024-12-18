@@ -65,7 +65,8 @@ func (ur *User) FindUserByUsername(
 	username string,
 ) (*model.User, error) {
 	var userModel model.User
-	query := `SELECT id, name, email, username, created_at, activated, password_hash, user_role
+	query := `SELECT id, name, email, username, created_at,
+   			  activated, password_hash, user_role
 			  FROM users where username = $1`
 
 	err := ur.pgPool.QueryRow(
