@@ -6,6 +6,7 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(AuthInitial()) {
-    on<AuthEvent>((event, emit) {});
+    on<AuthLoginPressed>((event, emit) {});
+    on<AuthSignupPressed>((event, emit) {});
   }
 }

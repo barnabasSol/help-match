@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class DioInterceptor extends Interceptor {
+class AppDioInterceptor extends Interceptor {
   final FlutterSecureStorage _secureStorage;
-  DioInterceptor(this._secureStorage);
+  AppDioInterceptor(this._secureStorage);
 
   @override
   void onRequest(

@@ -3,10 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 ThemeData lightTheme = ThemeData(
   useMaterial3: true,
-  colorScheme: ColorScheme.light(
-    primary: Colors.tealAccent[700] ?? Colors.tealAccent,
-    secondary: Colors.black,
-    tertiary: const Color.fromARGB(255, 114, 114, 114),
+  colorScheme: const ColorScheme.light(
+    primary: Color.fromARGB(255, 230, 112, 167),
+    secondary: Color.fromARGB(255, 231, 37, 128),
+    tertiary: Color.fromARGB(255, 66, 66, 66),
     onPrimary: Colors.black,
     onSecondary: Colors.white,
   ),
@@ -17,10 +17,10 @@ ThemeData lightTheme = ThemeData(
 
 ThemeData darkTheme = ThemeData(
   useMaterial3: true,
-  colorScheme: ColorScheme.dark(
-    primary: Colors.tealAccent[700] ?? Colors.tealAccent,
-    secondary: Colors.grey[850] ?? Colors.grey,
-    tertiary: Colors.grey[900],
+  colorScheme: const ColorScheme.dark(
+    primary: Color.fromARGB(255, 231, 37, 128),
+    secondary: Color(0xFFFF9A8B),
+    tertiary: Colors.white,
     onPrimary: Colors.white,
     onSecondary: Colors.black,
   ),

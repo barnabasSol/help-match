@@ -30,7 +30,7 @@ class PageContainer extends StatelessWidget {
             textAlign: TextAlign.center,
             titles[index],
             style: TextStyle(
-              fontSize: 35,
+              fontSize: 30,
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -42,10 +42,10 @@ class PageContainer extends StatelessWidget {
             child: Text(
               descriptions[index],
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.tertiary),
             ),
           ),
         ],

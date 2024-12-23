@@ -1,6 +1,6 @@
 List<String> lottieNames = ["hello", "secure", "sm"];
 List<String> titles = [
-  "Welcome to Help Match!",
+  "Welcome to HelpMatch!",
   "Discover Your Impact",
   "Connect and Collaborate",
 ];

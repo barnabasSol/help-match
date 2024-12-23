@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ThemeCubit extends Cubit<ThemeMode> {
-  ThemeCubit() : super(ThemeMode.light);
+  final FlutterSecureStorage secureStorage;
+  ThemeCubit(this.secureStorage) : super(ThemeMode.light);
 
-  void themeChange({bool isDark = false}) {
-    emit(isDark ? ThemeMode.dark : ThemeMode.light);
+  void themeChange() async {
+    final currentTheme = await secureStorage.read(key: "theme_mode");
+
+    if (currentTheme == "light") {
+      await secureStorage.write(key: "theme_mode", value: "dark");
+      emit(ThemeMode.dark);
+    } else {
+      await secureStorage.write(key: "theme_mode", value: "light");
+      emit(ThemeMode.light);
+    }
+  }
+
+  void loadTheme() async {
+    final themeMode = await secureStorage.read(key: "theme_mode");
+    if (themeMode == null || themeMode == "light") {
+      emit(ThemeMode.light);
+    } else {
+      emit(ThemeMode.dark);
+    }
   }
 }
