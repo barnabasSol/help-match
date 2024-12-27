@@ -15,9 +15,11 @@ import (
 	"hm.barney-host.site/internals/config"
 	auth_h "hm.barney-host.site/internals/features/auth/handler"
 	org_h "hm.barney-host.site/internals/features/organization/handler"
+	"hm.barney-host.site/internals/server/ws"
 )
 
 type AppServer struct {
+	wsManager   *ws.Manager
 	authHandler *auth_h.Auth
 	orgHandler  *org_h.Organization
 }
@@ -26,8 +28,9 @@ func New() *AppServer {
 	return &AppServer{}
 }
 
-func (as *AppServer) Serve(pgPool *pgxpool.Pool) error {
-	as.bootStrapHandlers(pgPool)
+func (as *AppServer) Serve(pgPool *pgxpool.Pool, ws *ws.Manager) error {
+	as.wsManager = ws
+	as.bootstrapHandlers(pgPool)
 	port := config.GetEnv("PORT")
 	shutdownError := make(chan error)
 	srv := &http.Server{

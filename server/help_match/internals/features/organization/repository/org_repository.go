@@ -239,6 +239,7 @@ func (o *Organization) GetRecommendedOrgs(
 	orgParams dto.OrgParams,
 ) ([]*dto.OrgListResponse, utils.Metadata, error) {
 	var orgList []*dto.OrgListResponse
+
 	query := fmt.Sprintf(
 		`SELECT count(*) OVER() as total_count, id, user_id, organization_name,
 		 profile_icon, description, created_at, is_verified,

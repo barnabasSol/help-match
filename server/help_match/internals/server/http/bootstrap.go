@@ -11,7 +11,7 @@ import (
 	user_r "hm.barney-host.site/internals/features/users/repository"
 )
 
-func (as *AppServer) bootStrapHandlers(pool *pgxpool.Pool) {
+func (as *AppServer) bootstrapHandlers(pool *pgxpool.Pool) {
 	//repository
 	userRepo := user_r.NewUserRepository(pool)
 	authRepo := auth_r.NewAuthRepository(pool)
@@ -19,7 +19,7 @@ func (as *AppServer) bootStrapHandlers(pool *pgxpool.Pool) {
 
 	//services
 	// userService := user_service.NewUserService(userRepo)
-	authService := auth_s.NewAuthService(userRepo, authRepo, orgRepo)
+	authService := auth_s.NewAuthService(userRepo, authRepo, orgRepo, as.wsManager)
 	orgService := org_s.NewOrgService(orgRepo)
 
 	//handlers

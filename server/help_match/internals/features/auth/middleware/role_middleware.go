@@ -7,7 +7,7 @@ import (
 	"hm.barney-host.site/internals/features/utils"
 )
 
-func RequreRole(role string, next httprouter.Handle) httprouter.Handle {
+func RequireRole(role string, next httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		userClaims := r.Context().Value("claimsKey").(utils.Claims)
 		if userClaims.Role != role {

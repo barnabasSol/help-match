@@ -27,7 +27,7 @@ func AuthMiddleware(next httprouter.Handle) httprouter.Handle {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		claims, err := utils.ParseToken(tokenString)
+		claims, err := utils.ParseTokenClaims(tokenString)
 		if err != nil {
 			http.Error(w, "Maybe you gave some bullshit claims, you bad boy", http.StatusUnauthorized)
 			return

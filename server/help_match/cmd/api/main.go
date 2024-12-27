@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/joho/godotenv"
 	"hm.barney-host.site/internals/db"
-	"hm.barney-host.site/internals/server"
+	server "hm.barney-host.site/internals/server/http"
+	"hm.barney-host.site/internals/server/ws"
 )
 
 func main() {
@@ -18,9 +20,13 @@ func main() {
 		log.Printf("failed to init postgres: %v", err)
 		return
 	}
+
+	wsManager := ws.NewManager(context.Background())
+
 	appServer := server.New()
-	if err := appServer.Serve(pgPool); err != nil {
+	if err := appServer.Serve(pgPool, wsManager); err != nil {
 		log.Printf("failed to serve: %v", err)
 		return
 	}
+
 }

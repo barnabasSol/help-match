@@ -19,7 +19,9 @@ type Auth struct {
 }
 
 func NewAuthHandler(authService *service.Auth) *Auth {
-	return &Auth{authService}
+	return &Auth{
+		authService: authService,
+	}
 }
 
 func (ah *Auth) Login(

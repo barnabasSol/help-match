@@ -14,7 +14,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-func ParseToken(tokenString string) (*Claims, error) {
+func ParseTokenClaims(tokenString string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(t *jwt.Token) (any, error) {
 		return []byte(config.GetEnv("SECRET_KEY")), nil
 	})

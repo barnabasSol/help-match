@@ -89,7 +89,7 @@ func (as *Auth) Signup(
 	}
 
 	var signupResponse dto.SignupResponse
-
+	signupResponse.OTP = as.wsManager.Otps.NewOTP().Key
 	if signupDto.Role != dto.Organization {
 		signupResponse.OrgResponse = nil
 		signupResponse.User.Interests = nil
