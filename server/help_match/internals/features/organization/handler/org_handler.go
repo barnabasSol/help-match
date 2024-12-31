@@ -15,10 +15,10 @@ import (
 const timeout = 7 * time.Second
 
 type Organization struct {
-	os *service.OrgService
+	os *service.Organization
 }
 
-func NewOrgHandler(os *service.OrgService) *Organization {
+func NewOrgHandler(os *service.Organization) *Organization {
 	return &Organization{os}
 }
 

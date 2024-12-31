@@ -7,25 +7,46 @@ part 'user_auth_state.dart';
 
 class UserAuthCubit extends Cubit<UserAuthState> {
   final FlutterSecureStorage secureStorage;
+
   UserAuthCubit({required this.secureStorage}) : super(UserAuthInitial());
 
+  Future<void> kickOut() async {
+    try {
+      await secureStorage.delete(key: 'access_token');
+      await secureStorage.delete(key: 'refresh_token');
+      emit(UserAuthInitial());
+    } catch (e) {
+      emit(UserAuthError('An error occurred during logout: ${e.toString()}'));
+    }
+  }
+
   Future<void> isUserAuthenticated() async {
+    emit(UserAuthChecking());
     try {
       final accessToken = await secureStorage.read(key: 'access_token');
       if (accessToken == null || accessToken.isEmpty) {
-        return emit(UserAuthInitial());
+        emit(UserAuthInitial());
+        return;
       }
 
-      // Ensure CurrentUser.fromToken handles null or invalid tokens gracefully
       final CurrentUser user = CurrentUser.fromToken(accessToken);
       if (user.isExpired()) {
-        return emit(UserAuthInitial());
+        emit(UserAuthInitial());
+        return;
       }
 
-      return emit(UserAuthIsLoggedIn(user));
+      emit(UserAuthIsLoggedIn(user));
     } catch (e) {
-      // Handle any unexpected errors
-      emit(UserAuthError('An error occurred: ${e.toString()}'));
+      emit(UserAuthError(
+        'An error occurred during authentication: ${e.toString()}',
+      ));
     }
+  }
+
+  CurrentUser? get currentUser {
+    if (state is UserAuthIsLoggedIn) {
+      return (state as UserAuthIsLoggedIn).currentUser;
+    }
+    return null;
   }
 }

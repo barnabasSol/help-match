@@ -8,22 +8,22 @@ import (
 	"hm.barney-host.site/internals/features/organization/repository"
 )
 
-type OrgService struct {
+type Organization struct {
 	orgRepo repository.OrgRepository
 }
 
-func NewOrgService(orgRepo repository.OrgRepository) *OrgService {
-	return &OrgService{orgRepo}
+func NewOrgService(orgRepo repository.OrgRepository) *Organization {
+	return &Organization{orgRepo}
 }
 
-func (os *OrgService) GetOrganization(
+func (os *Organization) GetOrganization(
 	ctx context.Context,
 	orgId string,
 ) (*dto.OrgResponseExtras, error) {
-	var orgResponse dto.OrgResponseExtras
-	orgResponse.Id = orgId
+	var org dto.OrgResponseExtras
+	org.Id = orgId
 	err := os.orgRepo.WithTransaction(ctx, func(tx pgx.Tx) error {
-		err := os.orgRepo.GetOrganization(ctx, nil, &orgResponse)
+		err := os.orgRepo.GetOrganization(ctx, tx, &org)
 		if err != nil {
 			return err
 		}
@@ -32,5 +32,5 @@ func (os *OrgService) GetOrganization(
 	if err != nil {
 		return nil, err
 	}
-	return &orgResponse, nil
+	return &org, nil
 }

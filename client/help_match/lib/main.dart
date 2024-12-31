@@ -16,16 +16,20 @@ void main() async {
     ),
   );
 
+  final userAuthCubit = UserAuthCubit(secureStorage: secureStorage);
   final dio = Dio();
-  dio.interceptors.add(AppDioInterceptor(secureStorage));
+  dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
 
+  final themeModeString = await secureStorage.read(key: "theme_mode");
+  final initialThemeMode =
+      (themeModeString == "dark") ? ThemeMode.dark : ThemeMode.light;
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(
-        create: (_) => ThemeCubit(secureStorage),
+        create: (_) => ThemeCubit(secureStorage)..emit(initialThemeMode),
       ),
       BlocProvider(
-        create: (_) => UserAuthCubit(secureStorage: secureStorage),
+        create: (_) => userAuthCubit,
       ),
     ],
     child: const MyApp(),
@@ -43,7 +47,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     context.read<UserAuthCubit>().isUserAuthenticated();
-    context.read<ThemeCubit>().loadTheme();
     super.initState();
   }
 
@@ -59,11 +62,41 @@ class _MyAppState extends State<MyApp> {
           themeMode: state,
           home: BlocBuilder<UserAuthCubit, UserAuthState>(
             builder: (context, state) {
-              if (state is UserAuthIsLoggedIn) {
-                return const Scaffold();
+              if (state is UserAuthChecking) {
+                return Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary, // Use the theme's primary color
+                      backgroundColor:
+                          Theme.of(context).scaffoldBackgroundColor,
+                    ),
+                  ),
+                );
+              } else if (state is UserAuthIsLoggedIn) {
+                final currentUser = context.read<UserAuthCubit>().currentUser;
+                if (currentUser != null) {
+                  // print('Logged in as: ${currentUser.username}');
+                }
+                return const Scaffold(
+                  body: Center(
+                      child: Text('Welcome to the App!')), // Example content
+                );
               } else if (state is UserAuthInitial) {
                 return const OnBoardingScreen();
+              } else if (state is UserAuthError) {
+                // Handle error state
+                return Scaffold(
+                  body: Center(
+                    child: Text(
+                      'An error occurred. Please try again. ${state.message}',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                );
               } else {
+                // Fallback for any unexpected states
                 return const OnBoardingScreen();
               }
             },

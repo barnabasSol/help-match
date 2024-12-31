@@ -14,3 +14,5 @@ class UserAuthError extends UserAuthState {
   final String message;
   UserAuthError(this.message);
 }
+
+class UserAuthChecking extends UserAuthState {}

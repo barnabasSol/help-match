@@ -19,6 +19,8 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
+var jwtExpires = time.Now().Add(30 * time.Minute)
+
 func generateJWT(userModel user_model.User, org *org_model.Organization) (string, error) {
 	var claims claims
 	if userModel.Role == string(dto.Organization) {
@@ -28,7 +30,7 @@ func generateJWT(userModel user_model.User, org *org_model.Organization) (string
 	claims.Username = userModel.Username
 	claims.RegisteredClaims = jwt.RegisteredClaims{
 		Subject:   userModel.Id,
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * time.Minute)),
+		ExpiresAt: jwt.NewNumericDate(jwtExpires),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		Issuer:    config.GetEnv("Iss"),
 		Audience:  jwt.ClaimStrings{config.GetEnv("Aud")},
@@ -47,6 +49,6 @@ func generateRefreshToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	refresToken := base64.URLEncoding.EncodeToString(tokenBytes)
-	return refresToken, nil
+	refreshToken := base64.URLEncoding.EncodeToString(tokenBytes)
+	return refreshToken, nil
 }

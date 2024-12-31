@@ -8,7 +8,7 @@ import (
 	"hm.barney-host.site/internals/features/utils"
 )
 
-func (os *OrgService) GetRecommendedOrgs(
+func (os *Organization) GetRecommendedOrgs(
 	ctx context.Context,
 	userId string,
 	userLocation dto.Location,

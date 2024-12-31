@@ -8,7 +8,7 @@ import (
 	"hm.barney-host.site/internals/features/utils"
 )
 
-func (os *OrgService) GetOrganizations(
+func (os *Organization) GetOrganizations(
 	ctx context.Context,
 	orgParams dto.OrgParams,
 	userId string,

@@ -20,6 +20,8 @@ var (
 	ErrOrgNameRequiredInOrgInfo  = errors.New("org_name is required in org_info")
 	ErrInvalidInutForThisRole    = errors.New("invalid input for this role")
 	ErrEmptyInterestsTopics      = errors.New("volunteer interests cannot be empty")
+	ErrExpiredRefreshToken       = errors.New("sadly your refresh token has expired")
+	ErrInvalidRefreshTokenOwner  = errors.New("this token does not belong to you")
 )
 
 var AuthErrors = map[error]int{
@@ -36,4 +38,6 @@ var AuthErrors = map[error]int{
 	ErrOrgInfoRequiredForOrgRole: http.StatusBadRequest,
 	ErrOrgNameRequiredInOrgInfo:  http.StatusBadRequest,
 	ErrEmptyInterestsTopics:      http.StatusBadRequest,
+	ErrExpiredRefreshToken:       http.StatusUnauthorized,
+	ErrInvalidRefreshTokenOwner:  http.StatusUnauthorized,
 }
