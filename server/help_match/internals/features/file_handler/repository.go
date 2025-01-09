@@ -7,8 +7,8 @@ import (
 )
 
 type FileHandlerRepository interface {
-	Profile(ctx context.Context, filePath string)
-	Post(ctx context.Context, filePath string)
+	UpdateProfile(ctx context.Context, filePath, userId string) error
+	InsertPost(ctx context.Context, filePath, orgId string) error
 }
 
 type FileHandler struct {
@@ -19,9 +19,18 @@ func NewFileHandlerRepository(pool *pgxpool.Pool) *FileHandler {
 	return &FileHandler{pool}
 }
 
-func Profile(ctx context.Context, filePath string) {
-
+func (f *FileHandler) UpdateProfile(ctx context.Context, path, userId string) error {
+	query := `UPDATE users SET profile_pic_url = $1 WHERE id = $2`
+	_, err := f.pool.Exec(ctx, query, path, userId)
+	return err
 }
 
-func Post(ctx context.Context, filePath string) {
+func (f *FileHandler) InsertPost(ctx context.Context, path, orgId string) error {
+	query := `
+		UPDATE organizations
+		SET image_posts = ARRAY_APPEND(image_posts, $1)
+		WHERE id = $2;
+		`
+	_, err := f.pool.Exec(ctx, query, path, orgId)
+	return err
 }

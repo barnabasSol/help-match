@@ -26,7 +26,6 @@ func (e *EventRepository) SendMessageHandler(event Event, c *Client) error {
 	if err := json.Unmarshal(event.Payload, &sendEvent); err != nil {
 		return fmt.Errorf("bad/invalid payload in request: %v", err)
 	}
-
 	on, err := e.ChatRepository.InsertMessage(
 		context.Background(),
 		sendEvent.FromId,
@@ -64,6 +63,7 @@ func (e *EventRepository) SendMessageHandler(event Event, c *Client) error {
 	}
 	return nil
 }
+
 func (e *EventRepository) NotifyOnlineStatusChange(ev Event, c *Client) error {
 	var statusEventPayload []byte
 	var err error
@@ -95,6 +95,8 @@ func (e *EventRepository) NotifyOnlineStatusChange(ev Event, c *Client) error {
 		}:
 			log.Println("is being notified")
 		default:
+			log.Println("Failed to notify client - channel full or closed", client.username)
+
 		}
 	}
 	return nil

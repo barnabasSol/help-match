@@ -12,6 +12,7 @@ func (as *AppServer) routes() http.Handler {
 	router := httprouter.New()
 	router.GET("/v1/health", healthCheck)
 	router.GET("/v1/public/*filepath", mw.AuthMiddleware(newStaticHandler().ServeStatic))
+	router.POST("/v1/upload", mw.AuthMiddleware(as.FileUploadHandler.Upload))
 	router.GET("/v1/ws", mw.AuthMiddleware(as.wsManager.ServeWS))
 	router.GET("/v1/otp", mw.AuthMiddleware(as.wsManager.RenewOTP))
 	router.POST("/v1/auth/login", as.authHandler.Login)

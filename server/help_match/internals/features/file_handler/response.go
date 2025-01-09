@@ -1,5 +1,5 @@
 package filehandler
 
-type ProfileResponse struct {
+type Response struct {
 	ImgUrl string `json:"img_url"`
 }
