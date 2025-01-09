@@ -11,6 +11,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/julienschmidt/httprouter"
+	"hm.barney-host.site/internals/features/utils"
 )
 
 var (
@@ -25,9 +26,10 @@ var (
 
 type Manager struct {
 	sync.RWMutex
-	Clients  ClientList
-	Handlers map[string]EventHandler
-	Otps     RetentionMap
+	Clients         ClientList
+	Handlers        map[string]EventHandler
+	Otps            RetentionMap
+	EventRepository EventRepository
 }
 
 func NewManager(ctx context.Context) *Manager {
@@ -65,17 +67,29 @@ func (m *Manager) ServeWS(
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+	log.Println("new connection")
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
+		http.Error(w, "Some bullshit happened when serving ws", http.StatusInternalServerError)
 		return
 	}
-	newClient := NewClient(conn, m)
-	m.addClient(newClient)
 
+	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
+
+	roomIds, err := m.EventRepository.ChatRepository.GetRoomIdsOfUserById(r.Context(), claims.Subject)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Some bullshit happened when serving ws", http.StatusInternalServerError)
+		return
+	}
+
+	newClient := NewClient(conn, m, roomIds, claims.Subject, claims.Username)
+	m.addClient(newClient)
 	go newClient.readMessages()
 	go newClient.writeMessages()
-
+	go m.EventRepository.NotifyOnlineStatusChange(Event{}, newClient)
+	go m.EventRepository.ChatRepository.UpdateOnlineStatus(r.Context(), claims.Subject, true)
 }
 
 func (m *Manager) RenewOTP(
@@ -95,7 +109,6 @@ func (m *Manager) RenewOTP(
 		log.Println(err)
 		return
 	}
-	// Return a response to the Authenticated user with the OTP
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
 }
@@ -113,9 +126,4 @@ func (m *Manager) removeClient(client *Client) {
 		client.connection.Close()
 		delete(m.Clients, client)
 	}
-}
-
-func (m *Manager) setupEventHandlers() {
-	// m.handlers[EventSendMessage] = SendMessageHandler
-	// m.handlers[EventChangeRoom] = ChatRoomHandler
 }

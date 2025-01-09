@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash BYTEA NOT NULL,
     activated BOOLEAN DEFAULT FALSE,
+    is_online BOOLEAN DEFAULT TRUE,
     user_role user_role_type NOT NULL DEFAULT 'user',
     interests interest_type [] DEFAULT '{}',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

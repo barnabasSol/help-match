@@ -66,10 +66,16 @@ func (oh *Organization) GetOrganizations(
 	v := utils.NewValidator()
 	queryParams.Filters.Validate(v)
 	if len(v.Errors) > 0 {
-		utils.CreateResponse(w, errors.New("some bad query params you're giving me"), nil, http.StatusBadRequest, "")
+		utils.CreateResponse(
+			w,
+			errors.New("some bad query params you're giving me"),
+			nil,
+			http.StatusBadRequest,
+			"",
+		)
 		return
 	}
-	claims := r.Context().Value("claimsKey").(utils.Claims)
+	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
 
 	type response struct {
 		Result   []*dto.OrgListResponse `json:"result"`

@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"time"
@@ -9,12 +10,13 @@ import (
 )
 
 type ClientList map[*Client]bool
-
 type Client struct {
 	connection *websocket.Conn
 	manager    *Manager
+	userId     string
+	username   string
 	egress     chan Event
-	chatroom   string
+	roomIds    []string
 }
 
 var (
@@ -22,16 +24,27 @@ var (
 	pingInterval = (pongWait * 9) / 10
 )
 
-func NewClient(conn *websocket.Conn, manager *Manager) *Client {
+func NewClient(
+	conn *websocket.Conn,
+	manager *Manager,
+	roomIds []string,
+	userId string,
+	username string,
+) *Client {
 	return &Client{
 		connection: conn,
 		manager:    manager,
 		egress:     make(chan Event),
+		roomIds:    roomIds,
 	}
 }
 
 func (c *Client) readMessages() {
-	defer c.manager.removeClient(c)
+	defer func() {
+		c.manager.removeClient(c)
+		c.manager.EventRepository.NotifyOnlineStatusChange(Event{}, c)
+		c.manager.EventRepository.ChatRepository.UpdateOnlineStatus(context.Background(), c.userId, false)
+	}()
 	c.connection.SetReadLimit(512)
 	if err := c.connection.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 		log.Println(err)
@@ -68,6 +81,8 @@ func (c *Client) writeMessages() {
 	defer func() {
 		ticker.Stop()
 		c.manager.removeClient(c)
+		c.manager.EventRepository.NotifyOnlineStatusChange(Event{}, c)
+		c.manager.EventRepository.ChatRepository.UpdateOnlineStatus(context.Background(), c.userId, false)
 	}()
 	for {
 		select {

@@ -14,6 +14,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"hm.barney-host.site/internals/config"
 	auth_h "hm.barney-host.site/internals/features/auth/handler"
+	chat_h "hm.barney-host.site/internals/features/chat/handler"
 	org_h "hm.barney-host.site/internals/features/organization/handler"
 	"hm.barney-host.site/internals/server/ws"
 )
@@ -22,6 +23,7 @@ type AppServer struct {
 	wsManager   *ws.Manager
 	authHandler *auth_h.Auth
 	orgHandler  *org_h.Organization
+	chatHandler *chat_h.Chat
 }
 
 func New() *AppServer {

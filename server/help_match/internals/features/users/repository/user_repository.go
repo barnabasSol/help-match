@@ -16,6 +16,7 @@ type UserRepository interface {
 	WithTransaction(ctx context.Context, fn func(pgx.Tx) error) error
 	Insert(ctx context.Context, tx pgx.Tx, user *model.User) error
 	FindUserByUsername(ctx context.Context, username string) (*model.User, error)
+	FindUserById(ctx context.Context, userId string) (*model.User, error)
 }
 
 type User struct {
@@ -82,6 +83,40 @@ func (ur *User) FindUserByUsername(
 		&userModel.IsActivated,
 		&userModel.PasswordHash,
 		&userModel.Role,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, user_errors.ErrRecordNotFound
+		} else {
+			return nil, err
+		}
+	}
+	return &userModel, nil
+}
+
+func (ur *User) FindUserById(
+	ctx context.Context,
+	userId string,
+) (*model.User, error) {
+	var userModel model.User
+	query := `SELECT id, name, email, username, created_at,
+   			  activated, password_hash, user_role, version
+			  FROM users where id = $1`
+
+	err := ur.pgPool.QueryRow(
+		ctx,
+		query,
+		userId,
+	).Scan(
+		&userModel.Id,
+		&userModel.Name,
+		&userModel.Email,
+		&userModel.Username,
+		&userModel.CreatedAt,
+		&userModel.IsActivated,
+		&userModel.PasswordHash,
+		&userModel.Role,
+		&userModel.Version,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

@@ -50,6 +50,7 @@ func (rm RetentionMap) Retention(
 		select {
 		case <-ticker.C:
 			for _, otp := range rm {
+				fmt.Println(len(rm))
 				fmt.Println(otp)
 				if otp.Created.Add(retentionPeriod).Before(time.Now()) {
 					delete(rm, otp.Key)

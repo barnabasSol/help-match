@@ -17,7 +17,7 @@ type OrgRepository interface {
 	WithTransaction(ctx context.Context, fn func(pgx.Tx) error) error
 	Insert(ctx context.Context, tx pgx.Tx, orgModel *model.Organization, userId string) error
 	GetOrganizationByOwnerId(ctx context.Context, tx pgx.Tx, userId string) (*model.Organization, error)
-	GetOrganization(ctx context.Context, tx pgx.Tx, orgResponse *dto.OrgResponseExtras) error
+	GetOrganization(ctx context.Context, orgId string) (*model.Organization, error)
 	GetRecommendedOrgs(
 		ctx context.Context,
 		userId string,
@@ -82,49 +82,44 @@ func (or *Organization) Insert(
 
 func (or *Organization) GetOrganization(
 	ctx context.Context,
-	tx pgx.Tx,
-	orgResponse *dto.OrgResponseExtras,
-) error {
+	orgId string,
+) (*model.Organization, error) {
 	query := `
-		SELECT organizations.id, user_id, organization_name, profile_icon, 
-	    description, location, organizations.created_at, 
-	    is_verified, organizations.version, org_type 
+		SELECT id, user_id, organization_name, profile_icon, 
+	    description, location, created_at, 
+	    is_verified, version, org_type 
 		FROM organizations 
-		JOIN users ON users.id = organizations.user_id 
-		WHERE organizations.id = $1
+		WHERE id = $1
 	`
 
-	var row pgx.Row
-	if tx != nil {
-		row = tx.QueryRow(ctx, query, orgResponse.Id)
-	} else if or.pgPool != nil {
-		row = or.pgPool.QueryRow(ctx, query, orgResponse.Id)
-	} else {
-		return fmt.Errorf("whattttttttttttttt")
-	}
+	row := or.pgPool.QueryRow(ctx, query, orgId)
 
+	var org model.Organization
 	var location pgtype.Point
+
 	err := row.Scan(
-		&orgResponse.Id,
-		&orgResponse.UserId,
-		&orgResponse.Name,
-		&orgResponse.ProfileIcon,
-		&orgResponse.Description,
+		&org.Id,
+		&org.UserId,
+		&org.Name,
+		&org.ProfileIcon,
+		&org.Description,
 		&location,
-		&orgResponse.CreatedAt,
-		&orgResponse.IsVerified,
-		&orgResponse.Version,
-		&orgResponse.Type,
+		&org.CreatedAt,
+		&org.IsVerified,
+		&org.Version,
+		&org.Type,
 	)
 
-	orgResponse.Location.Latitude = location.P.X
-	orgResponse.Location.Longitude = location.P.Y
-
 	if err != nil {
-		return fmt.Errorf("yeahhh it failed to fetch: %w", err)
+		return nil, fmt.Errorf("failed to fetch organization: %w", err)
 	}
 
-	return nil
+	org.Location = model.Location{
+		Latitude:  location.P.X,
+		Longitude: location.P.Y,
+	}
+
+	return &org, nil
 }
 
 func (o *Organization) GetOrganizations(
@@ -154,6 +149,7 @@ func (o *Organization) GetOrganizations(
 	}
 
 	rows, err := o.pgPool.Query(ctx, query, args...)
+	defer rows.Close()
 	if err != nil {
 		return nil, utils.Metadata{}, err
 	}
@@ -175,14 +171,14 @@ func (o *Organization) GetOrganizations(
 			&orgModel.Version,
 			&location,
 		)
+		if err != nil {
+			return nil, utils.Metadata{}, err
+		}
 		user_location := geo.NewPoint(userLocation.Latitude, userLocation.Longitude)
 		org_location := geo.NewPoint(location.P.X, location.P.Y)
 
 		orgModel.Proximity = user_location.GreatCircleDistance(org_location)
 		orgList = append(orgList, &orgModel)
-		if err != nil {
-			return nil, utils.Metadata{}, err
-		}
 	}
 	metadata := utils.CalculateMetadata(
 		totalRecords,

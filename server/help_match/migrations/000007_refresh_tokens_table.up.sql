@@ -3,5 +3,6 @@ CREATE TABLE refresh_tokens (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     token TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    version INTEGER NOT NULL DEFAULT 1
 );

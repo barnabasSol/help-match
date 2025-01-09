@@ -32,7 +32,7 @@ func AuthMiddleware(next httprouter.Handle) httprouter.Handle {
 			http.Error(w, "Maybe you gave some bullshit claims, you bad boy", http.StatusUnauthorized)
 			return
 		}
-		ctx := context.WithValue(r.Context(), "claimsKey", *claims)
+		ctx := context.WithValue(r.Context(), utils.ClaimsKey, *claims)
 		r = r.WithContext(ctx)
 		next(w, r, ps)
 	}

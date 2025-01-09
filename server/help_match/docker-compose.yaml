@@ -3,7 +3,7 @@ services:
     depends_on:
       - db
       - cache
-    image: barnabasdoc22/helpmatch-app:1.11
+    image: barnabasdoc22/helpmatch-app:1.2
     ports:
       - 2000:2000
     volumes:
@@ -15,7 +15,7 @@ services:
     depends_on:
       - db
       - cache
-    image: barnabasdoc22/helpmatch-app:1.11
+    image: barnabasdoc22/helpmatch-app:1.2
     ports:
       - 2001:2000
     volumes:
@@ -27,7 +27,7 @@ services:
     depends_on:
       - db
       - cache
-    image: barnabasdoc22/helpmatch-app:1.11
+    image: barnabasdoc22/helpmatch-app:1.2
     ports:
       - 2002:2000
     volumes:

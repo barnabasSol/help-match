@@ -21,7 +21,7 @@ type OrgResponse struct {
 }
 
 type OrgResponseExtras struct {
-	OrgResponse
+	OrgResult     OrgResponse           `json:"org_result"`
 	Owner         user_dto.User         `json:"owner"`
 	AvailableJobs []job_dto.JobResponse `json:"jobs"`
 }
