@@ -15,9 +15,9 @@ type Auth struct {
 }
 
 func NewAuthService(
-	userRepo *user_repo.User,
-	authRepo *auth_repo.Auth,
-	orgRepo *org_repo.Organization,
+	userRepo user_repo.UserRepository,
+	authRepo auth_repo.AuthRepository,
+	orgRepo org_repo.OrgRepository,
 	wsManager *ws.Manager,
 ) *Auth {
 	return &Auth{wsManager, userRepo, authRepo, orgRepo}

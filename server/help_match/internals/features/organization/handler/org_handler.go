@@ -31,7 +31,7 @@ func (oh *Organization) GetOrganization(
 	defer cancel()
 	result, err := oh.os.GetOrganization(ctx, p.ByName("id"))
 	if err != nil {
-		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "whoopsie")
+		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "whoopsie daisy")
 		return
 	}
 	utils.CreateResponse(w, nil, *result, http.StatusOK, "there u go")

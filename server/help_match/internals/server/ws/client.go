@@ -10,13 +10,14 @@ import (
 )
 
 type ClientList map[*Client]bool
+
 type Client struct {
-	connection *websocket.Conn
-	manager    *Manager
 	userId     string
 	username   string
-	egress     chan Event
 	roomIds    []string
+	connection *websocket.Conn
+	manager    *Manager
+	egress     chan Event
 }
 
 var (
@@ -73,7 +74,6 @@ func (c *Client) readMessages() {
 			log.Println("error handling the message", err)
 		}
 	}
-
 }
 
 func (c *Client) writeMessages() {

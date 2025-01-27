@@ -13,7 +13,11 @@ import (
 )
 
 func AuthMiddleware(next httprouter.Handle) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	return func(
+		w http.ResponseWriter,
+		r *http.Request,
+		ps httprouter.Params,
+	) {
 		tokenString := r.Header.Get("Authorization")
 		if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
 			tokenString = tokenString[7:]

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"sync"
 
 	"github.com/joho/godotenv"
 	"hm.barney-host.site/internals/db"
@@ -12,8 +13,7 @@ import (
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Println("Error loading .env file")
-		return
+		log.Fatal("Error loading .env file")
 	}
 	pgPool, err := db.InitPostgres()
 	if err != nil {
@@ -21,12 +21,12 @@ func main() {
 		return
 	}
 
+	wg := &sync.WaitGroup{}
 	wsManager := ws.NewManager(context.Background())
 
 	appServer := server.New()
-	if err := appServer.Serve(pgPool, wsManager); err != nil {
+	if err := appServer.Serve(pgPool, wsManager, wg); err != nil {
 		log.Printf("failed to serve: %v", err)
 		return
 	}
-
 }

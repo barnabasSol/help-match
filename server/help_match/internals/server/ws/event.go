@@ -83,6 +83,7 @@ func (e *EventRepository) NotifyOnlineStatusChange(ev Event, c *Client) error {
 		Username: c.username,
 		Status:   isOnline,
 	})
+
 	if err != nil {
 		return fmt.Errorf("failed to marshal online status event: %v", err)
 	}

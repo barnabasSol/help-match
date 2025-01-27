@@ -13,11 +13,11 @@ func (as *Auth) RenewToken(
 	ctx context.Context,
 	incommingToken, username string,
 ) (*dto.Tokens, error) {
-	token, err := as.authRepo.GetRefreshToken(ctx, incommingToken)
+	tokenHolder, err := as.authRepo.GetRefreshToken(ctx, incommingToken)
 	if err != nil {
 		return nil, err
 	}
-	if time.Now().After(token.ExpiresAt) {
+	if time.Now().After(tokenHolder.ExpiresAt) {
 		return nil, auth_errors.ErrExpiredRefreshToken
 	}
 	user, err := as.userRepo.FindUserByUsername(ctx, username)
@@ -32,7 +32,7 @@ func (as *Auth) RenewToken(
 		}
 	}
 
-	if token.UserID != user.Id {
+	if tokenHolder.UserID != user.Id {
 		return nil, auth_errors.ErrInvalidRefreshTokenOwner
 	}
 

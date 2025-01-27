@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -16,23 +17,31 @@ import (
 	auth_h "hm.barney-host.site/internals/features/auth/handler"
 	chat_h "hm.barney-host.site/internals/features/chat/handler"
 	filehandler "hm.barney-host.site/internals/features/file_handler"
+	job_h "hm.barney-host.site/internals/features/job/handler"
+	notif_h "hm.barney-host.site/internals/features/notifications/handler"
 	org_h "hm.barney-host.site/internals/features/organization/handler"
 	"hm.barney-host.site/internals/server/ws"
 )
 
 type AppServer struct {
-	wsManager         *ws.Manager
 	authHandler       *auth_h.Auth
 	orgHandler        *org_h.Organization
+	jobHandler        *job_h.Job
+	noitifHandler     *notif_h.Notification
 	chatHandler       *chat_h.Chat
 	FileUploadHandler *filehandler.FileUploadHandler
+	wsManager         *ws.Manager
 }
 
 func New() *AppServer {
 	return &AppServer{}
 }
 
-func (as *AppServer) Serve(pgPool *pgxpool.Pool, ws *ws.Manager) error {
+func (as *AppServer) Serve(
+	pgPool *pgxpool.Pool,
+	ws *ws.Manager,
+	wg *sync.WaitGroup,
+) error {
 	as.wsManager = ws
 	as.bootstrapHandlers(pgPool)
 	port := config.GetEnv("PORT")
@@ -67,6 +76,7 @@ func gracefulShutDown(shutdownError chan error, srv *http.Server) {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	s := <-quit
 	log.Printf("shutting down server %v", s.String())
+
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	shutdownError <- srv.Shutdown(ctx)

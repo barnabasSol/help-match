@@ -27,6 +27,10 @@ func (f *FileUploadHandler) Upload(
 ) {
 	q := r.URL.Query()
 	uploadType := utils.ReadString(q, "type", "")
+	if uploadType == "" {
+		http.Error(w, "Please specify the upload type", http.StatusBadRequest)
+		return
+	}
 	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
 	if claims.Role == string(dto.User) && uploadType == "post" {
 		http.Error(w, "Users aren't allowed to post for now", http.StatusForbidden)
@@ -65,6 +69,7 @@ func (f *FileUploadHandler) Upload(
 	fileName := uuid.NewString() + ext
 
 	dst, fullPath, err := createFile(fileName, uploadType)
+
 	fmt.Println(fullPath)
 	if err != nil {
 		http.Error(w, "Error saving the file", http.StatusInternalServerError)
@@ -89,9 +94,11 @@ func (f *FileUploadHandler) Upload(
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
-	utils.CreateResponse(w, nil, Response{ImgUrl: fullPath}, http.StatusOK, "here's the updated image")
-
-	// fmt.Fprintf(w, "File Name: %v\n", handler.Filename)
-	// fmt.Fprintf(w, "File Size: %v\n", handler.Size)
-	// fmt.Fprintf(w, "MIME Header: %v\n", handler.Header)
+	utils.CreateResponse(
+		w,
+		nil,
+		Response{ImgUrl: fullPath},
+		http.StatusOK,
+		"here's the updated image",
+	)
 }

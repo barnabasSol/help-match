@@ -84,7 +84,13 @@ func (m *Manager) ServeWS(
 		return
 	}
 
-	newClient := NewClient(conn, m, roomIds, claims.Subject, claims.Username)
+	newClient := NewClient(
+		conn,
+		m,
+		roomIds,
+		claims.Subject,
+		claims.Username,
+	)
 	m.addClient(newClient)
 	go newClient.readMessages()
 	go newClient.writeMessages()
@@ -100,6 +106,7 @@ func (m *Manager) RenewOTP(
 	type response struct {
 		OTP string `json:"otp"`
 	}
+
 	otp := m.Otps.NewOTP()
 	resp := response{
 		OTP: otp.Key,

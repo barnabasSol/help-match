@@ -5,6 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"hm.barney-host.site/internals/features/job/dto"
 	"hm.barney-host.site/internals/features/job/model"
 	"hm.barney-host.site/internals/features/utils"
 )
@@ -12,8 +13,13 @@ import (
 type JobRepository interface {
 	WithTransaction(ctx context.Context, fn func(pgx.Tx) error) error
 	GetJobsByOrgId(ctx context.Context, orgId string) ([]*model.Job, error)
+	GetApplicantsByOrgId(ctx context.Context, applicants *[]dto.JobApplicantDto, orgId string) error
 	Insert(ctx context.Context, tx pgx.Tx, job *model.Job) error
+	InsertApplicant(ctx context.Context, tx pgx.Tx, volunteerId, jobId string) error
+	Delete(ctx context.Context, tx pgx.Tx, jobId string) error
+	UpdateJobStatus(ctx context.Context, tx pgx.Tx, jobId, userId, status string) error
 }
+
 type Job struct {
 	pgPool *pgxpool.Pool
 }
@@ -26,7 +32,16 @@ func (j *Job) WithTransaction(ctx context.Context, fn func(pgx.Tx) error) error 
 }
 
 func (j *Job) Insert(ctx context.Context, tx pgx.Tx, job *model.Job) error {
-	panic("not done yet")
+	cmd := `INSERT INTO org_jobs (org_id, job_title, description)
+			VALUES ($1, $2, $3) RETURNING id, created_at`
+	err := j.pgPool.QueryRow(ctx, cmd, job.OrgId, job.Title, job.Description).Scan(
+		job.Id,
+		job.CreatedAt,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (j *Job) GetJobsByOrgId(ctx context.Context, orgId string) ([]*model.Job, error) {
@@ -56,4 +71,59 @@ func (j *Job) GetJobsByOrgId(ctx context.Context, orgId string) ([]*model.Job, e
 		jobs = append(jobs, &job)
 	}
 	return jobs, nil
+}
+
+func (j *Job) Delete(ctx context.Context, tx pgx.Tx, jobId string) error {
+	cmd := `DELETE from org_jobs WHERE id=$1`
+	_, err := j.pgPool.Exec(ctx, cmd, jobId)
+	return err
+}
+
+func (j *Job) UpdateJobStatus(ctx context.Context, tx pgx.Tx, jobId, userId, status string) error {
+	cmd := `UPDATE user_jobs SET job_status=$1::job_status_type WHERE user_id=$2 AND id=$3`
+	_, err := j.pgPool.Exec(ctx, cmd, status, userId, jobId)
+	return err
+}
+
+func (j *Job) InsertApplicant(ctx context.Context, tx pgx.Tx, volunteerId, jobId string) error {
+	cmd := `INSERT INTO user_jobs (user_id, job_id) VALUES ($1, $2)`
+	_, err := j.pgPool.Exec(ctx, cmd, volunteerId, jobId)
+	return err
+}
+
+func (j *Job) GetApplicantsByOrgId(
+	ctx context.Context,
+	applicants *[]dto.JobApplicantDto,
+	orgId string,
+) error {
+	query := `SELECT oj.id, uj.user_id, job_status, uj.created_at,
+			  u.name, u.username, u.profile_pic_url
+	 		  FROM user_jobs uj
+			  JOIN org_jobs oj ON oj.id = uj.job_id
+			  JOIN organizations o ON o.id = oj.org_id
+			  JOIN users u ON u.id = uj.user_id
+			  WHERE o.id = $1
+			  `
+	rows, err := j.pgPool.Query(ctx, query, orgId)
+	defer rows.Close()
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var applicant dto.JobApplicantDto
+		err := rows.Scan(
+			&applicant.JobId,
+			&applicant.VolunteerId,
+			&applicant.Status,
+			&applicant.CreatedAt,
+			&applicant.Name,
+			&applicant.Username,
+			&applicant.ProfileIcon,
+		)
+		if err != nil {
+			return err
+		}
+		*applicants = append(*applicants, applicant)
+	}
+	return nil
 }

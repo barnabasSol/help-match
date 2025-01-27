@@ -18,6 +18,7 @@ type OrgRepository interface {
 	Insert(ctx context.Context, tx pgx.Tx, orgModel *model.Organization, userId string) error
 	GetOrganizationByOwnerId(ctx context.Context, tx pgx.Tx, userId string) (*model.Organization, error)
 	GetOrganization(ctx context.Context, orgId string) (*model.Organization, error)
+	GetOrganizationByJobId(ctx context.Context, jobId string) (*model.Organization, error)
 	GetRecommendedOrgs(
 		ctx context.Context,
 		userId string,
@@ -289,4 +290,34 @@ func (o *Organization) GetRecommendedOrgs(
 		orgParams.Filters.PageSize,
 	)
 	return orgList, metadata, nil
+}
+
+func (o *Organization) GetOrganizationByJobId(ctx context.Context, jobId string) (*model.Organization, error) {
+	query := `SELECT organizations.id, organization_name, user_id, profile_icon, description,
+			 is_verified, organizations.created_at, org_type, organizations.version, location
+			 FROM organizations JOIN org_jobs ON organizations.id = org_jobs.org_id
+			 WHERE org_jobs.id = $1`
+
+	var orgModel model.Organization
+	var location pgtype.Point
+	err := o.pgPool.QueryRow(ctx, query, jobId).Scan(
+		&orgModel.Id,
+		&orgModel.Name,
+		&orgModel.UserId,
+		&orgModel.ProfileIcon,
+		&orgModel.Description,
+		&orgModel.IsVerified,
+		&orgModel.CreatedAt,
+		&orgModel.Type,
+		&orgModel.Version,
+		&location,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch organization: %w", err)
+	}
+	orgModel.Location = model.Location{
+		Latitude:  location.P.X,
+		Longitude: location.P.Y,
+	}
+	return &orgModel, nil
 }
