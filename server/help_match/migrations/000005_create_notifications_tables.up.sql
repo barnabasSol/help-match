@@ -3,5 +3,6 @@ CREATE TABLE notifications (
     from_id UUID REFERENCES users(id) ON DELETE CASCADE,
     to_id UUID REFERENCES users(id) ON DELETE CASCADE,
     message TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
 );

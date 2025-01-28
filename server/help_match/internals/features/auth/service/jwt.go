@@ -19,7 +19,7 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
-var jwtExpires = time.Now().Add(30 * time.Minute)
+var jwtExpires = time.Now().Add(24 * time.Hour * 7)
 
 func generateJWT(userModel user_model.User, org *org_model.Organization) (string, error) {
 	var claims claims

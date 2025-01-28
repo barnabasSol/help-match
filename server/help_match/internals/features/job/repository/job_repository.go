@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -13,6 +15,8 @@ import (
 type JobRepository interface {
 	WithTransaction(ctx context.Context, fn func(pgx.Tx) error) error
 	GetJobsByOrgId(ctx context.Context, orgId string) ([]*model.Job, error)
+	GetJobByOrgId(ctx context.Context, orgId string) (model.Job, error)
+	GetJobById(ctx context.Context, id string) (model.Job, error)
 	GetApplicantsByOrgId(ctx context.Context, applicants *[]dto.JobApplicantDto, orgId string) error
 	Insert(ctx context.Context, tx pgx.Tx, job *model.Job) error
 	InsertApplicant(ctx context.Context, tx pgx.Tx, volunteerId, jobId string) error
@@ -35,8 +39,8 @@ func (j *Job) Insert(ctx context.Context, tx pgx.Tx, job *model.Job) error {
 	cmd := `INSERT INTO org_jobs (org_id, job_title, description)
 			VALUES ($1, $2, $3) RETURNING id, created_at`
 	err := j.pgPool.QueryRow(ctx, cmd, job.OrgId, job.Title, job.Description).Scan(
-		job.Id,
-		job.CreatedAt,
+		&job.Id,
+		&job.CreatedAt,
 	)
 	if err != nil {
 		return err
@@ -75,14 +79,24 @@ func (j *Job) GetJobsByOrgId(ctx context.Context, orgId string) ([]*model.Job, e
 
 func (j *Job) Delete(ctx context.Context, tx pgx.Tx, jobId string) error {
 	cmd := `DELETE from org_jobs WHERE id=$1`
-	_, err := j.pgPool.Exec(ctx, cmd, jobId)
-	return err
+	result, err := j.pgPool.Exec(ctx, cmd, jobId)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return fmt.Errorf("job  does not exist")
+	}
+	return nil
 }
 
 func (j *Job) UpdateJobStatus(ctx context.Context, tx pgx.Tx, jobId, userId, status string) error {
-	cmd := `UPDATE user_jobs SET job_status=$1::job_status_type WHERE user_id=$2 AND id=$3`
+	cmd := `UPDATE user_jobs SET job_status=$1 WHERE user_id=$2 AND job_id=$3`
 	_, err := j.pgPool.Exec(ctx, cmd, status, userId, jobId)
-	return err
+	if err != nil {
+		log.Printf("Error executing SQL: %v", err)
+		return err
+	}
+	return nil
 }
 
 func (j *Job) InsertApplicant(ctx context.Context, tx pgx.Tx, volunteerId, jobId string) error {
@@ -126,4 +140,46 @@ func (j *Job) GetApplicantsByOrgId(
 		*applicants = append(*applicants, applicant)
 	}
 	return nil
+}
+
+func (j *Job) GetJobByOrgId(ctx context.Context, orgId string) (model.Job, error) {
+	query := `SELECT id, org_id, job_title, description,
+	    	  created_at, updated_at, version FROM org_jobs WHERE org_id = $1`
+
+	row := j.pgPool.QueryRow(ctx, query, orgId)
+	var job model.Job
+	err := row.Scan(
+		&job.Id,
+		&job.OrgId,
+		&job.Title,
+		&job.Description,
+		&job.CreatedAt,
+		&job.UpdatedAt,
+		&job.Version,
+	)
+	if err != nil {
+		return model.Job{}, err
+	}
+	return job, nil
+}
+
+func (j *Job) GetJobById(ctx context.Context, id string) (model.Job, error) {
+	query := `SELECT id, org_id, job_title, description,
+	    	  created_at, updated_at, version FROM org_jobs WHERE id = $1`
+
+	row := j.pgPool.QueryRow(ctx, query, id)
+	var job model.Job
+	err := row.Scan(
+		&job.Id,
+		&job.OrgId,
+		&job.Title,
+		&job.Description,
+		&job.CreatedAt,
+		&job.UpdatedAt,
+		&job.Version,
+	)
+	if err != nil {
+		return model.Job{}, err
+	}
+	return job, nil
 }

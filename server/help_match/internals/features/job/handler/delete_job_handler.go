@@ -17,7 +17,8 @@ func (j *Job) DeleteOrgJob(w http.ResponseWriter, r *http.Request, p httprouter.
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), contextTimeout)
 	defer cancel()
-	err := j.js.DeleteOrgJob(ctx, job_id)
+	claims := ctx.Value(utils.ClaimsKey).(utils.Claims)
+	err := j.js.DeleteOrgJob(ctx, job_id, claims.OrgId)
 	if err != nil {
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "failed to delete job")
 		return

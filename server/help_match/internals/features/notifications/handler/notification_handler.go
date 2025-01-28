@@ -24,11 +24,12 @@ func NewNotificationHandler(notifRepo repository.NotificationRepository) *Notifi
 func (n *Notification) GetOrganizationNotifications(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	var notifications []dto.OrgNotification
 	ctx, cancel := context.WithTimeout(r.Context(), contextTimeout)
-	claims := r.Context().Value("claims").(utils.Claims)
+	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
 	defer cancel()
 	err := n.notifRepo.GetOrganizationNotifications(ctx, claims.Subject, &notifications)
 	if err != nil {
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
+		return
 	}
 	utils.CreateResponse(w, nil, notifications, http.StatusOK, "")
 }
@@ -36,11 +37,12 @@ func (n *Notification) GetOrganizationNotifications(w http.ResponseWriter, r *ht
 func (n *Notification) GetVolunteerNotifications(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	var notifications []dto.VolunteerNotification
 	ctx, cancel := context.WithTimeout(r.Context(), contextTimeout)
-	claims := r.Context().Value("claims").(utils.Claims)
+	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
 	defer cancel()
 	err := n.notifRepo.GetVolunteerNotifications(ctx, claims.Subject, &notifications)
 	if err != nil {
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
+		return
 	}
 	utils.CreateResponse(w, nil, notifications, http.StatusOK, "")
 }

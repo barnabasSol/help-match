@@ -1,5 +1,12 @@
 package service
 
+const (
+	Accepted = "accepted"
+	Rejected = "rejected"
+	Pending  = "pending"
+	Finished = "finished"
+)
+
 func notificationMessageFromStatus(status string) string {
 	switch status {
 	case "pending":

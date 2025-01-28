@@ -18,7 +18,7 @@ func (j *Job) UpdateJobStatusOfApplicant(w http.ResponseWriter, r *http.Request,
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), contextTimeout)
 	defer cancel()
-	claims := r.Context().Value("claims").(utils.Claims)
+	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
 	err = j.js.UpdateJobStatus(ctx, req, claims.Subject)
 	if err != nil {
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")

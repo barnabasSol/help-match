@@ -18,7 +18,8 @@ func (jh *Job) AddJob(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), contextTimeout)
 	defer cancel()
-	job, err := jh.js.AddNewOrgJob(ctx, incommingJob)
+	claims := ctx.Value(utils.ClaimsKey).(utils.Claims)
+	job, err := jh.js.AddNewOrgJob(ctx, claims.OrgId, incommingJob)
 	if err != nil {
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
 		return

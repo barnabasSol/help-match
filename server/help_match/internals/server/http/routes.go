@@ -26,14 +26,35 @@ func (as *AppServer) routes() http.Handler {
 	router.GET("/v1/org/:id", mw.AuthMiddleware(as.orgHandler.GetOrganization))
 	router.GET("/v1/org", mw.AuthMiddleware(mw.RequireRole(string(dto.User), as.orgHandler.GetOrganizations)))
 	//jobs
-	router.GET("/v1/jobs/applicants/:job_id", mw.AuthMiddleware(mw.RequireRole(string(dto.Organization), as.jobHandler.GetJobApplicants)))
-	router.DELETE("/v1/jobs/:job_id", mw.AuthMiddleware(mw.RequireRole(string(dto.Organization), as.jobHandler.DeleteOrgJob)))
-	router.POST("/v1/jobs/add", mw.AuthMiddleware(mw.RequireRole(string(dto.Organization), as.jobHandler.AddJob)))
-	router.POST("/v1/jobs/apply", mw.AuthMiddleware(mw.RequireRole(string(dto.User), as.jobHandler.Apply)))
-	router.PATCH("/v1/jobs/status", mw.AuthMiddleware(mw.RequireRole(string(dto.Organization), as.jobHandler.UpdateJobStatusOfApplicant)))
+	router.GET("/v1/job/applicants/:job_id", mw.AuthMiddleware(mw.RequireRole(
+		string(dto.Organization),
+		as.jobHandler.GetJobApplicants,
+	)))
+	router.DELETE("/v1/job/:job_id", mw.AuthMiddleware(mw.RequireRole(
+		string(dto.Organization),
+		as.jobHandler.DeleteOrgJob,
+	)))
+	router.POST("/v1/job/add", mw.AuthMiddleware(mw.RequireRole(
+		string(dto.Organization),
+		as.jobHandler.AddJob,
+	)))
+	router.POST("/v1/job/apply/:job_id", mw.AuthMiddleware(mw.RequireRole(
+		string(dto.User),
+		as.jobHandler.Apply,
+	)))
+	router.PATCH("/v1/job/status", mw.AuthMiddleware(mw.RequireRole(
+		string(dto.Organization),
+		as.jobHandler.UpdateJobStatusOfApplicant,
+	)))
 	//notification
-	router.GET("/v1/notifications/volunteer", mw.AuthMiddleware(mw.RequireRole(string(dto.User), as.noitifHandler.GetVolunteerNotifications)))
-	router.GET("/v1/notifications/organization", mw.AuthMiddleware(mw.RequireRole(string(dto.User), as.noitifHandler.GetOrganizationNotifications)))
+	router.GET("/v1/notifications/volunteer", mw.AuthMiddleware(mw.RequireRole(
+		string(dto.User),
+		as.noitifHandler.GetVolunteerNotifications,
+	)))
+	router.GET("/v1/notifications/organization", mw.AuthMiddleware(mw.RequireRole(
+		string(dto.Organization),
+		as.noitifHandler.GetOrganizationNotifications,
+	)))
 	//chat
 	router.GET("/v1/chat/messages/:room_id", mw.AuthMiddleware(as.chatHandler.GetMessages))
 	router.GET("/v1/chat/rooms/:user_id", mw.AuthMiddleware(as.chatHandler.GetRooms))

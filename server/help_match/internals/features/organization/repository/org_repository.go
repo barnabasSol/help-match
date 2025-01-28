@@ -293,7 +293,7 @@ func (o *Organization) GetRecommendedOrgs(
 }
 
 func (o *Organization) GetOrganizationByJobId(ctx context.Context, jobId string) (*model.Organization, error) {
-	query := `SELECT organizations.id, organization_name, user_id, profile_icon, description,
+	query := `SELECT organizations.id, organization_name, user_id, profile_icon, organizations.description,
 			 is_verified, organizations.created_at, org_type, organizations.version, location
 			 FROM organizations JOIN org_jobs ON organizations.id = org_jobs.org_id
 			 WHERE org_jobs.id = $1`

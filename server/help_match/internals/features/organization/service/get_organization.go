@@ -60,7 +60,7 @@ func (os *Organization) GetOrganization(
 			Id:          job.Id,
 			Title:       job.Title,
 			Description: job.Description,
-			UpdatedAt:   job.UpdatedAt,
+			UpdatedAt:   &job.UpdatedAt,
 			CreatedAt:   job.CreatedAt,
 			Version:     job.Version,
 		})

@@ -67,7 +67,7 @@ func (n *Notification) GetOrganizationNotifications(
 	userId string,
 	notifications *[]dto.OrgNotification,
 ) error {
-	query := `SELECT u.id, u.profile_icon, u.name, u.username,
+	query := `SELECT u.id, u.profile_pic_url, u.name, u.username,
 			  u.is_online, message FROM notifications
 			  JOIN users u ON u.id = notifications.from_id
 			  WHERE to_id = $1`

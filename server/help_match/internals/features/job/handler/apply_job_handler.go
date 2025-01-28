@@ -15,7 +15,7 @@ func (j *Job) Apply(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 		utils.CreateResponse(w, errors.New("job id isnt provided"), nil, http.StatusBadRequest, "")
 		return
 	}
-	claims := r.Context().Value("claims").(utils.Claims)
+	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
 	ctx, cancel := context.WithTimeout(r.Context(), contextTimeout)
 	defer cancel()
 	err := j.js.ApplyJob(ctx, claims.Subject, job_id)

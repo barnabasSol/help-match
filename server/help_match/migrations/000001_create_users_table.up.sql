@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS users (
     id UUID NOT NULL DEFAULT uuid_generate_v1mc(),
     name VARCHAR(255) NOT NULL,
     username VARCHAR(255) UNIQUE NOT NULL,
-    profile_pic_url TEXT,
+    profile_pic_url TEXT DEFAULT '',
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash BYTEA NOT NULL,
     activated BOOLEAN DEFAULT FALSE,

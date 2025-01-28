@@ -11,11 +11,15 @@ import (
 
 type MessageRepository interface {
 	InsertMessage(ctx context.Context, senderId, roomId, message string) (time.Time, error)
+	InsertMemeberToRoom(ctx context.Context, userId, roomId string) error
+	InsertJobRoom(ctx context.Context, jobId string, name string) (string, error)
 	GetMessagesByRoomId(ctx context.Context, roomId string) (*[]dto.Message, error)
 	UpdateOnlineStatus(ctx context.Context, userId string, status bool) error
 	GetRoomIdsOfUserById(ctx context.Context, userId string) ([]string, error)
 	GetMembersOfRoomByRoomId(ctx context.Context, roomId string) (*[]dto.MemberInRoom, error)
 	GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.Room, error)
+	JobChatRoomExists(ctx context.Context, jobId string) (bool, error)
+	GetRoomIdByJobId(ctx context.Context, jobId string) (string, error)
 }
 type Message struct {
 	pool *pgxpool.Pool
@@ -211,4 +215,40 @@ func (m *Message) GetMembersOfRoomByRoomId(ctx context.Context, roomId string) (
 		members = append(members, member)
 	}
 	return &members, nil
+}
+
+func (c *Message) InsertJobRoom(ctx context.Context, jobId, roomName string) (string, error) {
+	jobRoomId := ""
+	cmd := `INSERT INTO job_chat_rooms(job_id, name) VALUES ($1, $2) RETURNING id`
+	err := c.pool.QueryRow(ctx, cmd, jobId, roomName).Scan(&jobRoomId)
+	if err != nil {
+		return "", err
+	}
+	return jobRoomId, nil
+}
+
+func (c *Message) JobChatRoomExists(ctx context.Context, jobId string) (bool, error) {
+	query := `SELECT EXISTS(SELECT 1 FROM job_chat_rooms WHERE job_id = $1)`
+	var exists bool
+	err := c.pool.QueryRow(ctx, query, jobId).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
+func (c *Message) InsertMemeberToRoom(ctx context.Context, userId, roomId string) error {
+	cmd := `INSERT INTO job_chat_members(user_id, chat_room_id) VALUES ($1, $2)`
+	_, err := c.pool.Exec(ctx, cmd, userId, roomId)
+	return err
+}
+
+func (m *Message) GetRoomIdByJobId(ctx context.Context, jobId string) (string, error) {
+	var roomId string
+	query := `SELECT id FROM job_chat_rooms WHERE job_id = $1`
+	err := m.pool.QueryRow(ctx, query, jobId).Scan(&roomId)
+	if err != nil {
+		return "", err
+	}
+	return roomId, nil
 }

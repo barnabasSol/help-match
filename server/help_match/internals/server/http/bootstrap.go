@@ -35,7 +35,7 @@ func (as *AppServer) bootstrapHandlers(pool *pgxpool.Pool) {
 	//services
 	authService := auth_s.NewAuthService(userRepo, authRepo, orgRepo, as.wsManager)
 	orgService := org_s.NewOrgService(orgRepo, jobRepo, userRepo)
-	jobService := job_s.NewJobService(jobRepo, notifRepo, orgRepo)
+	jobService := job_s.NewJobService(jobRepo, notifRepo, orgRepo, chatRepo)
 	chatService := chat_s.NewChatService(chatRepo)
 
 	//handlers
