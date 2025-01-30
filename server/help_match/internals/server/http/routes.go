@@ -21,7 +21,7 @@ func (as *AppServer) routes() http.Handler {
 	//auth
 	router.POST("/v1/auth/login", as.authHandler.Login)
 	router.POST("/v1/auth/signup", as.authHandler.SignUp)
-	router.POST("/v1/auth/renew", as.authHandler.Renew)
+	router.POST("/v1/auth/refresh", as.authHandler.Refresh)
 	//organization
 	router.GET("/v1/org/:id", mw.AuthMiddleware(as.orgHandler.GetOrganization))
 	router.GET("/v1/org", mw.AuthMiddleware(mw.RequireRole(string(dto.User), as.orgHandler.GetOrganizations)))
@@ -57,7 +57,7 @@ func (as *AppServer) routes() http.Handler {
 	)))
 	//chat
 	router.GET("/v1/chat/messages/:room_id", mw.AuthMiddleware(as.chatHandler.GetMessages))
-	router.GET("/v1/chat/rooms/:user_id", mw.AuthMiddleware(as.chatHandler.GetRooms))
+	router.GET("/v1/chat/rooms", mw.AuthMiddleware(as.chatHandler.GetRooms))
 	r_cors := configCORS(router)
 	return mw.RecoverPanic(mw.RateLimit(r_cors))
 }

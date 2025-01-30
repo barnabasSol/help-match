@@ -99,7 +99,7 @@ func (ah *Auth) SignUp(
 	utils.CreateResponse(w, nil, signupResponse, http.StatusOK, "successfully created account")
 }
 
-func (ah *Auth) Renew(
+func (ah *Auth) Refresh(
 	w http.ResponseWriter,
 	r *http.Request,
 	p httprouter.Params,

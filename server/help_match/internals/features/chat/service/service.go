@@ -27,6 +27,16 @@ func (c *Chat) GetMessages(ctx context.Context, roomId string) (*[]dto.Message, 
 }
 
 func (c *Chat) GetRooms(ctx context.Context, userId string) (*[]dto.Room, error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+	rooms, err := c.messageRepo.GetRoomsByUserId(ctx, userId)
+	if err != nil {
+		return &[]dto.Room{}, err
+	}
+	return rooms, nil
+}
+
+func (c *Chat) GetOrgRooms(ctx context.Context, userId string) (*[]dto.Room, error) {
 	ct, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
 	rooms, err := c.messageRepo.GetRoomsByUserId(ct, userId)

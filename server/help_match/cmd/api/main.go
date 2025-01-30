@@ -17,8 +17,7 @@ func main() {
 	}
 	pgPool, err := db.InitPostgres()
 	if err != nil {
-		log.Printf("failed to init postgres: %v", err)
-		return
+		log.Fatal("error initializing db")
 	}
 
 	wg := &sync.WaitGroup{}

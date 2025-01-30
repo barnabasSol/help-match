@@ -129,6 +129,10 @@ func (j *Job) UpdateJobStatus(
 		if err != nil {
 			return err
 		}
+		err = j.cr.InsertMemeberToRoom(ctx, true, orgHandlerId, roomId)
+		if err != nil {
+			return err
+		}
 	} else {
 		roomId, err = j.cr.GetRoomIdByJobId(ctx, updateDto.JobID)
 		if err != nil {
@@ -136,7 +140,7 @@ func (j *Job) UpdateJobStatus(
 		}
 	}
 	if updateDto.Status == Accepted {
-		err = j.cr.InsertMemeberToRoom(ctx, updateDto.UserId, roomId)
+		err = j.cr.InsertMemeberToRoom(ctx, false, updateDto.UserId, roomId)
 		if err != nil {
 			return err
 		}

@@ -20,6 +20,14 @@ type NewMessageEvent struct {
 const TypeOnlineStatus = "online_status_change"
 
 type OnlineStatus struct {
+	UserId   string `json:"user_id"`
+	Username string `json:"username"`
+	Status   bool   `json:"online_status"`
+}
+
+const TypePushNotification = "push_notification"
+
+type PushNotification struct {
 	Username string `json:"username"`
 	Status   bool   `json:"online_status"`
 }

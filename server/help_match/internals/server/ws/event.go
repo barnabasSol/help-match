@@ -49,7 +49,7 @@ func (e *EventRepository) SendMessageHandler(event Event, c *Client) error {
 	if err != nil {
 		return fmt.Errorf("failed to marshal broadcast message: %v", err)
 	}
-
+	c.manager.RLock()
 	for client := range c.manager.Clients {
 		for _, roomId := range client.roomIds {
 			if roomId == sendEvent.ToRoomId {
@@ -57,29 +57,28 @@ func (e *EventRepository) SendMessageHandler(event Event, c *Client) error {
 					Type:    TypeNewMessage,
 					Payload: marshalledNewEvent,
 				}
+				break
 			}
 		}
 
 	}
+	c.manager.RUnlock()
 	return nil
 }
 
 func (e *EventRepository) NotifyOnlineStatusChange(ev Event, c *Client) error {
-	var statusEventPayload []byte
-	var err error
-
-	c.manager.RLock()
 	isOnline := false
-	if _, found := c.manager.Clients[c]; found {
-		isOnline = true
-	}
-	clientsToNotify := make([]*Client, 0)
-	for client := range c.manager.Clients {
-		clientsToNotify = append(clientsToNotify, client)
+	c.manager.RLock()
+	for v := range c.manager.Clients {
+		if v.userId == c.userId {
+			isOnline = true
+			break
+		}
 	}
 	c.manager.RUnlock()
 
-	statusEventPayload, err = json.Marshal(OnlineStatus{
+	statusEventPayload, err := json.Marshal(OnlineStatus{
+		UserId:   c.userId,
 		Username: c.username,
 		Status:   isOnline,
 	})
@@ -88,17 +87,17 @@ func (e *EventRepository) NotifyOnlineStatusChange(ev Event, c *Client) error {
 		return fmt.Errorf("failed to marshal online status event: %v", err)
 	}
 
-	for _, client := range clientsToNotify {
-		select {
-		case client.egress <- Event{
+	c.manager.RLock()
+	for client := range c.manager.Clients {
+		client.egress <- Event{
 			Type:    TypeOnlineStatus,
 			Payload: statusEventPayload,
-		}:
-			log.Println("is being notified")
-		default:
-			log.Println("Failed to notify client - channel full or closed", client.username)
-
 		}
 	}
+	c.manager.RUnlock()
+
+	return nil
+}
+func (e *EventRepository) PushNewNotification(ev Event, c *Client) error {
 	return nil
 }

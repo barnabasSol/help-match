@@ -11,15 +11,15 @@ import (
 
 type MessageRepository interface {
 	InsertMessage(ctx context.Context, senderId, roomId, message string) (time.Time, error)
-	InsertMemeberToRoom(ctx context.Context, userId, roomId string) error
+	InsertMemeberToRoom(ctx context.Context, isOrg bool, userId, roomId string) error
 	InsertJobRoom(ctx context.Context, jobId string, name string) (string, error)
 	GetMessagesByRoomId(ctx context.Context, roomId string) (*[]dto.Message, error)
-	UpdateOnlineStatus(ctx context.Context, userId string, status bool) error
 	GetRoomIdsOfUserById(ctx context.Context, userId string) ([]string, error)
+	GetRoomIdByJobId(ctx context.Context, jobId string) (string, error)
 	GetMembersOfRoomByRoomId(ctx context.Context, roomId string) (*[]dto.MemberInRoom, error)
 	GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.Room, error)
+	UpdateOnlineStatus(ctx context.Context, userId string, status bool) error
 	JobChatRoomExists(ctx context.Context, jobId string) (bool, error)
-	GetRoomIdByJobId(ctx context.Context, jobId string) (string, error)
 }
 type Message struct {
 	pool *pgxpool.Pool
@@ -53,21 +53,27 @@ func (m *Message) GetMessagesByRoomId(
 	roomId string,
 ) (*[]dto.Message, error) {
 	query := `
-		SELECT 
-			u.profile_pic_url AS sender_profile,
-			u.id AS sender_id,
-			gm.chat_room_id AS room_id,
-			gm.created_at AS sent_time,
-			gm.is_seen,
-			gm.message 
-		FROM 
-			group_messages gm
-		JOIN 
-			users u ON gm.sender_id = u.id
-		JOIN 
-			job_chat_members jcm ON gm.chat_room_id = jcm.chat_room_id
-		WHERE 
-			gm.chat_room_id = $1 
+	SELECT 
+		CASE 
+			WHEN jcm.is_admin THEN o.profile_icon
+			ELSE u.profile_pic_url
+		END AS sender_profile_pic_url,
+		CASE 
+			WHEN jcm.is_admin THEN o.organization_name
+			ELSE u.name
+		END AS sender_name,
+		u.username AS sender_username,
+		u.id AS sender_id,
+		gm.message,
+		gm.created_at AS sent_time,
+		gm.is_seen,
+		gm.chat_room_id,
+		jcm.is_admin
+	FROM group_messages gm
+	JOIN job_chat_members jcm ON gm.sender_id = jcm.id
+	JOIN users u ON jcm.user_id = u.id
+	LEFT JOIN organizations o ON jcm.user_id = o.user_id
+	WHERE gm.chat_room_id = $1;
 		`
 	rows, err := m.pool.Query(ctx, query, roomId)
 	defer rows.Close()
@@ -79,11 +85,14 @@ func (m *Message) GetMessagesByRoomId(
 		var messageDto dto.Message
 		err := rows.Scan(
 			&messageDto.SenderProfileIcon,
+			&messageDto.SenderName,
+			&messageDto.SenderUsername,
 			&messageDto.SenderId,
-			&messageDto.RoomId,
+			&messageDto.Message,
 			&messageDto.SentTime,
 			&messageDto.IsSeen,
-			&messageDto.Message,
+			&messageDto.RoomId,
+			&messageDto.IsAdmin,
 		)
 		if err != nil {
 			return &[]dto.Message{}, err
@@ -95,35 +104,21 @@ func (m *Message) GetMessagesByRoomId(
 
 func (m *Message) GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.Room, error) {
 	query := `
-		WITH LatestMessages AS (
-		SELECT 
-			chat_room_id,
-			message,
-			created_at,
-			ROW_NUMBER() OVER (PARTITION BY chat_room_id ORDER BY created_at DESC) AS rn
-		FROM 
-			group_messages
-		)
-		SELECT 
-			job_chat_rooms.id AS chat_room_id
-			org_jobs.id AS job_id, 
-			lm.message AS latest_message,
-			lm.created_at AS sent_time,
-			profile_icon, 
-			organization_name
-		FROM 
-			organizations 
-		JOIN 
-			org_jobs ON org_jobs.org_id = organizations.id 
-		LEFT JOIN 
-			job_chat_rooms ON job_chat_rooms.job_id = org_jobs.id
-		LEFT JOIN 
-			LatestMessages lm ON lm.chat_room_id = job_chat_rooms.id AND lm.rn = 1
-		JOIN 
-			job_chat_members jcm ON jcm.chat_room_id = job_chat_rooms.id
-		WHERE 
-			jcm.user_id = $1;  
-	`
+	SELECT DISTINCT ON (jcr.id) jcr.id AS chat_room_id, 
+       COALESCE(gm.message, '') AS message, 
+       COALESCE(gm.created_at, '1970-01-01 00:00:00') AS latest_message_time, 
+       jcm.is_admin, 
+       o.profile_icon AS org_profile_icon, 
+       jcr.name AS room_name 
+	FROM job_chat_rooms jcr
+	JOIN org_jobs oj ON jcr.job_id = oj.id
+	JOIN organizations o ON oj.org_id = o.id
+	LEFT JOIN group_messages gm ON jcr.id = gm.chat_room_id
+	JOIN job_chat_members jcm ON jcr.id = jcm.chat_room_id
+	WHERE jcm.user_id = $1
+	ORDER BY jcr.id, gm.created_at DESC;
+			 `
+
 	rows, err := m.pool.Query(
 		ctx,
 		query,
@@ -137,9 +132,9 @@ func (m *Message) GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.R
 		var roomDto dto.Room
 		err := rows.Scan(
 			&roomDto.RoomId,
-			&roomDto.JobId,
 			&roomDto.LatestText,
 			&roomDto.SentTime,
+			&roomDto.IsAdming,
 			&roomDto.RoomProfile,
 			&roomDto.RoomName,
 		)
@@ -237,9 +232,9 @@ func (c *Message) JobChatRoomExists(ctx context.Context, jobId string) (bool, er
 	return exists, nil
 }
 
-func (c *Message) InsertMemeberToRoom(ctx context.Context, userId, roomId string) error {
-	cmd := `INSERT INTO job_chat_members(user_id, chat_room_id) VALUES ($1, $2)`
-	_, err := c.pool.Exec(ctx, cmd, userId, roomId)
+func (c *Message) InsertMemeberToRoom(ctx context.Context, isOrg bool, userId, roomId string) error {
+	cmd := `INSERT INTO job_chat_members(user_id, chat_room_id, is_admin) VALUES ($1, $2, $3)`
+	_, err := c.pool.Exec(ctx, cmd, userId, roomId, isOrg)
 	return err
 }
 
