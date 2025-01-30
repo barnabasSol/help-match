@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	c_r "hm.barney-host.site/internals/features/chat/repository"
@@ -56,14 +55,7 @@ func (j *Job) AddNewOrgJob(
 }
 
 func (j *Job) DeleteOrgJob(ctx context.Context, jobId, orgId string) error {
-	job, err := j.jr.GetJobByOrgId(ctx, orgId)
-	if err != nil {
-		return nil
-	}
-	if job.Id != jobId {
-		return errors.New("you're not allowed to delete this job")
-	}
-	err = j.jr.Delete(ctx, nil, jobId)
+	err := j.jr.Delete(ctx, nil, jobId, orgId)
 	return err
 }
 
@@ -101,7 +93,7 @@ func (j *Job) UpdateJobStatus(
 	if message == "" {
 		return nil
 	}
-	_, err = j.jr.GetJobById(ctx, updateDto.JobID)
+	job, err := j.jr.GetJobById(ctx, updateDto.JobID)
 	if err != nil {
 		return err
 	}
@@ -110,17 +102,12 @@ func (j *Job) UpdateJobStatus(
 		return err
 	}
 	room_exists, err := j.cr.JobChatRoomExists(ctx, updateDto.JobID)
-
 	if err != nil {
 		return err
 	}
 	roomId := ""
 	if !room_exists {
 		org, err := j.or.GetOrganizationByJobId(ctx, updateDto.JobID)
-		if err != nil {
-			return err
-		}
-		job, err := j.jr.GetJobByOrgId(ctx, org.Id)
 		if err != nil {
 			return err
 		}

@@ -20,7 +20,7 @@ type JobRepository interface {
 	GetApplicantsByOrgId(ctx context.Context, applicants *[]dto.JobApplicantDto, orgId string) error
 	Insert(ctx context.Context, tx pgx.Tx, job *model.Job) error
 	InsertApplicant(ctx context.Context, tx pgx.Tx, volunteerId, jobId string) error
-	Delete(ctx context.Context, tx pgx.Tx, jobId string) error
+	Delete(ctx context.Context, tx pgx.Tx, jobId, orgId string) error
 	UpdateJobStatus(ctx context.Context, tx pgx.Tx, jobId, userId, status string) error
 }
 
@@ -77,9 +77,9 @@ func (j *Job) GetJobsByOrgId(ctx context.Context, orgId string) ([]*model.Job, e
 	return jobs, nil
 }
 
-func (j *Job) Delete(ctx context.Context, tx pgx.Tx, jobId string) error {
-	cmd := `DELETE from org_jobs WHERE id=$1`
-	result, err := j.pgPool.Exec(ctx, cmd, jobId)
+func (j *Job) Delete(ctx context.Context, tx pgx.Tx, jobId, orgId string) error {
+	cmd := `DELETE from org_jobs WHERE id=$1 AND org_id=$2`
+	result, err := j.pgPool.Exec(ctx, cmd, jobId, orgId)
 	if err != nil {
 		return err
 	}
@@ -144,7 +144,7 @@ func (j *Job) GetApplicantsByOrgId(
 
 func (j *Job) GetJobByOrgId(ctx context.Context, orgId string) (model.Job, error) {
 	query := `SELECT id, org_id, job_title, description,
-	    	  created_at, updated_at, version FROM org_jobs WHERE org_id = $1`
+	    	  created_at, updated_at, version FROM org_jobs WHERE org_id = $1 `
 
 	row := j.pgPool.QueryRow(ctx, query, orgId)
 	var job model.Job

@@ -108,6 +108,7 @@ func (m *Message) GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.R
        COALESCE(gm.message, '') AS message, 
        COALESCE(gm.created_at, '1970-01-01 00:00:00') AS latest_message_time, 
        jcm.is_admin, 
+	   gm.is_seen,
        o.profile_icon AS org_profile_icon, 
        jcr.name AS room_name 
 	FROM job_chat_rooms jcr
@@ -134,7 +135,8 @@ func (m *Message) GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.R
 			&roomDto.RoomId,
 			&roomDto.LatestText,
 			&roomDto.SentTime,
-			&roomDto.IsAdming,
+			&roomDto.IsAdmin,
+			&roomDto.IsSeen,
 			&roomDto.RoomProfile,
 			&roomDto.RoomName,
 		)
