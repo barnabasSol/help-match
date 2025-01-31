@@ -17,13 +17,13 @@ class GradientButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [
-              Color.fromARGB(255, 209, 83, 142), // Pink
-              Color.fromARGB(255, 243, 178, 134), // Orange
+              Color.fromARGB(255, 209, 83, 142),
+              Color.fromARGB(255, 243, 178, 134),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20), // Rounded corners
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -37,7 +37,7 @@ class GradientButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(width: 8), // Spacing between icon and text
+            const SizedBox(width: 8),
             Text(
               text,
               style: const TextStyle(

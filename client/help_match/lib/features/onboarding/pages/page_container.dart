@@ -37,8 +37,7 @@ class PageContainer extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           SizedBox(
-            width:
-                MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+            width: MediaQuery.of(context).size.width * 0.8,
             child: Text(
               descriptions[index],
               textAlign: TextAlign.center,

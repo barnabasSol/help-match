@@ -5,6 +5,8 @@ sealed class UserAuthState {}
 
 final class UserAuthInitial extends UserAuthState {}
 
+final class UserAuthExpired extends UserAuthState {}
+
 final class UserAuthIsLoggedIn extends UserAuthState {
   final CurrentUser currentUser;
   UserAuthIsLoggedIn(this.currentUser);

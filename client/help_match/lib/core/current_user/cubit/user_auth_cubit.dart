@@ -12,8 +12,7 @@ class UserAuthCubit extends Cubit<UserAuthState> {
 
   Future<void> kickOut() async {
     try {
-      await secureStorage.delete(key: 'access_token');
-      await secureStorage.delete(key: 'refresh_token');
+      await secureStorage.deleteAll();
       emit(UserAuthInitial());
     } catch (e) {
       emit(UserAuthError('An error occurred during logout: ${e.toString()}'));
@@ -28,12 +27,10 @@ class UserAuthCubit extends Cubit<UserAuthState> {
         emit(UserAuthInitial());
         return;
       }
-
       final CurrentUser user = CurrentUser.fromToken(accessToken);
-      if (user.isExpired()) {
-        emit(UserAuthInitial());
-        return;
-      }
+
+      await secureStorage.write(key: 'username', value: user.username);
+      await secureStorage.write(key: 'userId', value: user.sub);
 
       emit(UserAuthIsLoggedIn(user));
     } catch (e) {

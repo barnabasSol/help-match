@@ -10,7 +10,10 @@ class ThemeCubit extends Cubit<ThemeMode> {
 
   Future<void> _initializeTheme() async {
     final themeMode = await secureStorage.read(key: "theme_mode");
-    if (themeMode == null || themeMode == "light") {
+    if (themeMode == null) {
+      await secureStorage.write(key: 'theme_mode', value: 'light');
+    }
+    if (themeMode == "light") {
       emit(ThemeMode.light);
     } else {
       emit(ThemeMode.dark);
