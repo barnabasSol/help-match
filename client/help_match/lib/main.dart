@@ -10,6 +10,8 @@ import 'package:help_match/core/secrets/secrets.dart';
 import 'package:help_match/core/theme/colors.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/core/ws_manager/ws_manager.dart';
+import 'package:help_match/features/auth/presentation/pages/login.dart';
+import 'package:help_match/features/auth/presentation/pages/signup.dart';
 import 'package:help_match/features/chat/dataprovider/remote/chat_remote.dart';
 import 'package:help_match/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:help_match/features/chat/repository/chat_repository.dart';
@@ -106,11 +108,28 @@ class _MyAppState extends State<MyApp> {
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, state) {
         return MaterialApp(
+          //  route navigation for the pages
+          routes: {
+            '/signin': (context) => SignUpPage(),
+            '/login': (context) => LogInPage(),
+            //  '/signintype' :(context) => Signinaccounttype(),
+
+            //  '/signinv1' : (context) => Signinv1(),
+            //  '/signinv2' : (context) => Signinv2(),
+            //  '/signinv3' : (context) => Signinv3(),
+
+            //  '/signino1' : (context) => Signino1(),
+            //  '/signino2' : (context) => Signino2(),
+
+            //  '/homev' : (context) => Home_Page_V(),
+          },
+
           title: 'HelpMatch',
           debugShowCheckedModeBanner: false,
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: state,
+
           home: BlocBuilder<UserAuthCubit, UserAuthState>(
             builder: (context, state) {
               if (state is UserAuthChecking) {
@@ -118,7 +137,8 @@ class _MyAppState extends State<MyApp> {
               } else if (state is UserAuthIsLoggedIn) {
                 final currentUser = context.read<UserAuthCubit>().currentUser;
                 if (currentUser!.role == "user") {
-                  return const VolunteerScreen();
+                  // return const VolunteerScreen();
+                  return SignUpPage();
                 }
                 return const Scaffold();
               } else if (state is UserAuthInitial) {
