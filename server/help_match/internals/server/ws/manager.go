@@ -76,7 +76,6 @@ func (m *Manager) ServeWS(
 	}
 
 	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
-
 	roomIds, err := m.EventRepository.ChatRepository.GetRoomIdsOfUserById(r.Context(), claims.Subject)
 	if err != nil {
 		log.Println(err)
@@ -94,8 +93,8 @@ func (m *Manager) ServeWS(
 	m.addClient(newClient)
 	go newClient.readMessages()
 	go newClient.writeMessages()
-	go m.EventRepository.NotifyOnlineStatusChange(Event{}, newClient)
-	go m.EventRepository.ChatRepository.UpdateOnlineStatus(r.Context(), claims.Subject, true)
+	go notifyOnlineStatusChange(newClient, true)
+	go m.EventRepository.ChatRepository.UpdateOnlineStatus(context.Background(), claims.Subject, true)
 }
 
 func (m *Manager) RenewOTP(

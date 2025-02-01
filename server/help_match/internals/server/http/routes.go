@@ -26,7 +26,7 @@ func (as *AppServer) routes() http.Handler {
 	router.GET("/v1/org/:id", mw.AuthMiddleware(as.orgHandler.GetOrganization))
 	router.GET("/v1/org", mw.AuthMiddleware(mw.RequireRole(string(dto.User), as.orgHandler.GetOrganizations)))
 	//jobs
-	router.GET("/v1/job/applicants/:job_id", mw.AuthMiddleware(mw.RequireRole(
+	router.GET("/v1/job/applicants/:org_id", mw.AuthMiddleware(mw.RequireRole(
 		string(dto.Organization),
 		as.jobHandler.GetJobApplicants,
 	)))

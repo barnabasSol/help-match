@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -10,7 +9,7 @@ import (
 )
 
 type MessageRepository interface {
-	InsertMessage(ctx context.Context, senderId, roomId, message string) (time.Time, error)
+	InsertMessage(ctx context.Context, senderId, roomId, message string, sentTIme time.Time) error
 	InsertMemeberToRoom(ctx context.Context, isOrg bool, userId, roomId string) error
 	InsertJobRoom(ctx context.Context, jobId string, name string) (string, error)
 	GetMessagesByRoomId(ctx context.Context, roomId string) (*[]dto.Message, error)
@@ -31,21 +30,19 @@ func NewMessageRepository(pool *pgxpool.Pool) *Message {
 func (m *Message) InsertMessage(
 	ctx context.Context,
 	senderId, roomdId, message string,
-) (time.Time, error) {
-	cmd := `INSERT INTO group_messages(chat_room_id, sender_id, message)
-			VALUES ($1, $2, $3) RETURNING created_at
+	sentAt time.Time,
+) error {
+	cmd := `INSERT INTO group_messages(chat_room_id, sender_id, message, created_at)
+			VALUES ($1, $2, $3, $4)
 		   `
 	args := []any{
 		roomdId,
 		senderId,
 		message,
+		sentAt,
 	}
-	var on time.Time
-	err := m.pool.QueryRow(ctx, cmd, args...).Scan(&on)
-	if err != nil {
-		return time.Time{}, err
-	}
-	return on, nil
+	_, err := m.pool.Exec(ctx, cmd, args...)
+	return err
 }
 
 func (m *Message) GetMessagesByRoomId(
@@ -152,10 +149,10 @@ func (m *Message) GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.R
 }
 
 func (m *Message) UpdateOnlineStatus(ctx context.Context, userId string, status bool) error {
+	println("UPDATE IS CALLEd")
 	cmd := `UPDATE users SET is_online = $1 WHERE id = $2`
 	_, err := m.pool.Exec(ctx, cmd, status, userId)
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil

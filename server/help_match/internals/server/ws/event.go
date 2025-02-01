@@ -26,24 +26,13 @@ func (e *EventRepository) SendMessageHandler(event Event, c *Client) error {
 	if err := json.Unmarshal(event.Payload, &sendEvent); err != nil {
 		return fmt.Errorf("bad/invalid payload in request: %v", err)
 	}
-	on, err := e.ChatRepository.InsertMessage(
-		context.Background(),
-		sendEvent.FromId,
-		sendEvent.ToRoomId,
-		sendEvent.Message,
-	)
-
-	if err != nil {
-		log.Println(err)
-		return errors.New("failed to store message")
-	}
 
 	var newMessageEvent NewMessageEvent
 
 	newMessageEvent.Message = sendEvent.Message
 	newMessageEvent.ToRoomId = sendEvent.ToRoomId
 	newMessageEvent.FromId = sendEvent.FromId
-	newMessageEvent.SentAt = on
+	newMessageEvent.SentTime = sendEvent.SentTime
 
 	marshalledNewEvent, err := json.Marshal(newMessageEvent)
 	if err != nil {
@@ -63,36 +52,25 @@ func (e *EventRepository) SendMessageHandler(event Event, c *Client) error {
 
 	}
 	c.manager.RUnlock()
+	err = e.ChatRepository.InsertMessage(
+		context.Background(),
+		sendEvent.FromId,
+		sendEvent.ToRoomId,
+		sendEvent.Message,
+		sendEvent.SentTime,
+	)
+
+	if err != nil {
+		log.Println(err)
+		return errors.New("failed to store message")
+	}
 	return nil
 }
 
 func (e *EventRepository) NotifyOnlineStatusChange(ev Event, c *Client) error {
-	isOnline := false
-	c.manager.RLock()
-	for v := range c.manager.Clients {
-		if v.userId == c.userId {
-			isOnline = true
-			break
-		}
-	}
-	c.manager.RUnlock()
-
-	statusEventPayload, err := json.Marshal(OnlineStatus{
-		UserId:   c.userId,
-		Username: c.username,
-		Status:   isOnline,
-	})
-
-	if err != nil {
-		return fmt.Errorf("failed to marshal online status event: %v", err)
-	}
-
 	c.manager.RLock()
 	for client := range c.manager.Clients {
-		client.egress <- Event{
-			Type:    TypeOnlineStatus,
-			Payload: statusEventPayload,
-		}
+		client.egress <- ev
 	}
 	c.manager.RUnlock()
 

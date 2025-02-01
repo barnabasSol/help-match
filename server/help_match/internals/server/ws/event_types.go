@@ -5,16 +5,16 @@ import "time"
 const TypeSendMessage = "send_message"
 
 type SendMessageEvent struct {
-	Message  string `json:"message"`
-	FromId   string `json:"from_id"`
-	ToRoomId string `json:"to_room_id"`
+	Message  string    `json:"message"`
+	FromId   string    `json:"from_id"`
+	ToRoomId string    `json:"to_room_id"`
+	SentTime time.Time `json:"sent_time"`
 }
 
 const TypeNewMessage = "new_message"
 
 type NewMessageEvent struct {
 	SendMessageEvent
-	SentAt time.Time `json:"sent_at"`
 }
 
 const TypeOnlineStatus = "online_status_change"

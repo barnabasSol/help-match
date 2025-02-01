@@ -1,5 +1,7 @@
 package service
 
+import "fmt"
+
 const (
 	Accepted = "accepted"
 	Rejected = "rejected"
@@ -7,14 +9,14 @@ const (
 	Finished = "finished"
 )
 
-func notificationMessageFromStatus(status string) string {
+func notificationMessageFromStatus(jobName, orgName, status string) string {
 	switch status {
 	case "pending":
 		return "Your application is pending"
 	case "accepted":
-		return "Congratulations, you have been accepted for this job"
+		return fmt.Sprintf("Congratulations, you have been accepted for %s job at %s", jobName, orgName)
 	case "rejected":
-		return "Unfortunaltey, you have been rejected for this job, go fuck yourself"
+		return fmt.Sprintf("Unfortunaltey, you have not been accepted for the %s job at %s, go fuck yourself kindly", jobName, orgName)
 	case "finished":
 		return "You have successfully completed "
 	default:
