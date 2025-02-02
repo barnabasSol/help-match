@@ -18,8 +18,7 @@ class ProfilePage extends StatelessWidget {
               height: MediaQuery.of(context).size.height * 0.8,
               child: LocationPicker(
                 onLocationPicked: (location) {
-                  // Return the picked location when the user confirms
-                  Navigator.pop(context, location);
+                  Navigator.of(context).pop(location);
                 },
               ),
             );
@@ -28,7 +27,6 @@ class ProfilePage extends StatelessWidget {
 
         if (pickedLocation != null) {
           print('Picked Location: $pickedLocation');
-          // You can now use the picked location as needed
         }
       },
       child: const Center(

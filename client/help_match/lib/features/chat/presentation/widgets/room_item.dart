@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:help_match/features/chat/presentation/pages/room_messages.dart';
 
 class RoomListItem extends StatelessWidget {
+  final String roomId;
   final String roomProfile;
   final String roomName;
   final String latestText;
@@ -12,6 +14,7 @@ class RoomListItem extends StatelessWidget {
     required this.roomName,
     required this.latestText,
     required this.seen,
+    required this.roomId,
   });
 
   @override
@@ -47,7 +50,15 @@ class RoomListItem extends StatelessWidget {
               : const Icon(Icons.circle,
                   color: Colors.red, size: 12), // Icon for unseen messages
       onTap: () {
-        print('Tapped on $roomName');
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => RoomMessagesPage(
+              roomId: roomId,
+              groupName: roomName,
+              profileIcon: 'https://img.rasset.ie/00141e21-1600.jpg',
+            ),
+          ),
+        );
       },
     );
   }

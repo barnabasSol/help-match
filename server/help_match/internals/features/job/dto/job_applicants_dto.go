@@ -8,6 +8,6 @@ type JobApplicantDto struct {
 	Name        string    `json:"name"`
 	ProfileIcon string    `json:"profile_icon"`
 	JobId       string    `json:"job_id"`
-	Status      string    `json:"status"`
+	Status      bool      `json:"status"`
 	CreatedAt   time.Time `json:"created_at"`
 }

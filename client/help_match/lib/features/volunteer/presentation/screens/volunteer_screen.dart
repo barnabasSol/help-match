@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:help_match/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
 import 'package:help_match/features/chat/presentation/pages/room_list_page.dart';
+import 'package:help_match/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:help_match/features/notifications/presentation/pages/notif_list_page.dart';
 import 'package:help_match/features/volunteer/presentation/pages/volunteer_home.dart';
 import 'package:help_match/features/volunteer/presentation/pages/volunteer_profile.dart';
 
@@ -18,20 +20,29 @@ class _VolunteerScreen extends State<VolunteerScreen> {
   final List<Widget> _pages = [
     const HomePage(),
     const ProfilePage(),
-    const RoomListPage()
+    const RoomListPage(),
+    const NotificationListPage(),
   ];
 
   static const List<BottomNavigationBarItem> _bottomNavItems = [
     BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
     BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.notifications),
+      label: 'Notifications',
+    ),
   ];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
       if (index == 2) {
-        context.read<ChatBloc>().add(ChatRoomListRequested());
+        context.read<RoomsBloc>().add(RoomListRequested());
+      } else if (index == 3) {
+        context
+            .read<NotificationBloc>()
+            .add(VolunteerNotificationListRequested());
       }
     });
   }
@@ -43,6 +54,10 @@ class _VolunteerScreen extends State<VolunteerScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: _bottomNavItems,
+        selectedItemColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        type: BottomNavigationBarType.fixed,
       ),
       body: _pages[_selectedIndex],
     );
