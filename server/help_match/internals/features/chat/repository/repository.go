@@ -50,7 +50,7 @@ func (m *Message) GetMessagesByRoomId(
 	roomId string,
 ) (*[]dto.Message, error) {
 	query := `
-	SELECT 
+		SELECT 
 		CASE 
 			WHEN jcm.is_admin THEN o.profile_icon
 			ELSE u.profile_pic_url
@@ -67,7 +67,7 @@ func (m *Message) GetMessagesByRoomId(
 		gm.chat_room_id,
 		jcm.is_admin
 	FROM group_messages gm
-	JOIN job_chat_members jcm ON gm.sender_id = jcm.id
+	JOIN job_chat_members jcm ON gm.chat_room_id = jcm.chat_room_id AND gm.sender_id = jcm.user_id
 	JOIN users u ON jcm.user_id = u.id
 	LEFT JOIN organizations o ON jcm.user_id = o.user_id
 	WHERE gm.chat_room_id = $1;
@@ -101,20 +101,27 @@ func (m *Message) GetMessagesByRoomId(
 
 func (m *Message) GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.Room, error) {
 	query := `
-	SELECT DISTINCT ON (jcr.id) jcr.id AS chat_room_id, 
-       COALESCE(gm.message, '') AS message, 
-       COALESCE(gm.created_at, '1970-01-01 00:00:00') AS latest_message_time, 
-       jcm.is_admin, 
-	   gm.is_seen,
-       o.profile_icon AS org_profile_icon, 
-       jcr.name AS room_name 
-	FROM job_chat_rooms jcr
-	JOIN org_jobs oj ON jcr.job_id = oj.id
-	JOIN organizations o ON oj.org_id = o.id
-	LEFT JOIN group_messages gm ON jcr.id = gm.chat_room_id
-	JOIN job_chat_members jcm ON jcr.id = jcm.chat_room_id
-	WHERE jcm.user_id = $1
-	ORDER BY jcr.id, gm.created_at DESC;
+			WITH latest_messages AS (
+			SELECT chat_room_id,
+				   message,
+				   created_at,
+				   is_seen,
+				   ROW_NUMBER() OVER (PARTITION BY chat_room_id ORDER BY created_at DESC) as rn
+			FROM group_messages
+		)
+		SELECT jcr.id AS chat_room_id, 
+			   COALESCE(lm.message, '') AS message, 
+			   COALESCE(lm.created_at, '1970-01-01 00:00:00') AS latest_message_time, 
+			   jcm.is_admin, 
+			   lm.is_seen,
+			   o.profile_icon AS org_profile_icon, 
+			   jcr.name AS room_name 
+		FROM job_chat_rooms jcr
+		JOIN org_jobs oj ON jcr.job_id = oj.id
+		JOIN organizations o ON oj.org_id = o.id
+		JOIN job_chat_members jcm ON jcr.id = jcm.chat_room_id
+		LEFT JOIN latest_messages lm ON jcr.id = lm.chat_room_id AND lm.rn = 1
+		WHERE jcm.user_id = $1;
 			 `
 
 	rows, err := m.pool.Query(

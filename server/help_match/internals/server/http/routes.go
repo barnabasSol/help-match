@@ -22,11 +22,13 @@ func (as *AppServer) routes() http.Handler {
 	router.POST("/v1/auth/login", as.authHandler.Login)
 	router.POST("/v1/auth/signup", as.authHandler.SignUp)
 	router.POST("/v1/auth/refresh", as.authHandler.Refresh)
+	//user
+	router.GET("/v1/user", mw.AuthMiddleware(as.userHandler.GetUser))
 	//organization
 	router.GET("/v1/org/:id", mw.AuthMiddleware(as.orgHandler.GetOrganization))
 	router.GET("/v1/org", mw.AuthMiddleware(mw.RequireRole(string(dto.User), as.orgHandler.GetOrganizations)))
 	//jobs
-	router.GET("/v1/job/applicants/:org_id", mw.AuthMiddleware(mw.RequireRole(
+	router.GET("/v1/job/applicants", mw.AuthMiddleware(mw.RequireRole(
 		string(dto.Organization),
 		as.jobHandler.GetJobApplicants,
 	)))

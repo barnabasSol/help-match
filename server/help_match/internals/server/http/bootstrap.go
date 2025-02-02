@@ -18,7 +18,9 @@ import (
 	org_h "hm.barney-host.site/internals/features/organization/handler"
 	org_r "hm.barney-host.site/internals/features/organization/repository"
 	org_s "hm.barney-host.site/internals/features/organization/service"
+	user_h "hm.barney-host.site/internals/features/users/handler"
 	user_r "hm.barney-host.site/internals/features/users/repository"
+	user_s "hm.barney-host.site/internals/features/users/service"
 )
 
 func (as *AppServer) bootstrapHandlers(pool *pgxpool.Pool) {
@@ -33,6 +35,7 @@ func (as *AppServer) bootstrapHandlers(pool *pgxpool.Pool) {
 	bootstrapEventRepository(as, chatRepo)
 
 	//services
+	userService := user_s.NewUserService(userRepo, orgRepo)
 	authService := auth_s.NewAuthService(userRepo, authRepo, orgRepo, as.wsManager)
 	orgService := org_s.NewOrgService(orgRepo, jobRepo, userRepo)
 	jobService := job_s.NewJobService(jobRepo, notifRepo, orgRepo, chatRepo)
@@ -45,6 +48,7 @@ func (as *AppServer) bootstrapHandlers(pool *pgxpool.Pool) {
 	as.chatHandler = chat_h.NewChatHandler(chatService)
 	as.noitifHandler = not_h.NewNotificationHandler(notifRepo)
 	as.FileUploadHandler = filehandler.NewFileUploadHandler(fileRepo)
+	as.userHandler = user_h.NewUserHandler(userService)
 }
 
 func bootstrapEventRepository(as *AppServer, chatRepo *chat_r.Message) {

@@ -3,8 +3,8 @@ package dto
 import (
 	"time"
 
+	user_dto "hm.barney-host.site/internals/features/common/dto"
 	job_dto "hm.barney-host.site/internals/features/job/dto"
-	user_dto "hm.barney-host.site/internals/features/users/dto"
 )
 
 type OrgResponse struct {

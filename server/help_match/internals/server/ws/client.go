@@ -73,6 +73,7 @@ func (c *Client) readMessages() {
 			break
 
 		}
+		log.Println(request)
 		if err := c.manager.RouteEvent(request, c); err != nil {
 			log.Println("error handling the message", err)
 		}
