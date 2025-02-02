@@ -10,6 +10,11 @@ import 'package:help_match/core/secrets/secrets.dart';
 import 'package:help_match/core/theme/colors.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/core/ws_manager/ws_manager.dart';
+import 'package:help_match/features/auth/presentation/pages/SignupO1.dart';
+import 'package:help_match/features/auth/presentation/pages/SignupO2.dart';
+import 'package:help_match/features/auth/presentation/pages/SignupV1.dart';
+import 'package:help_match/features/auth/presentation/pages/SignupV2.dart';
+import 'package:help_match/features/auth/presentation/pages/SignupV3.dart';
 import 'package:help_match/features/auth/presentation/pages/login.dart';
 import 'package:help_match/features/auth/presentation/pages/signup.dart';
 import 'package:help_match/features/chat/dataprovider/remote/chat_remote.dart';
@@ -110,19 +115,17 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp(
           //  route navigation for the pages
           routes: {
-            '/signin': (context) => SignUpPage(),
-            '/login': (context) => LogInPage(),
-            //  '/signintype' :(context) => Signinaccounttype(),
+            '/login': (context) => Login(),
 
-            //  '/signinv1' : (context) => Signinv1(),
-            //  '/signinv2' : (context) => Signinv2(),
-            //  '/signinv3' : (context) => Signinv3(),
+            '/signup': (context) => Signup(),
 
-            //  '/signino1' : (context) => Signino1(),
-            //  '/signino2' : (context) => Signino2(),
-
-            //  '/homev' : (context) => Home_Page_V(),
-          },
+            '/signupv1': (context) => Signupv1(),
+            '/signupv2': (context) => Signupv2(),
+            '/signupv3': (context) => Signupv3(),
+            
+            '/signupo1': (context) => Signupo1(),
+            '/signupo2': (context) => Signupo2(),
+         },
 
           title: 'HelpMatch',
           debugShowCheckedModeBanner: false,
@@ -130,6 +133,7 @@ class _MyAppState extends State<MyApp> {
           darkTheme: darkTheme,
           themeMode: state,
 
+          // home:  SignUp(),
           home: BlocBuilder<UserAuthCubit, UserAuthState>(
             builder: (context, state) {
               if (state is UserAuthChecking) {
@@ -138,7 +142,7 @@ class _MyAppState extends State<MyApp> {
                 final currentUser = context.read<UserAuthCubit>().currentUser;
                 if (currentUser!.role == "user") {
                   // return const VolunteerScreen();
-                  return SignUpPage();
+                  return Signup();
                 }
                 return const Scaffold();
               } else if (state is UserAuthInitial) {
@@ -158,6 +162,11 @@ class _MyAppState extends State<MyApp> {
               }
             },
           ),
+
+
+
+
+
         );
       },
     );

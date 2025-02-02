@@ -1,244 +1,160 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
-
-  @override
-  State<SignUpPage> createState() => _SignUpPageState();
-}
-
-class _SignUpPageState extends State<SignUpPage> {
-  final _formKey = GlobalKey<FormState>();
-  bool _obscureText = true;
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class Signup extends StatelessWidget {
+  const Signup({super.key});
 
   @override
   Widget build(BuildContext context) {
-      var primaryButton = Theme.of(context).colorScheme.primary;
-    
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 40),
-                // Logo
-                Icon(Icons.volunteer_activism,
-                    size: 80, color: primaryButton,),
-                const SizedBox(height: 32),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Logo
+              const Icon(Icons.volunteer_activism,
+                  size: 80, color: Colors.blue),
+              const SizedBox(height: 32),
 
-                const SizedBox(height: 32),
-
-                const Text(
-                  'Welcome Back',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+              // Title
+              const Text(
+                'Create Account',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
                 ),
-                const SizedBox(height: 8),
+              ),
+              const SizedBox(height: 12),
 
-                Text(
-                  'Hello there, sign in to continue',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
+              // Subtitle
+              Text(
+                'Which type of account would you like?',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
                 ),
-                const SizedBox(height: 32),
+              ),
+              const SizedBox(height: 40),
 
-                // Form Field
-                _buildUsernameField(),
-                const SizedBox(height: 20),
+              // Account Type Cards
+              const AccountTypeCard(
+                title: 'Volunteer',
+                subtitle: 'I am a professional looking to volunteer',
+                icon: Icons.person,
+                color: Colors.blue,
+              ),
+              const SizedBox(height: 24),
 
-                // Password Input
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscureText,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
+              const AccountTypeCard(
+                title: 'Organization',
+                subtitle:
+                    'My non-profit Organization is looking for volunteers',
+                icon: Icons.business,
+                color: Colors.green,
+              ),
+              const SizedBox(height: 40),
+
+              // Existing Account Link
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Already have an account? ',
+                    style: TextStyle(color: Colors.grey[600]),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 28),
-
-                // Sign In Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      
-                      foregroundColor: Colors.white,
-                    ),
+                  TextButton(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // Handle sign in
-                      }
+                      // Navigate to login
                     },
                     child: const Text(
-                      'Sign In',
+                      'Log In',
                       style: TextStyle(
-                        fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Colors.blue,
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-
-                // Social Login Text
-                Text(
-                  'or sign in with',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Social Buttons Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Google Button
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.g_mobiledata, size: 24),
-                      label: const Text('Google'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        side: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      onPressed: () {
-                        // Handle Google sign in
-                      },
-                    ),
-                    const SizedBox(width: 16),
-
-                    // Facebook Button
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.facebook, size: 24),
-                      label: const Text('Facebook'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        side: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      onPressed: () {
-                        // Handle Facebook sign in
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Sign Up Link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Don't have an account? ",
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // Navigate to sign up screen
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, '/login');
-                      },
-                      child: Text(
-                        'Join us',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: primaryButton,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
   }
-
-  Widget _buildUsernameField() {
-    return TextFormField(
-      controller: _usernameController,
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_]')),
-      ],
-      decoration: InputDecoration(
-        labelText: 'Username',
-        prefixIcon: const Icon(Icons.alternate_email),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        filled: true,
-        fillColor: Colors.grey[100],
-        hintText: '@username',
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a username';
-        }
-        if (value.contains(' ')) {
-          return 'Username cannot contain spaces';
-        }
-        return null;
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
 }
 
+class AccountTypeCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
 
+  const AccountTypeCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+
+        // ignore: deprecated_member_use
+        backgroundColor: color.withOpacity(0.1),
+        foregroundColor: color,
+        padding: const EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        elevation: 0,
+        shadowColor: Colors.transparent,
+      ),
+      onPressed: () {
+        // Handle account type selection
+
+        if (title == 'Volunteer') {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/signupv1');
+               
+        }
+        else if(title == 'Organization'){
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/signupo1');
+        }
+      },
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, size: 40),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
