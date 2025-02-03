@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
+import 'package:help_match/core/current_user/data_provider/local.dart';
+import 'package:help_match/core/current_user/data_provider/user_remote.dart';
+import 'package:help_match/core/current_user/repository/user_repo.dart';
 import 'package:help_match/core/interceptor/interceptor.dart';
+import 'package:help_match/core/local_storage/app_local.dart';
 import 'package:help_match/core/theme/colors.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/core/ws_manager/cubit/websocket_cubit.dart';
@@ -30,6 +34,7 @@ Future<void> main() async {
   );
 
   final userAuthCubit = UserAuthCubit(secureStorage: secureStorage);
+  await initializeHive();
 
   await secureStorage.write(
       key: 'access_token',
@@ -65,6 +70,18 @@ Future<void> main() async {
             context.read<WsManager>(),
           ),
         ),
+        RepositoryProvider<UserInfoRemoteProvider>(
+          create: (_) => UserInfoRemoteProvider(dio),
+        ),
+        RepositoryProvider<UserLocalProvider>(
+          create: (_) => UserLocalProvider(),
+        ),
+        RepositoryProvider<UserRepo>(
+          create: (context) => UserRepo(
+            context.read<UserInfoRemoteProvider>(),
+            context.read<UserLocalProvider>(),
+          ),
+        ),
         RepositoryProvider<NotificationProvider>(
           create: (_) => NotificationProvider(dio: dio),
         ),
@@ -93,7 +110,10 @@ Future<void> main() async {
                 create: (_) => userAuthCubit,
               ),
               BlocProvider(
-                create: (_) => ChatBloc(context.read<ChatRepository>()),
+                create: (_) => ChatBloc(
+                  context.read<ChatRepository>(),
+                  context.read<UserRepo>(),
+                ),
               ),
               BlocProvider(
                 create: (_) => RoomsBloc(context.read<ChatRepository>()),

@@ -6,7 +6,7 @@ import 'package:help_match/features/chat/dto/room_dto.dart';
 import 'package:help_match/features/chat/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
 import 'package:help_match/features/chat/presentation/widgets/input_field.dart';
-import 'package:help_match/shared/widgets/loading_indicator.dart';
+import 'package:help_match/features/chat/presentation/widgets/message_card.dart';
 import 'package:help_match/shared/widgets/snack_bar.dart';
 
 class RoomMessagesPage extends StatefulWidget {
@@ -33,9 +33,15 @@ class _RoomMessagesPageState extends State<RoomMessagesPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currentUser = context.read<UserAuthCubit>().currentUser;
     final ThemeData theme = Theme.of(context);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -63,7 +69,6 @@ class _RoomMessagesPageState extends State<RoomMessagesPage> {
               centerTitle: false,
               background: Stack(
                 children: [
-                  // Background Image
                   Image.network(
                     widget.profileIcon.isEmpty
                         ? Secrets.DummyImage
@@ -72,7 +77,6 @@ class _RoomMessagesPageState extends State<RoomMessagesPage> {
                     width: double.infinity,
                     height: double.infinity,
                   ),
-
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -91,13 +95,17 @@ class _RoomMessagesPageState extends State<RoomMessagesPage> {
           ),
           BlocConsumer<ChatBloc, ChatState>(
             listener: (context, state) {
-              if (state is NewMessageReceived) {
+              if (state is NewMessageReceiveSuccess) {
+                showCustomSnackBar(
+                    context: context,
+                    message: state.message.message,
+                    color: Colors.pink);
                 context.read<RoomsBloc>().add(
                       RoomsUpdated(
                         RoomDto(
                           roomProfile: null,
-                          roomId: state.message.toRoomId,
-                          isAdmin: null,
+                          roomId: state.message.roomId,
+                          isAdmin: state.message.isAdmin,
                           roomName: null,
                           latestText: state.message.message,
                           sentTime: state.message.sentTime,
@@ -105,81 +113,45 @@ class _RoomMessagesPageState extends State<RoomMessagesPage> {
                         ),
                       ),
                     );
-                if (currentUser?.sub != state.message.fromId) {
-                  showCustomSnackBar(
-                    context: context,
-                    message: state.message.message,
-                    color: Colors.green,
-                  );
-                }
+                if (currentUser?.sub != state.message.senderId) {}
               }
             },
             builder: (context, state) {
               if (state is ChatMessagesLoading) {
                 return const SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 200,
-                    child: LoadingIndicator(),
-                  ),
+                  child: Center(child: CircularProgressIndicator()),
                 );
               } else if (state is ChatMessagesLoaded) {
-                final messages = state.messages;
-                if (messages.isEmpty) {
-                  return const SliverToBoxAdapter(
-                    child: Center(
-                      child: Text('There are no messages'),
-                    ),
-                  );
-                } else {
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final message = messages[index];
-                        return ListTile(
-                          title: Text(message.senderName),
-                          subtitle: Text(message.message),
-                        );
-                      },
-                      childCount: messages.length,
-                    ),
-                  );
-                }
+                final sortedMessages = state.messages
+                  ..sort((a, b) => a.sentTime.compareTo(b.sentTime));
+
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final msg = sortedMessages[index];
+                      return MessageCard(
+                        senderName: msg.senderName,
+                        profileIcon: msg.senderProfileIcon,
+                        sentTime: msg.sentTime,
+                        isSeen: msg.isSeen,
+                        isOther: true,
+                        message: msg.message,
+                      );
+                    },
+                    childCount: sortedMessages.length,
+                  ),
+                );
               } else if (state is ChatMessagesLoadingFailed) {
                 return SliverToBoxAdapter(
                   child: Center(
-                    child: Text(state.error),
+                    child: Text('Failed to load messages: ${state.error}'),
                   ),
                 );
-              } else if (state is NewMessageReceived) {
-                context.read<ChatBloc>().add(UpdateMessages(state.message));
-              } else if (state is MessageUpdate) {
-                final messages = state.messages;
-                if (messages.isEmpty) {
-                  return const SliverToBoxAdapter(
-                    child: Center(
-                      child: Text('There are no messages'),
-                    ),
-                  );
-                } else {
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final message = messages[index];
-                        return ListTile(
-                          title: Text(message.senderName),
-                          subtitle: Text(message.message),
-                        );
-                      },
-                      childCount: messages.length,
-                    ),
-                  );
-                }
-              }
-              {
+              } else if (state is NewMessageReceiveSuccess) {
+                return const SliverToBoxAdapter();
+              } else {
                 return const SliverToBoxAdapter(
-                  child: Center(
-                    child: Text('Something unexpected'),
-                  ),
+                  child: Center(child: Text('Unknown state')),
                 );
               }
             },

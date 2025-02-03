@@ -18,9 +18,9 @@ class NewMessageSent extends ChatEvent {
   NewMessageSent(this.message);
 }
 
-class UpdateMessages extends ChatEvent {
-  final MessageModel message;
-  UpdateMessages(this.message);
-}
-
 class NewMessageListening extends ChatEvent {}
+
+class NewMessageReceived extends ChatEvent {
+  final MessageDto messageDto;
+  NewMessageReceived(this.messageDto);
+}

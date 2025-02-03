@@ -11,7 +11,7 @@ class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
   List<RoomDto> _rooms = [];
 
   RoomsBloc(this.chatRepository) : super(RoomsInitial()) {
-    on<RoomsEvent>((event, emit) {});
+    // on<RoomsEvent>((event, emit) {});
 
     on<RoomsUpdated>((event, emit) {
       _rooms = _rooms.map((room) {
@@ -24,7 +24,7 @@ class RoomsBloc extends Bloc<RoomsEvent, RoomsState> {
         }
         return room;
       }).toList();
-      emit(RoomsUpdateSuccess(_rooms));
+      emit(RoomsLoaded(_rooms));
     });
 
     on<RoomListRequested>((event, emit) async {
