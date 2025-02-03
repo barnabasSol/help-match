@@ -3,10 +3,12 @@ package common
 import "time"
 
 type User struct {
+	Id            string            `json:"id"`
 	Name          string            `json:"name"`
 	Username      string            `json:"username"`
 	Email         string            `json:"email"`
 	ProfilePicUrl string            `json:"profile_pic_url"`
+	Role          string            `json:"role"`
 	IsActivated   bool              `json:"is_activated"`
 	IsOnline      bool              `json:"is_online"`
 	Interests     *AllowedInterests `json:"interests,omitempty"`
@@ -16,6 +18,7 @@ type User struct {
 }
 
 type OrgInfo struct {
+	Id          string    `json:"org_id"`
 	Name        string    `json:"org_name"`
 	ProfileIcon string    `json:"profile_icon"`
 	Description string    `json:"description"`

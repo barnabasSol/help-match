@@ -41,3 +41,24 @@ func (u *User) GetUser(
 	}
 	utils.CreateResponse(w, err, user, http.StatusOK, "here's the user")
 }
+
+func (u *User) GetByUsernameOrId(
+	w http.ResponseWriter,
+	r *http.Request,
+	p httprouter.Params,
+) {
+	username := r.URL.Query().Get("username")
+	userID := r.URL.Query().Get("user_id")
+	ctx, cancel := context.WithTimeout(r.Context(), contextTimeout)
+	defer cancel()
+	user, err := u.us.GetUserByUsernameOrId(ctx, username, userID)
+	if statusCode, ok := auth_errors.AuthErrors[err]; ok {
+		utils.CreateResponse(w, err, nil, statusCode, "")
+		return
+	} else if err != nil {
+		log.Println(err)
+		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
+		return
+	}
+	utils.CreateResponse(w, err, user, http.StatusOK, "here's the user")
+}
