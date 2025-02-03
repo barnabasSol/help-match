@@ -16,6 +16,11 @@ import 'package:help_match/features/notifications/data_provider/notif_provider.d
 import 'package:help_match/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:help_match/features/notifications/repository/notif_repository.dart';
 import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
+
+import 'package:help_match/features/organization/bloc/org_bloc.dart';
+import 'package:help_match/features/organization/data_provider/org_remote.dart';
+import 'package:help_match/features/organization/presentation/pages/screen.dart';
+import 'package:help_match/features/organization/repository/org_repository.dart';
 import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/features/online_status/repository/online_status_repository.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
@@ -73,11 +78,15 @@ Future<void> main() async {
             context.read<NotificationProvider>(),
           ),
         ),
+        RepositoryProvider(create: (context) => OrgDataProvider(dio: dio)
+        ),
+        RepositoryProvider(create: (context)=>OrgRepository(context.read<OrgDataProvider>()))
       ],
       child: Builder(
         builder: (context) {
           return MultiBlocProvider(
             providers: [
+              BlocProvider(create: (context) => OrgBloc(context.read<OrgRepository>())),
               BlocProvider(
                 create: (_) =>
                     ThemeCubit(secureStorage)..emit(initialThemeMode),

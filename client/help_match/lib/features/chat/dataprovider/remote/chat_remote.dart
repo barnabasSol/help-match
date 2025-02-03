@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:help_match/core/secrets/secrets.dart';
 
 class ChatRemoteDataProvider {
-  final Dio _dio;
+  final Dio _dio; 
 
   ChatRemoteDataProvider({required Dio dio}) : _dio = dio;
 
