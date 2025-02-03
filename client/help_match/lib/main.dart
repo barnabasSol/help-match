@@ -14,6 +14,10 @@ import 'package:help_match/features/chat/dataprovider/remote/chat_remote.dart';
 import 'package:help_match/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:help_match/features/chat/repository/chat_repository.dart';
 import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
+import 'package:help_match/features/organization/bloc/org_bloc.dart';
+import 'package:help_match/features/organization/data_provider/org_remote.dart';
+import 'package:help_match/features/organization/presentation/pages/screen.dart';
+import 'package:help_match/features/organization/repository/org_repository.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
 import 'package:help_match/shared/widgets/loading_indicator.dart';
 
@@ -30,7 +34,7 @@ Future<void> main() async {
   await secureStorage.write(
       key: 'access_token',
       value:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhZyIsInJvbGUiOiJ1c2VyIiwiaXNzIjoiaHR0cHM6Ly9obS5iYXJuZXktaG9zdC5zaXRlIiwic3ViIjoiYzUzMjZiMWUtZGYxMi0xMWVmLWJhNjEtZGI2NzI4OGI0MTNlIiwiYXVkIjpbImNvbS5iYXJuZXktaG9zdC5obSJdLCJleHAiOjE3Mzg4NTA1MDksImlhdCI6MTczODI0NTcxOH0.OSdQymU4QJgE7fK0RemZFa0DngbVaO4C4YImf7tVMmQ');
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhZ20iLCJyb2xlIjoidXNlciIsImlzcyI6Imh0dHBzOi8vaG0uYmFybmV5LWhvc3Quc2l0ZSIsInN1YiI6IjJiNGEyYWRlLWUwNzgtMTFlZi05OWJkLWQzNmQyOTU0MjdlNyIsImF1ZCI6WyJjb20uYmFybmV5LWhvc3QuaG0iXSwiZXhwIjoxNzM5MDExNTk5LCJpYXQiOjE3Mzg0MDkwOTd9.VNs4F4iUQ4KuGxBU3XPK1FWaWnpFtIYFnDkWwyOd_2k");
 
   final dio = Dio();
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
@@ -63,11 +67,15 @@ Future<void> main() async {
             context.read<ChatRemoteDataProvider>(),
           ),
         ),
+        RepositoryProvider(create: (context) => OrgDataProvider(dio: dio)
+        ),
+        RepositoryProvider(create: (context)=>OrgRepository(context.read<OrgDataProvider>()))
       ],
       child: Builder(
         builder: (context) {
           return MultiBlocProvider(
             providers: [
+              BlocProvider(create: (context) => OrgBloc(context.read<OrgRepository>())),
               BlocProvider(
                 create: (_) =>
                     ThemeCubit(secureStorage)..emit(initialThemeMode),
@@ -118,7 +126,7 @@ class _MyAppState extends State<MyApp> {
               } else if (state is UserAuthIsLoggedIn) {
                 final currentUser = context.read<UserAuthCubit>().currentUser;
                 if (currentUser!.role == "user") {
-                  return const VolunteerScreen();
+                  return const OrgScreen();
                 }
                 return const Scaffold();
               } else if (state is UserAuthInitial) {
