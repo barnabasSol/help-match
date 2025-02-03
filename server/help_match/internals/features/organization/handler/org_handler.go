@@ -58,9 +58,11 @@ func (oh *Organization) GetOrganizations(
 	queryParams.Filters.Page = utils.ReadInt(q, "page", 1)
 	queryParams.Filters.Sort = utils.ReadString(q, "sort", "organization_name")
 	queryParams.Filters.SortSafeList = []string{
+		"proximity",
 		"organization_name",
 		"org_type",
 		"-organization_name",
+		"-proximity",
 		"-org_type",
 	}
 	v := utils.NewValidator()

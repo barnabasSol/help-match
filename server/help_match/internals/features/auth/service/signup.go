@@ -6,9 +6,9 @@ import (
 	"github.com/jackc/pgx/v5"
 	"hm.barney-host.site/internals/features/auth/dto"
 	auth_errors "hm.barney-host.site/internals/features/auth/errors"
+	user_dto "hm.barney-host.site/internals/features/common/dto"
 	org_dto "hm.barney-host.site/internals/features/organization/dto"
 	org_model "hm.barney-host.site/internals/features/organization/model"
-	user_dto "hm.barney-host.site/internals/features/users/dto"
 	"hm.barney-host.site/internals/features/users/model"
 )
 

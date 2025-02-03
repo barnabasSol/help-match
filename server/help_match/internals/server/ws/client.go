@@ -37,13 +37,16 @@ func NewClient(
 		manager:    manager,
 		egress:     make(chan Event),
 		roomIds:    roomIds,
+		username:   username,
+		userId:     userId,
 	}
 }
 
 func (c *Client) readMessages() {
 	defer func() {
+		log.Println(c.username, " disconnected")
 		c.manager.removeClient(c)
-		c.manager.EventRepository.NotifyOnlineStatusChange(Event{}, c)
+		notifyOnlineStatusChange(c, false)
 		c.manager.EventRepository.ChatRepository.UpdateOnlineStatus(context.Background(), c.userId, false)
 	}()
 	c.connection.SetReadLimit(512)
@@ -59,7 +62,7 @@ func (c *Client) readMessages() {
 		t, payload, err := c.connection.ReadMessage()
 		_ = t
 		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error reading message: %v", err)
 			}
 			break
@@ -70,6 +73,7 @@ func (c *Client) readMessages() {
 			break
 
 		}
+		log.Println(request)
 		if err := c.manager.RouteEvent(request, c); err != nil {
 			log.Println("error handling the message", err)
 		}
@@ -81,8 +85,6 @@ func (c *Client) writeMessages() {
 	defer func() {
 		ticker.Stop()
 		c.manager.removeClient(c)
-		c.manager.EventRepository.NotifyOnlineStatusChange(Event{}, c)
-		c.manager.EventRepository.ChatRepository.UpdateOnlineStatus(context.Background(), c.userId, false)
 	}()
 	for {
 		select {
@@ -106,7 +108,7 @@ func (c *Client) writeMessages() {
 		case <-ticker.C:
 			log.Println("ping")
 			if err := c.connection.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				log.Println("failed to ping", err)
+				log.Println("failed to ping, client is gone", err)
 				return
 			}
 		}

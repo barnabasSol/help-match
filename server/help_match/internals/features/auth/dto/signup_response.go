@@ -1,8 +1,8 @@
 package dto
 
 import (
+	user_dto "hm.barney-host.site/internals/features/common/dto"
 	org_dto "hm.barney-host.site/internals/features/organization/dto"
-	user_dto "hm.barney-host.site/internals/features/users/dto"
 )
 
 type SignupResponse struct {

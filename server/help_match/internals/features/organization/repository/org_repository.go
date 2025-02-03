@@ -137,10 +137,23 @@ func (o *Organization) GetOrganizations(
 		FROM organizations JOIN users on users.id = organizations.user_id
 		WHERE (organization_name ILIKE '%%' || $1 || '%%' OR $1 = '')
 		AND (CASE WHEN $2 = '' THEN true ELSE org_type::text = $2 END)
+		ORDER BY organization_name ASC
+		LIMIT $3 OFFSET $4`,
+	)
+
+	if orgParams.Filters.Sort != "proximity" && orgParams.Filters.Sort != "-proximity" {
+		query = fmt.Sprintf(`
+		SELECT count(*) OVER() AS total_count, 
+		organizations.id, organization_name, user_id, profile_icon, 
+		description, is_verified, organizations.created_at, org_type, organizations.version, location
+		FROM organizations JOIN users on users.id = organizations.user_id
+		WHERE (organization_name ILIKE '%%' || $1 || '%%' OR $1 = '')
+		AND (CASE WHEN $2 = '' THEN true ELSE org_type::text = $2 END)
 		ORDER BY %s %s, organization_name ASC
 		LIMIT $3 OFFSET $4`,
-		orgParams.Filters.SortColumn(), orgParams.Filters.SortDirection(),
-	)
+			orgParams.Filters.SortColumn(), orgParams.Filters.SortDirection(),
+		)
+	}
 
 	args := []any{
 		orgParams.OrgName,
@@ -175,10 +188,8 @@ func (o *Organization) GetOrganizations(
 		if err != nil {
 			return nil, utils.Metadata{}, err
 		}
-		user_location := geo.NewPoint(userLocation.Latitude, userLocation.Longitude)
-		org_location := geo.NewPoint(location.P.X, location.P.Y)
-
-		orgModel.Proximity = user_location.GreatCircleDistance(org_location)
+		orgModel.Location.Latitude = location.P.X
+		orgModel.Location.Longitude = location.P.Y
 		orgList = append(orgList, &orgModel)
 	}
 	metadata := utils.CalculateMetadata(
@@ -187,7 +198,6 @@ func (o *Organization) GetOrganizations(
 		orgParams.Filters.PageSize,
 	)
 	return orgList, metadata, nil
-
 }
 
 func (or *Organization) GetOrganizationByOwnerId(

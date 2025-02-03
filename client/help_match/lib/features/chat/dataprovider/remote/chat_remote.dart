@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:help_match/core/secrets/secrets.dart';
 
@@ -28,12 +26,12 @@ class ChatRemoteDataProvider {
     }
   }
 
-  Future<String> getMessages(String roomId) async {
+  Future<dynamic> fetchMessages(String roomId) async {
     try {
       final response =
-          await _dio.get('${Secrets.DOMAIN}/v1/chat/messages/$roomId');
+          await _dio.get('${Secrets.LOCAL_DOMAIN}/v1/chat/messages/$roomId');
       if (response.statusCode == 200) {
-        return jsonEncode(response.data);
+        return response.data;
       } else {
         throw Exception('Failed to get messages: ${response.statusMessage}');
       }

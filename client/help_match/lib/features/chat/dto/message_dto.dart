@@ -9,6 +9,7 @@
 // 	SentTime          time.Time `json:"sent_time"`
 // 	IsSeen            bool      `json:"is_seen"`
 // }
+// ignore: constant_identifier_names
 
 class MessageDto {
   final String senderProfileIcon;

@@ -99,8 +99,8 @@ func (ur *User) FindUserById(
 	userId string,
 ) (*model.User, error) {
 	var userModel model.User
-	query := `SELECT id, name, email, username, created_at,
-   			  activated, password_hash, user_role, version
+	query := `SELECT id, name, email, username, created_at, interests,
+   			  activated, is_online, password_hash, user_role, version
 			  FROM users where id = $1`
 
 	err := ur.pgPool.QueryRow(
@@ -113,7 +113,9 @@ func (ur *User) FindUserById(
 		&userModel.Email,
 		&userModel.Username,
 		&userModel.CreatedAt,
+		&userModel.Interests,
 		&userModel.IsActivated,
+		&userModel.IsOnline,
 		&userModel.PasswordHash,
 		&userModel.Role,
 		&userModel.Version,

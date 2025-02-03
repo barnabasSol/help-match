@@ -11,6 +11,7 @@ type OrgListResponse struct {
 	ProfileIcon string    `json:"profile_icon"`
 	Description string    `json:"description"`
 	Proximity   float64   `json:"proximity"`
+	Location    Location  `json:"location"`
 	IsVerified  bool      `json:"is_verified"`
 	CreatedAt   time.Time `json:"created_at"`
 	Type        string    `json:"type"`

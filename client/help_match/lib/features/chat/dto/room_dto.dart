@@ -1,17 +1,17 @@
 class RoomDto {
-  final String roomProfile;
-  final String roomId;
-  final bool isAdmin;
-  final bool? isSeen; // Make isSeen nullable
-  final String roomName;
-  final String latestText;
-  final String sentTime;
+  final String? roomProfile;
+  final String? roomId;
+  final bool? isAdmin;
+  final bool? isSeen;
+  final String? roomName;
+  final String? latestText;
+  final DateTime? sentTime;
 
   RoomDto({
     required this.roomProfile,
     required this.roomId,
     required this.isAdmin,
-    this.isSeen, // isSeen is now optional
+    this.isSeen,
     required this.roomName,
     required this.latestText,
     required this.sentTime,
@@ -22,10 +22,31 @@ class RoomDto {
       roomProfile: json['room_profile'],
       roomId: json['room_id'],
       isAdmin: json['is_admin'],
-      isSeen: json['is_seen'], // This can be null
+      isSeen: json['is_seen'],
       roomName: json['room_name'],
       latestText: json['latest_text'],
-      sentTime: json['sent_time'],
+      sentTime:
+          json['sent_time'] != null ? DateTime.parse(json['sent_time']) : null,
+    );
+  }
+
+  RoomDto copyWith({
+    String? roomProfile,
+    String? roomId,
+    bool? isAdmin,
+    bool? isSeen,
+    String? roomName,
+    String? latestText,
+    DateTime? sentTime,
+  }) {
+    return RoomDto(
+      roomProfile: roomProfile ?? this.roomProfile,
+      roomId: roomId ?? this.roomId,
+      isAdmin: isAdmin ?? this.isAdmin,
+      isSeen: isSeen ?? this.isSeen,
+      roomName: roomName ?? this.roomName,
+      latestText: latestText ?? this.latestText,
+      sentTime: sentTime ?? this.sentTime,
     );
   }
 

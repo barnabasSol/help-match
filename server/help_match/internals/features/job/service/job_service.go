@@ -89,13 +89,17 @@ func (j *Job) UpdateJobStatus(
 	if err != nil {
 		return err
 	}
-	message := notificationMessageFromStatus(updateDto.Status)
-	if message == "" {
-		return nil
-	}
 	job, err := j.jr.GetJobById(ctx, updateDto.JobID)
 	if err != nil {
 		return err
+	}
+	org, err := j.or.GetOrganizationByJobId(ctx, updateDto.JobID)
+	if err != nil {
+		return err
+	}
+	message := notificationMessageFromStatus(job.Title, org.Name, updateDto.Status)
+	if message == "" {
+		return nil
 	}
 	err = j.jr.UpdateJobStatus(ctx, nil, updateDto.JobID, updateDto.UserId, updateDto.Status)
 	if err != nil {
@@ -107,10 +111,6 @@ func (j *Job) UpdateJobStatus(
 	}
 	roomId := ""
 	if !room_exists {
-		org, err := j.or.GetOrganizationByJobId(ctx, updateDto.JobID)
-		if err != nil {
-			return err
-		}
 		roomName := fmt.Sprintf("%s  (%s)", job.Title, org.Name)
 		roomId, err = j.cr.InsertJobRoom(ctx, updateDto.JobID, roomName)
 		if err != nil {

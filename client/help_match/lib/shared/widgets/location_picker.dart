@@ -28,7 +28,6 @@ class _LocationPickerState extends State<LocationPicker> {
     bool serviceEnabled;
     PermissionStatus permissionGranted;
 
-    // Check if location service is enabled
     serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
@@ -37,7 +36,6 @@ class _LocationPickerState extends State<LocationPicker> {
       }
     }
 
-    // Check for location permissions
     permissionGranted = await location.hasPermission();
     if (permissionGranted == PermissionStatus.denied) {
       permissionGranted = await location.requestPermission();
@@ -46,7 +44,6 @@ class _LocationPickerState extends State<LocationPicker> {
       }
     }
 
-    // Get the current location
     final locationData = await location.getLocation();
     setState(() {
       _currentLocation =
@@ -55,8 +52,11 @@ class _LocationPickerState extends State<LocationPicker> {
       _isLoading = false;
     });
 
-    // Move the map to the current location
-    _mapController.move(_currentLocation!, 15.0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_currentLocation != null) {
+        _mapController.move(_currentLocation!, 15.0);
+      }
+    });
   }
 
   @override
@@ -64,13 +64,14 @@ class _LocationPickerState extends State<LocationPicker> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pick a Location'),
+        backgroundColor: Colors.transparent,
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
               if (_pickedLocation != null) {
-                widget.onLocationPicked(_pickedLocation!);
-                Navigator.pop(context);
+                // Return the picked location instead of using callback
+                Navigator.of(context).pop(_pickedLocation);
               }
             },
           ),
@@ -91,9 +92,7 @@ class _LocationPickerState extends State<LocationPicker> {
               ),
               children: [
                 TileLayer(
-                  urlTemplate:
-                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: const ['a', 'b', 'c'],
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 ),
                 MarkerLayer(
                   markers: [
@@ -112,3 +111,5 @@ class _LocationPickerState extends State<LocationPicker> {
     );
   }
 }
+
+// And in your profile page:

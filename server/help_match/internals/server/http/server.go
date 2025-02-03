@@ -20,6 +20,7 @@ import (
 	job_h "hm.barney-host.site/internals/features/job/handler"
 	notif_h "hm.barney-host.site/internals/features/notifications/handler"
 	org_h "hm.barney-host.site/internals/features/organization/handler"
+	user_h "hm.barney-host.site/internals/features/users/handler"
 	"hm.barney-host.site/internals/server/ws"
 )
 
@@ -31,6 +32,7 @@ type AppServer struct {
 	chatHandler       *chat_h.Chat
 	FileUploadHandler *filehandler.FileUploadHandler
 	wsManager         *ws.Manager
+	userHandler       *user_h.User
 }
 
 func New() *AppServer {
