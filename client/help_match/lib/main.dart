@@ -8,6 +8,11 @@ import 'package:help_match/core/theme/colors.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/core/ws_manager/cubit/websocket_cubit.dart';
 import 'package:help_match/core/ws_manager/ws_manager.dart';
+import 'package:help_match/features/Auth/data_provider/remote/auth_remote.dart';
+import 'package:help_match/features/Auth/presentation/bloc/auth_bloc.dart';
+import 'package:help_match/features/Auth/presentation/bloc/auth_cubit.dart';
+import 'package:help_match/features/Auth/presentation/pages/login.dart';
+import 'package:help_match/features/Auth/repository/auth_repository.dart';
 import 'package:help_match/features/chat/dataprovider/remote/chat_remote.dart';
 import 'package:help_match/features/chat/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
@@ -20,6 +25,7 @@ import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
 import 'package:help_match/features/organization/bloc/org_bloc.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
+// import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
 import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/features/online_status/repository/online_status_repository.dart';
@@ -36,11 +42,7 @@ Future<void> main() async {
 
   final userAuthCubit = UserAuthCubit(secureStorage: secureStorage);
 
-  await secureStorage.write(
-      key: 'access_token',
-      value:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhZyIsInJvbGUiOiJ1c2VyIiwiaXNzIjoiaHR0cHM6Ly9obS5iYXJuZXktaG9zdC5zaXRlIiwic3ViIjoiNDc0Zjk0MmMtZTE0NC0xMWVmLWI5YmYtMmYxM2Y2ODczMjhmIiwiYXVkIjpbImNvbS5iYXJuZXktaG9zdC5obSJdLCJleHAiOjE3MzkwOTE2NTUsImlhdCI6MTczODQ4Njg4NH0.rkLPnDV98EyJ3ItO_AquAROj8lTZNHIhIpFXrqi3B8g');
-
+ 
   final dio = Dio();
 
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
@@ -78,15 +80,24 @@ Future<void> main() async {
             context.read<NotificationProvider>(),
           ),
         ),
-        RepositoryProvider(create: (context) => OrgDataProvider(dio: dio)
-        ),
-        RepositoryProvider(create: (context)=>OrgRepository(context.read<OrgDataProvider>()))
+        RepositoryProvider(create: (context) => OrgDataProvider(dio: dio)),
+        RepositoryProvider(
+            create: (context) =>
+                OrgRepository(context.read<OrgDataProvider>())),
+        RepositoryProvider(create: (context) => AuthDataProvider(dio: dio)),
+        RepositoryProvider(
+            create: (context) =>
+                AuthRepository(context.read<AuthDataProvider>()))
       ],
       child: Builder(
         builder: (context) {
           return MultiBlocProvider(
             providers: [
-              BlocProvider(create: (context) => OrgBloc(context.read<OrgRepository>())),
+              BlocProvider(create: (context)=>SignUpUserCubit()),
+                  BlocProvider(create: (context)=>SignUpOrgCubit()),
+              BlocProvider(create: (context)=>AuthBloc(secureStorage: secureStorage,authRepository: context.read<AuthRepository>())),
+              BlocProvider(
+                  create: (context) => OrgBloc(context.read<OrgRepository>())),
               BlocProvider(
                 create: (_) =>
                     ThemeCubit(secureStorage)..emit(initialThemeMode),
@@ -161,11 +172,11 @@ class _MyAppState extends State<MyApp> {
                   if (currentUser!.role == "user") {
                     return const VolunteerScreen();
                   }
-                  return const Scaffold();
+                  return const OrgScreen();
                 } else if (state is UserAuthInitial) {
                   return const OnBoardingScreen();
                 } else {
-                  return const Scaffold();
+                  return const Login();
                 }
               },
             ),

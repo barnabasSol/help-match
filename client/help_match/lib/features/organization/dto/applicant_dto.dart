@@ -53,13 +53,13 @@ class ApplicantDto {
 
   factory ApplicantDto.fromMap(Map<String, dynamic> map) {
     return ApplicantDto(
-     volunteerId:  map['volunteerId'] as String,
+     volunteerId:  map['volunteer_id'] as String,
      username:  map['username'] as String,
      name:  map['name'] as String,
-     profileIcon:  map['profileIcon'] as String,
-     jobId:  map['jobId'] as String,
+     profileIcon:  map['profile_icon'] as String,
+     jobId:  map['job_id'] as String,
      status:  map['status'] as String,
-     createdAt:  DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
+     createdAt:  DateTime.parse(map['created_at']),
     );
   }
 

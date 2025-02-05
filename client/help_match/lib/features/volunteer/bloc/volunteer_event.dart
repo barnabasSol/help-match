@@ -1,4 +1,4 @@
 part of 'volunteer_bloc.dart';
 
-@immutable
+// @immutable
 sealed class VolunteerEvent {}

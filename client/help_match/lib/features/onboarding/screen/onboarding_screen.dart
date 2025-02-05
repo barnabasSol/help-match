@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
+import 'package:help_match/features/Auth/presentation/pages/login.dart';
 import 'package:help_match/features/onboarding/info/info.dart';
 import 'package:help_match/features/onboarding/pages/page_container.dart';
 import 'package:help_match/shared/widgets/gradient_button.dart';
@@ -66,7 +67,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             child: isLastPage
                 ? GradientButton(
                     text: "Get Started",
-                    onPressed: () {},
+                    onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context)=>const Login()));},
                   )
                 : SmoothPageIndicator(
                     controller: _pageController,
