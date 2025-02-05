@@ -29,17 +29,17 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
-        listener: (BuildContext context, state) {
+        listener: (BuildContext context, state) async{
           if (state is AuthSignupFailure) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
           } else if (state is AuthSignupSuccess) {
-            context.read<UserAuthCubit>().isUserAuthenticated();
-            // Navigator.pop(context);
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //         builder: (context) => const VolunteerScreen()));
+           await context.read<UserAuthCubit>().isUserAuthenticated();
+            Navigator.pop(context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const VolunteerScreen()));
           }
         },
         child: SafeArea(
@@ -66,7 +66,7 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
 
                 // Subtitle
                 Text(
-                  'Create account to Volunteer',
+                  'Please let us know your interests',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[600],

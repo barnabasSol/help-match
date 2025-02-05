@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/features/Auth/presentation/bloc/auth_bloc.dart';
 import 'package:help_match/features/Auth/presentation/bloc/auth_cubit.dart';
+import 'package:help_match/features/organization/presentation/pages/screen.dart';
 
 class Signupo2 extends StatefulWidget {
   const Signupo2({super.key});
@@ -24,12 +25,14 @@ class _SigninState extends State<Signupo2> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
-        listener: (BuildContext context, state) {
+        listener: (BuildContext context, state) async {
           if (state is AuthSignupFailure) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
           } else if (state is AuthSignupSuccess) {
-            context.read<UserAuthCubit>().isUserAuthenticated();
+            await context.read<UserAuthCubit>().isUserAuthenticated();
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => OrgScreen()));
           }
         },
         child: SingleChildScrollView(
