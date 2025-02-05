@@ -57,7 +57,8 @@ class _OrgNotificationState extends State<OrgNotification> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: Center(
-                      child: ListView.separated(
+                      child: applicants.length!=0?
+                       ListView.separated(
                         itemCount: applicants.length,
                         scrollDirection: Axis.vertical,
                         itemBuilder: (context, index) {
@@ -70,7 +71,7 @@ class _OrgNotificationState extends State<OrgNotification> {
                             height: 20,
                           );
                         },
-                      ),
+                      ): Center(child: Text("No one has applied so far",style: Theme.of(context).textTheme.bodyLarge,)),
                     ),
                   ),
                 )
