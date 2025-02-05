@@ -15,12 +15,21 @@ import 'package:help_match/features/auth/presentation/pages/SignupO2.dart';
 import 'package:help_match/features/auth/presentation/pages/SignupV1.dart';
 import 'package:help_match/features/auth/presentation/pages/SignupV2.dart';
 import 'package:help_match/features/auth/presentation/pages/SignupV3.dart';
+import 'package:help_match/features/auth/presentation/pages/homeO.dart';
 import 'package:help_match/features/auth/presentation/pages/login.dart';
 import 'package:help_match/features/auth/presentation/pages/signup.dart';
 import 'package:help_match/features/chat/dataprovider/remote/chat_remote.dart';
 import 'package:help_match/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:help_match/features/chat/repository/chat_repository.dart';
 import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
+import 'package:help_match/features/volunteer/presentation/pages/addjob.dart';
+import 'package:help_match/features/volunteer/presentation/pages/editjob.dart';
+import 'package:help_match/features/volunteer/presentation/pages/homeV.dart';
+import 'package:help_match/features/volunteer/presentation/pages/joblisting.dart';
+import 'package:help_match/features/volunteer/presentation/pages/navO.dart';
+import 'package:help_match/features/volunteer/presentation/pages/navV.dart';
+import 'package:help_match/features/volunteer/presentation/pages/profileO.dart';
+import 'package:help_match/features/volunteer/presentation/pages/profileV.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
 import 'package:help_match/shared/widgets/loading_indicator.dart';
 
@@ -115,16 +124,35 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp(
           //  route navigation for the pages
           routes: {
-            '/login': (context) => Login(),
+            '/login': (context) => const Login(),
 
-            '/signup': (context) => Signup(),
+            '/signup': (context) => const Signup(),
 
-            '/signupv1': (context) => Signupv1(),
-            '/signupv2': (context) => Signupv2(),
-            '/signupv3': (context) => Signupv3(),
+            '/signupv1': (context) => const Signupv1(),
+            '/signupv2': (context) => const Signupv2(),
+            '/signupv3': (context) => const Signupv3(),
             
-            '/signupo1': (context) => Signupo1(),
-            '/signupo2': (context) => Signupo2(),
+            '/signupo1': (context) => const Signupo1(),
+            '/signupo2': (context) => const Signupo2(),
+
+
+           '/homev' : (context) => Home_Page_V(),
+           '/profilev' : (context) => Profile_Page_V(),
+           '/navv' : (context) => Navigation_Page_v(),
+           '/joblist' : (context) => Joblisting(),
+
+           
+
+           
+           '/homeo' : (context) => Home_Page_O(),
+           '/profileo' : (context) => Profile_Page_O(),
+           '/navo' : (context) => Navigation_Page_o(),
+           '/addjob' : (context) => Addjob(),
+           '/editjob' : (context) => Editjob(),
+
+
+
+
          },
 
           title: 'HelpMatch',
@@ -142,7 +170,7 @@ class _MyAppState extends State<MyApp> {
                 final currentUser = context.read<UserAuthCubit>().currentUser;
                 if (currentUser!.role == "user") {
                   // return const VolunteerScreen();
-                  return Signup();
+                  return const Signup();
                 }
                 return const Scaffold();
               } else if (state is UserAuthInitial) {
