@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:help_match/features/Auth/presentation/bloc/auth_bloc.dart';
 import 'package:help_match/features/Auth/presentation/bloc/auth_cubit.dart';
 import 'package:help_match/features/Auth/presentation/pages/signup_2.dart';
 
@@ -77,13 +76,19 @@ class _VolunteerSignUpScreenState extends State<Signupv1> {
                       ),
                       // backgroundColor: Theme.of(context).colorScheme.primary,
                       backgroundColor: Colors.blue,
-                    
+
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () {
-                      context.read<SignUpUserCubit>().updateUserName(_usernameController.text);
-                      context.read<SignUpUserCubit>().updateName(_nameController.text);
-                      context.read<SignUpUserCubit>().updateEmail(_emailController.text);
+                      context
+                          .read<SignUpUserCubit>()
+                          .updateUserName(_usernameController.text);
+                      context
+                          .read<SignUpUserCubit>()
+                          .updateName(_nameController.text);
+                      context
+                          .read<SignUpUserCubit>()
+                          .updateEmail(_emailController.text);
 
                       _change_to_v2();
                     },
@@ -180,7 +185,8 @@ class _VolunteerSignUpScreenState extends State<Signupv1> {
 
   void _change_to_v2() {
     Navigator.pop(context);
-    Navigator.push(context,MaterialPageRoute(builder: (context)=>const Signupv2()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const Signupv2()));
   }
 
   @override

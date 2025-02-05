@@ -40,11 +40,11 @@ class _LoginState extends State<Login> {
             );
           else if (state is AuthLoginSuccess) {
             // ignore: use_build_context_synchronously
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //         builder: (context) => const VolunteerScreen()));
-           context.read<UserAuthCubit>().isUserAuthenticated();
+            await context.read<UserAuthCubit>().isUserAuthenticated();
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const VolunteerScreen()));
           }
         },
         child: SingleChildScrollView(
@@ -221,9 +221,10 @@ class _LoginState extends State<Login> {
                         onPressed: () {
                           // Navigate to sign up screen
                           Navigator.pop(context);
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context)=>const Signup()
-                          ));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Signup()));
                         },
                         child: const Text(
                           'Join us',

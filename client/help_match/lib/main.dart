@@ -29,7 +29,6 @@ import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
 import 'package:help_match/features/organization/bloc/org_bloc.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
-// import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
 import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/features/online_status/repository/online_status_repository.dart';
@@ -51,6 +50,8 @@ Future<void> main() async {
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
 
   await initializeHive();
+
+  await secureStorage.deleteAll();
 
   final themeModeString = await secureStorage.read(key: "theme_mode");
   if (themeModeString == null) {
@@ -193,11 +194,11 @@ class _MyAppState extends State<MyApp> {
                 } else if (state is UserAuthIsLoggedIn) {
                   final currentUser = context.read<UserAuthCubit>().currentUser;
                   if (currentUser!.role == "organization") {
-                    return const VolunteerScreen();
+                    return const OrgScreen();
                   } else if (currentUser.role == "user") {
                     return const VolunteerScreen();
                   }
-                  return const OrgScreen();
+                  return const OnBoardingScreen();
                 } else if (state is UserAuthInitial) {
                   return const OnBoardingScreen();
                 } else {

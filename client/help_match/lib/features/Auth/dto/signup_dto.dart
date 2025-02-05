@@ -106,7 +106,7 @@ class OrgSignUpDto {
   final String orgname;
   final String description;
   final String type;
-LatLng? location;
+  LatLng? location;
   final String name;
   final String username;
   final String email;
@@ -117,7 +117,7 @@ LatLng? location;
     required this.orgname,
     required this.description,
     required this.type,
-    this.location ,
+    this.location,
     required this.name,
     required this.username,
     required this.email,
@@ -126,16 +126,16 @@ LatLng? location;
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      "Org_info": {
+      "org_info": {
         'org_name': orgname,
         'description': description,
-        'location': location!=null
+        'location': location != null
             ? Map.from({
                 "latitude": location!.latitude,
                 "logitude": location!.longitude
               })
             : {},
-        'type':convert(type)
+        'type': convert(type)
       },
       "name": name,
       "username": username,
@@ -148,7 +148,7 @@ LatLng? location;
   OrgSignUpDto copyWith({
     String? orgname,
     String? desc,
-  LatLng? location,
+    LatLng? location,
     String? name,
     String? username,
     String? email,
@@ -166,18 +166,17 @@ LatLng? location;
         orgname: orgname ?? this.orgname);
   }
 
-   String convert(String interests) { 
-      if (interests == "For Profit") return "for_profit";
-      if (interests == "Non Profit") return "non_profit";
-      if (interests == "Government") return "government";
-      if (interests == "Community") return "community";
-      if (interests == "Education") return "educational";
-      if (interests == "Healthcare") {
-        return "healthcare";
-      } else {
-        return "cultural";
-      }
+  String convert(String interests) {
+    if (interests == "For Profit") return "for_profit";
+    if (interests == "Non Profit") return "non_profit";
+    if (interests == "Government") return "government";
+    if (interests == "Community") return "community";
+    if (interests == "Education") return "educational";
+    if (interests == "Healthcare") {
+      return "healthcare";
+    } else {
+      return "cultural";
     }
-    //return interests;
   }
-
+  //return interests;
+}
