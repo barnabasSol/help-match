@@ -12,6 +12,11 @@ import 'package:help_match/core/theme/colors.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/core/ws_manager/cubit/websocket_cubit.dart';
 import 'package:help_match/core/ws_manager/ws_manager.dart';
+import 'package:help_match/features/Auth/data_provider/remote/auth_remote.dart';
+import 'package:help_match/features/Auth/presentation/bloc/auth_bloc.dart';
+import 'package:help_match/features/Auth/presentation/bloc/auth_cubit.dart';
+import 'package:help_match/features/Auth/presentation/pages/login.dart';
+import 'package:help_match/features/Auth/repository/auth_repository.dart';
 import 'package:help_match/features/chat/dataprovider/remote/chat_remote.dart';
 import 'package:help_match/features/chat/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
@@ -23,6 +28,8 @@ import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
 
 import 'package:help_match/features/organization/bloc/org_bloc.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
+import 'package:help_match/features/organization/presentation/pages/screen.dart';
+// import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
 import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/features/online_status/repository/online_status_repository.dart';
@@ -38,12 +45,6 @@ Future<void> main() async {
   );
 
   final userAuthCubit = UserAuthCubit(secureStorage: secureStorage);
-
-  await secureStorage.write(
-    key: 'access_token',
-    value:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlX2pvaG5zb25fMjAyNCIsIm9yZ19pZCI6IjQ5MWEwNTk0LWUxNDQtMTFlZi1iOWMyLTZmY2E5Yjk3NzE0ZSIsInJvbGUiOiJvcmdhbml6YXRpb24iLCJpc3MiOiJodHRwczovL2htLmJhcm5leS1ob3N0LnNpdGUiLCJzdWIiOiI0OTE4NGE5Yy1lMTQ0LTExZWYtYjljMS0zNzgxZGQ3YTU1N2EiLCJhdWQiOlsiY29tLmJhcm5leS1ob3N0LmhtIl0sImV4cCI6MTczOTA5MTY1NSwiaWF0IjoxNzM4NDg2ODg3fQ.NJ0PWw7-RuRo9rJ2ilTuBbzTGXUUPytrU4WdQjri_xg',
-  );
 
   final dio = Dio();
 
@@ -98,12 +99,23 @@ Future<void> main() async {
         ),
         RepositoryProvider(create: (context) => OrgDataProvider(dio: dio)),
         RepositoryProvider(
-            create: (context) => OrgRepository(context.read<OrgDataProvider>()))
+            create: (context) =>
+                OrgRepository(context.read<OrgDataProvider>())),
+        RepositoryProvider(create: (context) => AuthDataProvider(dio: dio)),
+        RepositoryProvider(
+            create: (context) =>
+                AuthRepository(context.read<AuthDataProvider>()))
       ],
       child: Builder(
         builder: (context) {
           return MultiBlocProvider(
             providers: [
+              BlocProvider(create: (context) => SignUpUserCubit()),
+              BlocProvider(create: (context) => SignUpOrgCubit()),
+              BlocProvider(
+                  create: (context) => AuthBloc(
+                      secureStorage: secureStorage,
+                      authRepository: context.read<AuthRepository>())),
               BlocProvider(
                   create: (context) => OrgBloc(context.read<OrgRepository>())),
               BlocProvider(
@@ -185,11 +197,11 @@ class _MyAppState extends State<MyApp> {
                   } else if (currentUser.role == "user") {
                     return const VolunteerScreen();
                   }
-                  return const Scaffold();
+                  return const OrgScreen();
                 } else if (state is UserAuthInitial) {
                   return const OnBoardingScreen();
                 } else {
-                  return const Scaffold();
+                  return const Login();
                 }
               },
             ),

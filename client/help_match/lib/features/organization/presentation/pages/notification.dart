@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/features/organization/bloc/org_bloc.dart';
+import 'package:help_match/features/organization/dto/applicant_dto.dart';
 import 'package:help_match/features/organization/presentation/widgets/user_app_card.dart';
 
 class OrgNotification extends StatefulWidget {
@@ -11,11 +12,10 @@ class OrgNotification extends StatefulWidget {
 }
 
 class _OrgNotificationState extends State<OrgNotification> {
-
   @override
   void initState() {
     super.initState();
-    context.read<OrgBloc>().add(ApplicantsFetched("20"));
+    context.read<OrgBloc>().add(ApplicantsFetched());
   }
 
   @override
@@ -24,9 +24,10 @@ class _OrgNotificationState extends State<OrgNotification> {
       if (state is FetchFailed) {
         return Text(state.error);
       } else if (state is FetchSuccessful) {
+        List<ApplicantDto> applicants = state.applicants;
         return SafeArea(
           child: Container(
-            color: Theme.of(context).colorScheme.tertiary,
+            color: Theme.of(context).colorScheme.onSecondary,
             child: Column(
               children: [
                 Padding(
@@ -56,12 +57,19 @@ class _OrgNotificationState extends State<OrgNotification> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     child: Center(
-                      child: ListView(
+                      child: ListView.separated(
+                        itemCount: applicants.length,
                         scrollDirection: Axis.vertical,
-                        children: [
-                          ApplicantCard(name: state.applicants[0].name),
-                          //Add some separator
-                        ],
+                        itemBuilder: (context, index) {
+                          if (applicants[index].status == "pending") {
+                            return ApplicantCard(name: applicants[index].name);
+                          }
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const SizedBox(
+                            height: 20,
+                          );
+                        },
                       ),
                     ),
                   ),

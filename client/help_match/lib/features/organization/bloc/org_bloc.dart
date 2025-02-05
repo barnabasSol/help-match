@@ -13,7 +13,7 @@ class OrgBloc extends Bloc<OrgEvent, OrgState> {
       ApplicantsFetched event, Emitter<OrgState> emit) async {
     emit(FetchLoading());
     try {
-      final applicants = await orgRepo.getApplicants(event.jobId);
+      final applicants = await orgRepo.getApplicants();
       emit(FetchSuccessful(applicants));
     } catch (e) {
       emit(FetchFailed(e.toString()));
