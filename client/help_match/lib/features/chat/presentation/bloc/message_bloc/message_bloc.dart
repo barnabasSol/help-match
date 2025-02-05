@@ -35,6 +35,19 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           try {
             final user = await userRepo.getUserById(data.fromId);
             if (user != null) {
+              if (user.role == "organization") {
+                return MessageDto(
+                  senderProfileIcon: user.orgInfo!.profileIcon,
+                  senderId: data.fromId,
+                  senderName: user.orgInfo!.name,
+                  senderUsername: user.username,
+                  isAdmin: user.role == "organization",
+                  roomId: data.toRoomId,
+                  message: data.message,
+                  sentTime: data.sentTime,
+                  isSeen: false,
+                );
+              }
               return MessageDto(
                 senderProfileIcon: user.profilePicUrl,
                 senderId: data.fromId,
@@ -54,14 +67,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           }
         }),
         onData: (messageDto) {
-          _messages.add(messageDto);
+          _messages.insert(0, messageDto);
           emit(NewMessageReceiveSuccess(messageDto));
           emit(ChatMessagesLoaded(_messages));
           return state;
         },
-        onError: (error, stackTrace) {
-          emit(NewMessageReceiveFailed(
-              "Failed to listen for new messages: $error"));
+        onError: (e, stackTrace) {
+          emit(
+              NewMessageReceiveFailed("Failed to listen for new messages: $e"));
           return state;
         },
       );

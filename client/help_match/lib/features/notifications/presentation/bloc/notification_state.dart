@@ -9,14 +9,14 @@ final class NotificationFetchRequested extends NotificationState {}
 
 final class NotificationFetchLoading extends NotificationState {}
 
+final class OrgNotificationFetchLoaded extends NotificationState {
+  final List<OrgNotificationDto> notifList;
+  OrgNotificationFetchLoaded(this.notifList);
+}
+
 final class VolunteerNotificationFetchLoaded extends NotificationState {
   final List<VolunteerNotificationDto> notifList;
   VolunteerNotificationFetchLoaded(this.notifList);
-}
-
-final class OrganizationNotificationFetchLoaded extends NotificationState {
-  final List<VolunteerNotificationDto> notifList;
-  OrganizationNotificationFetchLoaded(this.notifList);
 }
 
 final class NotificationFetchError extends NotificationState {

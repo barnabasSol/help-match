@@ -11,9 +11,9 @@ class OrgNotification extends StatefulWidget {
 }
 
 class _OrgNotificationState extends State<OrgNotification> {
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     context.read<OrgBloc>().add(ApplicantsFetched("20"));
   }
@@ -21,7 +21,7 @@ class _OrgNotificationState extends State<OrgNotification> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder(builder: (context, state) {
-       if (state is FetchFailed) {
+      if (state is FetchFailed) {
         return Text(state.error);
       } else if (state is FetchSuccessful) {
         return SafeArea(
@@ -70,10 +70,9 @@ class _OrgNotificationState extends State<OrgNotification> {
             ),
           ),
         );
-      }
-      else {
+      } else {
         return const CircularProgressIndicator();
-      } 
+      }
     });
   }
 }

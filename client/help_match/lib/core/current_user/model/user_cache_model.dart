@@ -21,25 +21,25 @@ class User {
   String profilePicUrl;
 
   @HiveField(5)
-  bool isActivated;
+  String role;
 
   @HiveField(6)
-  bool isOnline;
+  bool isActivated;
 
   @HiveField(7)
-  List<String>? interests;
+  bool isOnline;
 
   @HiveField(8)
-  DateTime createdAt;
+  List<String>? interests;
 
   @HiveField(9)
-  int version;
+  DateTime createdAt;
 
   @HiveField(10)
-  OrgInfo? orgInfo;
+  int version;
 
   @HiveField(11)
-  String role;
+  OrgInfo? orgInfo;
 
   User({
     required this.id,
@@ -47,13 +47,13 @@ class User {
     required this.username,
     required this.email,
     required this.profilePicUrl,
+    required this.role,
     required this.isActivated,
     required this.isOnline,
     this.interests,
     required this.createdAt,
     required this.version,
     this.orgInfo,
-    required this.role,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -62,10 +62,10 @@ class User {
         username: json['username'] as String,
         email: json['email'] as String,
         profilePicUrl: json['profile_pic_url'] as String,
+        role: json['role'] as String,
         isActivated: json['is_activated'] as bool,
         isOnline: json['is_online'] as bool,
-        role: json['role'] as String,
-        interests: json['interests'] != null
+        interests: json['interests'] is List
             ? List<String>.from(json['interests'])
             : null,
         createdAt: DateTime.parse(json['created_at'] as String),
@@ -76,14 +76,14 @@ class User {
       );
 
   Map<String, dynamic> toJson() => {
-        'id': id, // Add this line
+        'id': id,
         'name': name,
         'username': username,
         'email': email,
         'profile_pic_url': profilePicUrl,
+        'role': role,
         'is_activated': isActivated,
         'is_online': isOnline,
-        'role': role,
         'interests': interests,
         'created_at': createdAt.toIso8601String(),
         'version': version,
@@ -131,6 +131,7 @@ class OrgInfo {
     required this.type,
     required this.version,
   });
+
   factory OrgInfo.fromJson(Map<String, dynamic> json) => OrgInfo(
         orgId: json['org_id'] as String,
         name: json['org_name'] as String,
@@ -142,6 +143,7 @@ class OrgInfo {
         type: json['type'] as String,
         version: json['version'] as int,
       );
+
   Map<String, dynamic> toJson() => {
         'org_id': orgId,
         'org_name': name,

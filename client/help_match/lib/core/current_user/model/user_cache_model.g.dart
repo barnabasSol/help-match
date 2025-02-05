@@ -22,13 +22,13 @@ class UserAdapter extends TypeAdapter<User> {
       username: fields[2] as String,
       email: fields[3] as String,
       profilePicUrl: fields[4] as String,
-      isActivated: fields[5] as bool,
-      isOnline: fields[6] as bool,
-      interests: (fields[7] as List?)?.cast<String>(),
-      createdAt: fields[8] as DateTime,
-      version: (fields[9] as num).toInt(),
-      orgInfo: fields[10] as OrgInfo?,
-      role: fields[11] as String,
+      role: fields[5] as String,
+      isActivated: fields[6] as bool,
+      isOnline: fields[7] as bool,
+      interests: (fields[8] as List?)?.cast<String>(),
+      createdAt: fields[9] as DateTime,
+      version: (fields[10] as num).toInt(),
+      orgInfo: fields[11] as OrgInfo?,
     );
   }
 
@@ -47,19 +47,19 @@ class UserAdapter extends TypeAdapter<User> {
       ..writeByte(4)
       ..write(obj.profilePicUrl)
       ..writeByte(5)
-      ..write(obj.isActivated)
+      ..write(obj.role)
       ..writeByte(6)
-      ..write(obj.isOnline)
+      ..write(obj.isActivated)
       ..writeByte(7)
-      ..write(obj.interests)
+      ..write(obj.isOnline)
       ..writeByte(8)
-      ..write(obj.createdAt)
+      ..write(obj.interests)
       ..writeByte(9)
-      ..write(obj.version)
+      ..write(obj.createdAt)
       ..writeByte(10)
-      ..write(obj.orgInfo)
+      ..write(obj.version)
       ..writeByte(11)
-      ..write(obj.role);
+      ..write(obj.orgInfo);
   }
 
   @override

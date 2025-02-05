@@ -42,13 +42,10 @@ class RoomListItem extends StatelessWidget {
         ),
       ),
       trailing: seen == null
-          ? const Icon(Icons.circle_outlined,
-              color: Colors.grey) // Icon for no messages
+          ? const Icon(Icons.circle_outlined, color: Colors.grey)
           : seen!
-              ? const Icon(Icons.check_circle,
-                  color: Colors.green) // Icon for seen messages
-              : const Icon(Icons.circle,
-                  color: Colors.red, size: 12), // Icon for unseen messages
+              ? const Icon(Icons.check_circle, color: Colors.green)
+              : const Icon(Icons.circle, color: Colors.red, size: 12),
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(

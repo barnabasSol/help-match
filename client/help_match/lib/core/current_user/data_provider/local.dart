@@ -12,8 +12,8 @@ class UserLocalProvider {
     return _userBox.get(username);
   }
 
-  Future<void> deleteUser(String username) async {
-    await _userBox.delete(username);
+  Future<void> deleteUser(String userId) async {
+    await _userBox.delete(userId);
   }
 
   List<User> getAllUsers() {

@@ -1,36 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
-import 'package:help_match/core/secrets/secrets.dart';
 import 'package:help_match/features/chat/dto/room_dto.dart';
 import 'package:help_match/features/chat/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
 import 'package:help_match/features/chat/presentation/widgets/input_field.dart';
-import 'package:help_match/features/chat/presentation/widgets/message_card.dart';
+import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/shared/widgets/snack_bar.dart';
+import 'package:intl/intl.dart';
 
 class RoomMessagesPage extends StatefulWidget {
   final String roomId;
   final String groupName;
   final String profileIcon;
-
-  const RoomMessagesPage({
-    super.key,
-    required this.groupName,
-    required this.profileIcon,
-    required this.roomId,
-  });
+  const RoomMessagesPage(
+      {super.key,
+      required this.roomId,
+      required this.groupName,
+      required this.profileIcon});
 
   @override
-  State<RoomMessagesPage> createState() => _RoomMessagesPageState();
+  State<RoomMessagesPage> createState() => _RoomMessagesState();
 }
 
-class _RoomMessagesPageState extends State<RoomMessagesPage> {
+class _RoomMessagesState extends State<RoomMessagesPage> {
   @override
   void initState() {
     super.initState();
     context.read<ChatBloc>().add(ChatMessagesRequested(widget.roomId));
   }
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void dispose() {
@@ -40,66 +40,58 @@ class _RoomMessagesPageState extends State<RoomMessagesPage> {
   @override
   Widget build(BuildContext context) {
     final currentUser = context.read<UserAuthCubit>().currentUser;
-    final ThemeData theme = Theme.of(context);
-
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: const Drawer(),
+      resizeToAvoidBottomInset: true,
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: ChatInput(roomId: widget.roomId),
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            backgroundColor: Theme.of(context).primaryColor,
             expandedHeight: 200.0,
             floating: true,
             pinned: true,
-            snap: true,
-            backgroundColor: theme.primaryColor,
+            leading: IconButton(
+              icon: const Icon(Icons.menu, color: Colors.white),
+              onPressed: () {
+                _scaffoldKey.currentState?.openDrawer();
+              },
+            ),
             flexibleSpace: FlexibleSpaceBar(
-              title: Container(
-                padding: const EdgeInsets.only(bottom: 0, left: 0),
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  widget.groupName,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              title: Text(
+                widget.groupName,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
                 ),
               ),
-              centerTitle: false,
-              background: Stack(
-                children: [
-                  Image.network(
-                    widget.profileIcon.isEmpty
-                        ? Secrets.DummyImage
-                        : widget.profileIcon,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.6),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                  ),
-                ],
+              background: Image.network(
+                widget.profileIcon,
+                fit: BoxFit.cover,
               ),
+              centerTitle: true,
             ),
           ),
           BlocConsumer<ChatBloc, ChatState>(
             listener: (context, state) {
               if (state is NewMessageReceiveSuccess) {
-                showCustomSnackBar(
+                if (state.message.senderId != currentUser!.sub) {
+                  showCustomSnackBar(
                     context: context,
                     message: state.message.message,
-                    color: Colors.pink);
+                    color: Colors.green,
+                  );
+                }
+                print("LISTENINGNNGNGNGNG");
+                print("LISTENINGNNGNGNGNG");
+                print("LISTENINGNNGNGNGNG");
+                print("LISTENINGNNGNGNGNG");
                 context.read<RoomsBloc>().add(
                       RoomsUpdated(
                         RoomDto(
@@ -113,58 +105,96 @@ class _RoomMessagesPageState extends State<RoomMessagesPage> {
                         ),
                       ),
                     );
-                if (currentUser?.sub != state.message.senderId) {}
               }
             },
             builder: (context, state) {
               if (state is ChatMessagesLoading) {
                 return const SliverToBoxAdapter(
-                  child: Center(child: CircularProgressIndicator()),
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is ChatMessagesLoadingFailed) {
+                return const SliverToBoxAdapter(
+                  child: Center(
+                    child: Text('Failed loading messages'),
+                  ),
                 );
               } else if (state is ChatMessagesLoaded) {
-                final sortedMessages = state.messages
-                  ..sort((a, b) => a.sentTime.compareTo(b.sentTime));
-
+                if (state.messages.isEmpty) {
+                  return const SliverToBoxAdapter(
+                    child: Center(
+                      child: Text('No messages'),
+                    ),
+                  );
+                }
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final msg = sortedMessages[index];
-                      return MessageCard(
-                        senderName: msg.senderName,
-                        profileIcon: msg.senderProfileIcon,
-                        sentTime: msg.sentTime,
-                        isSeen: msg.isSeen,
-                        isOther: true,
-                        message: msg.message,
+                      final message = state.messages[index];
+                      return ListTile(
+                        trailing: Text(
+                          DateFormat('HH:mm').format(message.sentTime),
+                        ),
+                        title: Text(message.senderName),
+                        subtitle: Text(message.message),
+                        leading:
+                            BlocBuilder<OnlineStatusCubit, OnlineStatusState>(
+                          builder: (context, state) {
+                            if (state is OnlineStatusChange) {
+                              if (state.osm.userId == message.senderId) {
+                                return Badge(
+                                  smallSize: 14,
+                                  backgroundColor: state.osm.status
+                                      ? Colors.green
+                                      : Colors.transparent,
+                                  child: CircleAvatar(
+                                    child: Text(message.senderProfileIcon == ""
+                                        ? message.senderName[0]
+                                        : message.senderProfileIcon),
+                                  ),
+                                );
+                              }
+                              return Badge(
+                                smallSize: 14,
+                                backgroundColor: Colors.transparent,
+                                child: CircleAvatar(
+                                  child: Text(message.senderProfileIcon == ""
+                                      ? message.senderName[0]
+                                      : message.senderProfileIcon),
+                                ),
+                              );
+                            }
+                            return Badge(
+                              smallSize: 14,
+                              backgroundColor: Colors.transparent,
+                              child: CircleAvatar(
+                                child: Text(message.senderProfileIcon == ""
+                                    ? message.senderName[0]
+                                    : message.senderProfileIcon),
+                              ),
+                            );
+                          },
+                        ),
                       );
                     },
-                    childCount: sortedMessages.length,
+                    childCount: state.messages.length,
                   ),
                 );
-              } else if (state is ChatMessagesLoadingFailed) {
-                return SliverToBoxAdapter(
+              } else if (state is NewMessageReceiveFailed) {
+                return const SliverToBoxAdapter(
                   child: Center(
-                    child: Text('Failed to load messages: ${state.error}'),
+                    child: Text(
+                      'Dealing with technical problem, try again later',
+                    ),
                   ),
                 );
-              } else if (state is NewMessageReceiveSuccess) {
-                return const SliverToBoxAdapter();
               } else {
                 return const SliverToBoxAdapter(
-                  child: Center(child: Text('Unknown state')),
+                  child: Text('wtf'),
                 );
               }
             },
           ),
         ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: ChatInput(
-          roomId: widget.roomId,
-        ),
       ),
     );
   }

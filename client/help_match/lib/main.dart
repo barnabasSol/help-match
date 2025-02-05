@@ -16,14 +16,13 @@ import 'package:help_match/features/chat/dataprovider/remote/chat_remote.dart';
 import 'package:help_match/features/chat/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
 import 'package:help_match/features/chat/repository/chat_repository.dart';
-import 'package:help_match/features/notifications/data_provider/notif_provider.dart';
+import 'package:help_match/features/notifications/data_provider/remote/notif_provider.dart';
 import 'package:help_match/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:help_match/features/notifications/repository/notif_repository.dart';
 import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
 
 import 'package:help_match/features/organization/bloc/org_bloc.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
-import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
 import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/features/online_status/repository/online_status_repository.dart';
@@ -39,16 +38,18 @@ Future<void> main() async {
   );
 
   final userAuthCubit = UserAuthCubit(secureStorage: secureStorage);
-  await initializeHive();
 
   await secureStorage.write(
-      key: 'access_token',
-      value:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhZyIsInJvbGUiOiJ1c2VyIiwiaXNzIjoiaHR0cHM6Ly9obS5iYXJuZXktaG9zdC5zaXRlIiwic3ViIjoiNDc0Zjk0MmMtZTE0NC0xMWVmLWI5YmYtMmYxM2Y2ODczMjhmIiwiYXVkIjpbImNvbS5iYXJuZXktaG9zdC5obSJdLCJleHAiOjE3MzkwOTE2NTUsImlhdCI6MTczODQ4Njg4NH0.rkLPnDV98EyJ3ItO_AquAROj8lTZNHIhIpFXrqi3B8g');
+    key: 'access_token',
+    value:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlX2pvaG5zb25fMjAyNCIsIm9yZ19pZCI6IjQ5MWEwNTk0LWUxNDQtMTFlZi1iOWMyLTZmY2E5Yjk3NzE0ZSIsInJvbGUiOiJvcmdhbml6YXRpb24iLCJpc3MiOiJodHRwczovL2htLmJhcm5leS1ob3N0LnNpdGUiLCJzdWIiOiI0OTE4NGE5Yy1lMTQ0LTExZWYtYjljMS0zNzgxZGQ3YTU1N2EiLCJhdWQiOlsiY29tLmJhcm5leS1ob3N0LmhtIl0sImV4cCI6MTczOTA5MTY1NSwiaWF0IjoxNzM4NDg2ODg3fQ.NJ0PWw7-RuRo9rJ2ilTuBbzTGXUUPytrU4WdQjri_xg',
+  );
 
   final dio = Dio();
 
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
+
+  await initializeHive();
 
   final themeModeString = await secureStorage.read(key: "theme_mode");
   if (themeModeString == null) {
@@ -95,15 +96,16 @@ Future<void> main() async {
             context.read<NotificationProvider>(),
           ),
         ),
-        RepositoryProvider(create: (context) => OrgDataProvider(dio: dio)
-        ),
-        RepositoryProvider(create: (context)=>OrgRepository(context.read<OrgDataProvider>()))
+        RepositoryProvider(create: (context) => OrgDataProvider(dio: dio)),
+        RepositoryProvider(
+            create: (context) => OrgRepository(context.read<OrgDataProvider>()))
       ],
       child: Builder(
         builder: (context) {
           return MultiBlocProvider(
             providers: [
-              BlocProvider(create: (context) => OrgBloc(context.read<OrgRepository>())),
+              BlocProvider(
+                  create: (context) => OrgBloc(context.read<OrgRepository>())),
               BlocProvider(
                 create: (_) =>
                     ThemeCubit(secureStorage)..emit(initialThemeMode),
@@ -178,7 +180,9 @@ class _MyAppState extends State<MyApp> {
                   return const LoadingIndicator();
                 } else if (state is UserAuthIsLoggedIn) {
                   final currentUser = context.read<UserAuthCubit>().currentUser;
-                  if (currentUser!.role == "user") {
+                  if (currentUser!.role == "organization") {
+                    return const VolunteerScreen();
+                  } else if (currentUser.role == "user") {
                     return const VolunteerScreen();
                   }
                   return const Scaffold();

@@ -9,16 +9,12 @@ class UserRepo {
   UserRepo(this.userRemote, this.userLocal);
 
   Future<User?> getUserById(
-    String userId, {
-    bool forceRefresh = false,
-  }) async {
-    if (!forceRefresh) {
-      final cachedUser = userLocal.getUser(userId);
-      if (cachedUser != null) {
-        return cachedUser;
-      }
+    String userId,
+  ) async {
+    final cachedUser = userLocal.getUser(userId);
+    if (cachedUser != null) {
+      return cachedUser;
     }
-
     try {
       final user = await userRemote.fetchCurrentUser(userId);
       if (user != null) {
