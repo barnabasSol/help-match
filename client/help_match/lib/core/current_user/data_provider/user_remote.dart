@@ -10,7 +10,7 @@ class UserInfoRemoteProvider {
   Future<User?> fetchCurrentUser(String username) async {
     try {
       final response =
-          await dio.get('${Secrets.LOCAL_DOMAIN}/v1/user-by?user_id=$username');
+          await dio.get('${Secrets.APP_DOMAIN}/v1/user-by?user_id=$username');
       if (response.statusCode == 200) {
         return User.fromJson(response.data['data']);
       } else {

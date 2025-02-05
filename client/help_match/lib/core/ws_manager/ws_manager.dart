@@ -31,7 +31,7 @@ class WsManager {
     }
 
     final wsUrl =
-        '${Secrets.LOCAL_DOMAIN.replaceFirst('http', 'ws')}/v1/ws?otp=$otp';
+        '${Secrets.APP_DOMAIN.replaceFirst('https', 'wss')}/v1/ws?otp=$otp';
 
     try {
       _channel = IOWebSocketChannel.connect(

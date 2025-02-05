@@ -29,7 +29,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
-        listener: (BuildContext context, state) async {
+        listener: (BuildContext context, state) {
           if (state is AuthLoginFailure) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
@@ -39,12 +39,7 @@ class _LoginState extends State<Login> {
               child: CircularProgressIndicator(),
             );
           else if (state is AuthLoginSuccess) {
-            // ignore: use_build_context_synchronously
-            await context.read<UserAuthCubit>().isUserAuthenticated();
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const VolunteerScreen()));
+            context.read<UserAuthCubit>().isUserAuthenticated();
           }
         },
         child: SingleChildScrollView(

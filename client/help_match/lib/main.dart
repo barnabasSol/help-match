@@ -185,6 +185,23 @@ class _MyAppState extends State<MyApp> {
                 context.read<WebsocketCubit>().connectCubit();
                 context.read<OnlineStatusCubit>().listenOnlineStatusChange();
                 context.read<ChatBloc>().add(NewMessageListening());
+                if (state.currentUser.role == "user") {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const VolunteerScreen(),
+                    ),
+                  );
+                } else if (state.currentUser.role == "organization") {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OrgScreen(),
+                    ),
+                  );
+                }
               }
             },
             child: BlocBuilder<UserAuthCubit, UserAuthState>(

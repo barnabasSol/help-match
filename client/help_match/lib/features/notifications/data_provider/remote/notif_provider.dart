@@ -8,7 +8,7 @@ class NotificationProvider {
   Future<dynamic> fetchVolunteerNotifications() async {
     try {
       final response =
-          await dio.get('${Secrets.LOCAL_DOMAIN}/v1/notifications/volunteer');
+          await dio.get('${Secrets.APP_DOMAIN}/v1/notifications/volunteer');
       if (response.statusCode == 200) {
         return response.data;
       } else {
@@ -29,8 +29,8 @@ class NotificationProvider {
 
   Future<dynamic> fetchOrgNotifications() async {
     try {
-      final response = await dio
-          .get('${Secrets.LOCAL_DOMAIN}/v1/notifications/organization');
+      final response =
+          await dio.get('${Secrets.APP_DOMAIN}/v1/notifications/organization');
       if (response.statusCode == 200) {
         return response.data;
       } else {

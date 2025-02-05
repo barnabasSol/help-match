@@ -80,7 +80,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       );
     });
 
-    on<NewMessageSent>((event, emit) async {
+    on<NewMessageSent>((event, emit) {
       try {
         chatRepository.sendMessage(
             WsEvent(type: TypeSendMessage, payload: event.message));

@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:help_match/core/secrets/secrets.dart';
-import 'package:help_match/features/Auth/dto/login_dto.dart';
-import 'package:help_match/features/Auth/dto/signup_dto.dart';
 
 class AuthDataProvider {
   final Dio _dio;
