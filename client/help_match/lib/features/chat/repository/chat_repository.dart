@@ -28,6 +28,9 @@ class ChatRepository {
 
       final dynamic data = response['data'];
 
+      if (data == null) {
+        return [];
+      }
       if (data is List) {
         final List<RoomDto> roomsList =
             data.map((json) => RoomDto.fromJson(json)).toList();

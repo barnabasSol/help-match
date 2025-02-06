@@ -70,7 +70,6 @@ class _LocationPickerState extends State<LocationPicker> {
             icon: const Icon(Icons.check),
             onPressed: () {
               if (_pickedLocation != null) {
-                // Return the picked location instead of using callback
                 Navigator.of(context).pop(_pickedLocation);
               }
             },

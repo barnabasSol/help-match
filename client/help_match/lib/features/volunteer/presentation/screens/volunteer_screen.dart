@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
 import 'package:help_match/features/chat/presentation/pages/room_list_page.dart';
 import 'package:help_match/features/notifications/presentation/bloc/notification_bloc.dart';
@@ -16,7 +17,6 @@ class VolunteerScreen extends StatefulWidget {
 
 class _VolunteerScreen extends State<VolunteerScreen> {
   int _selectedIndex = 0;
-
   final List<Widget> _pages = [
     const HomePage(),
     const ProfilePage(),
@@ -40,9 +40,10 @@ class _VolunteerScreen extends State<VolunteerScreen> {
       if (index == 2) {
         context.read<RoomsBloc>().add(RoomListRequested());
       } else if (index == 3) {
+        final currentUser = context.read<UserAuthCubit>().currentUser;
         context
             .read<NotificationBloc>()
-            .add(VolunteerNotificationListRequested());
+            .add(NotificationListRequested(role: currentUser!.role));
       }
     });
   }

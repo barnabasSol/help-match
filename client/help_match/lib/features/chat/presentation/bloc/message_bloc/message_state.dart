@@ -22,12 +22,7 @@ class NewMessageReceiveFailed extends ChatState {
   NewMessageReceiveFailed(this.error);
 }
 
-class NewMessageReceived extends ChatState {
-  final MessageModel message;
-  NewMessageReceived(this.message);
-}
-
-class MessageUpdate extends ChatState {
-  final List<MessageDto> messages;
-  MessageUpdate(this.messages);
+class NewMessageReceiveSuccess extends ChatState {
+  final MessageDto message;
+  NewMessageReceiveSuccess(this.message);
 }

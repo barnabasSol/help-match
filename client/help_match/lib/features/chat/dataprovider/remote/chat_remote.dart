@@ -2,13 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:help_match/core/secrets/secrets.dart';
 
 class ChatRemoteDataProvider {
-  final Dio _dio; 
+  final Dio _dio;
 
   ChatRemoteDataProvider({required Dio dio}) : _dio = dio;
 
   Future<dynamic> fetchRooms() async {
     try {
-      final response = await _dio.get('${Secrets.LOCAL_DOMAIN}/v1/chat/rooms');
+      final response = await _dio.get('${Secrets.APP_DOMAIN}/v1/chat/rooms');
       if (response.statusCode == 200) {
         return response.data;
       } else {
@@ -29,7 +29,7 @@ class ChatRemoteDataProvider {
   Future<dynamic> fetchMessages(String roomId) async {
     try {
       final response =
-          await _dio.get('${Secrets.LOCAL_DOMAIN}/v1/chat/messages/$roomId');
+          await _dio.get('${Secrets.APP_DOMAIN}/v1/chat/messages/$roomId');
       if (response.statusCode == 200) {
         return response.data;
       } else {

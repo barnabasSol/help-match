@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
           showCustomSnackBar(
             context: context,
             message:
-                '${state.osm.userName} online status is ${state.osm.status}',
+                '${state.osm.userName} is ${state.osm.status ? 'online' : 'offline'}',
             color: Colors.green,
           );
         }

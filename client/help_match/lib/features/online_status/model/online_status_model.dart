@@ -1,5 +1,3 @@
-// const TypeOnlineStatus = "online_status_change"
-
 // ignore: constant_identifier_names
 const String TypeOnlineStatus = "online_status_change";
 
@@ -18,7 +16,6 @@ class OnlineStatusModel {
     );
   }
 
-  // Convert instance to JSON
   Map<String, dynamic> toJson() {
     return {
       'user_id': userId,

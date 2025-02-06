@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
+import 'package:help_match/core/current_user/data_provider/local.dart';
+import 'package:help_match/core/current_user/data_provider/user_remote.dart';
+import 'package:help_match/core/current_user/repository/user_repo.dart';
 import 'package:help_match/core/interceptor/interceptor.dart';
+import 'package:help_match/core/local_storage/app_local.dart';
 import 'package:help_match/core/theme/colors.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/core/ws_manager/cubit/websocket_cubit.dart';
@@ -17,7 +21,7 @@ import 'package:help_match/features/chat/dataprovider/remote/chat_remote.dart';
 import 'package:help_match/features/chat/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
 import 'package:help_match/features/chat/repository/chat_repository.dart';
-import 'package:help_match/features/notifications/data_provider/notif_provider.dart';
+import 'package:help_match/features/notifications/data_provider/remote/notif_provider.dart';
 import 'package:help_match/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:help_match/features/notifications/repository/notif_repository.dart';
 import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
@@ -26,7 +30,6 @@ import 'package:help_match/features/organization/bloc/org_bloc.dart';
 import 'package:help_match/features/organization/cubit/org_cubit.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
-// import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
 import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/features/online_status/repository/online_status_repository.dart';
@@ -43,14 +46,13 @@ Future<void> main() async {
 
   final userAuthCubit = UserAuthCubit(secureStorage: secureStorage);
 
- 
   final dio = Dio();
 
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
 
-  //await initializeHive();
+  await initializeHive();
 
-  // await secureStorage.deleteAll();
+  await secureStorage.deleteAll();
 
   final themeModeString = await secureStorage.read(key: "theme_mode");
   if (themeModeString == null) {
@@ -77,6 +79,18 @@ Future<void> main() async {
             context.read<WsManager>(),
           ),
         ),
+        RepositoryProvider<UserInfoRemoteProvider>(
+          create: (_) => UserInfoRemoteProvider(dio),
+        ),
+        RepositoryProvider<UserLocalProvider>(
+          create: (_) => UserLocalProvider(),
+        ),
+        RepositoryProvider<UserRepo>(
+          create: (context) => UserRepo(
+            context.read<UserInfoRemoteProvider>(),
+            context.read<UserLocalProvider>(),
+          ),
+        ),
         RepositoryProvider<NotificationProvider>(
           create: (_) => NotificationProvider(dio: dio),
         ),
@@ -98,9 +112,12 @@ Future<void> main() async {
         builder: (context) {
           return MultiBlocProvider(
             providers: [
-              BlocProvider(create: (context)=>SignUpUserCubit()),
-                  BlocProvider(create: (context)=>SignUpOrgCubit()),
-              BlocProvider(create: (context)=>AuthBloc(secureStorage: secureStorage,authRepository: context.read<AuthRepository>())),
+              BlocProvider(create: (context) => SignUpUserCubit()),
+              BlocProvider(create: (context) => SignUpOrgCubit()),
+              BlocProvider(
+                  create: (context) => AuthBloc(
+                      secureStorage: secureStorage,
+                      authRepository: context.read<AuthRepository>())),
               BlocProvider(
                   create: (context) => OrgBloc(context.read<OrgRepository>())),
               BlocProvider(
@@ -118,7 +135,10 @@ Future<void> main() async {
                 create: (_) => userAuthCubit,
               ),
               BlocProvider(
-                create: (_) => ChatBloc(context.read<ChatRepository>()),
+                create: (_) => ChatBloc(
+                  context.read<ChatRepository>(),
+                  context.read<UserRepo>(),
+                ),
               ),
               BlocProvider(
                 create: (_) => RoomsBloc(context.read<ChatRepository>()),
@@ -192,10 +212,12 @@ class _MyAppState extends State<MyApp> {
                   return const LoadingIndicator();
                 } else if (state is UserAuthIsLoggedIn) {
                   final currentUser = context.read<UserAuthCubit>().currentUser;
-                  if (currentUser!.role == "user") {
+                  if (currentUser!.role == "organization") {
+                    return const OrgScreen();
+                  } else if (currentUser.role == "user") {
                     return const VolunteerScreen();
                   }
-                  return const OrgScreen();
+                  return const OnBoardingScreen();
                 } else if (state is UserAuthInitial) {
                   return const OnBoardingScreen();
                 } else {

@@ -20,7 +20,7 @@ class _OrgNotificationState extends State<OrgNotification> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OrgBloc, OrgState>(builder: (context, state) {
+  return BlocBuilder<OrgBloc, OrgState>(builder: (context, state) {
   if (state is FetchFailed) {
     return Text(state.error);
   } else if (state is FetchSuccessful) {
@@ -92,6 +92,5 @@ class _OrgNotificationState extends State<OrgNotification> {
     return const Center(child: CircularProgressIndicator());
   }
 });
-
   }
 }

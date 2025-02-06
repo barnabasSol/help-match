@@ -20,7 +20,6 @@ class NotificationListPage extends StatelessWidget {
           BlocBuilder<NotificationBloc, NotificationState>(
             builder: (context, state) {
               if (state is NotificationFetchLoading) {
-                // Wrap LoadingIndicator in SliverToBoxAdapter
                 return const SliverToBoxAdapter(
                   child: SizedBox(
                     height: 200,
@@ -36,7 +35,9 @@ class NotificationListPage extends StatelessWidget {
                         final notif = state.notifList[index];
                         final notification = VolunteerNotificationDto(
                           orgId: notif.orgId,
-                          profileIcon: Secrets.DummyImage,
+                          profileIcon: notif.profileIcon == ""
+                              ? Secrets.DummyImage
+                              : notif.profileIcon,
                           orgType: notif.orgType,
                           orgName: notif.orgName,
                           message: notif.message,
@@ -48,7 +49,32 @@ class NotificationListPage extends StatelessWidget {
                           child: NotificationCard(notification: notification),
                         );
                       },
-                      childCount: state.notifList.length, // Use actual length
+                      childCount: state.notifList.length,
+                    ),
+                  ),
+                );
+              } else if (state is OrgNotificationFetchLoaded) {
+                return SliverPadding(
+                  padding: const EdgeInsets.all(16.0),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final notif = state.notifList[index];
+                        final notification = VolunteerNotificationDto(
+                          orgId: notif.volunteerId,
+                          profileIcon: Secrets.DummyImage,
+                          orgType: "",
+                          orgName: notif.volunteerName,
+                          message: notif.message,
+                          isVerified: false,
+                        );
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: NotificationCard(notification: notification),
+                        );
+                      },
+                      childCount: state.notifList.length,
                     ),
                   ),
                 );

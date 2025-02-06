@@ -29,81 +29,93 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
-        listener: (BuildContext context, state) async{
+        listener: (BuildContext context, state) {
           if (state is AuthSignupFailure) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
           } else if (state is AuthSignupSuccess) {
-           await context.read<UserAuthCubit>().isUserAuthenticated();
+            context.read<UserAuthCubit>().isUserAuthenticated();
  
           }
-        },
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Logo
-                const Icon(Icons.volunteer_activism,
-                    size: 80, color: Colors.blue),
-                const SizedBox(height: 24),
+        }
+      },
+      child: Scaffold(
+        body: BlocListener<AuthBloc, AuthState>(
+          listener: (BuildContext context, state) async {
+            if (state is AuthSignupFailure) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(state.error)));
+            } else if (state is AuthSignupSuccess) {
+              context.read<UserAuthCubit>().isUserAuthenticated();
+            }
+          },
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Logo
+                  const Icon(Icons.volunteer_activism,
+                      size: 80, color: Colors.blue),
+                  const SizedBox(height: 24),
 
-                // Title
-                const Text(
-                  'Your Volunteer',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Subtitle
-                Text(
-                  'Please let us know your interests',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Interest Chips
-                _buildCategoryChips(),
-                const SizedBox(height: 40),
-
-                // Signup Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Colors.blue,
-                      // backgroundColor: Theme.of(context).colorScheme.primary,
-
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () {
-                      _selectedInterests.isEmpty
-                          ? null
-                          : _change_to_Home(context);
-                    },
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  // Title
+                  const Text(
+                    'Your Volunteer',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+
+                  // Subtitle
+                  Text(
+                    'Please let us know your interests',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Interest Chips
+                  _buildCategoryChips(),
+                  const SizedBox(height: 40),
+
+                  // Signup Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: Colors.blue,
+                        // backgroundColor: Theme.of(context).colorScheme.primary,
+
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        _selectedInterests.isEmpty
+                            ? null
+                            : _change_to_Home(context);
+                      },
+                      child: const Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

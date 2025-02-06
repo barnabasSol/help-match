@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:help_match/core/secrets/secrets.dart';
+import 'package:help_match/core/current_user/repository/user_repo.dart';
 import 'package:help_match/core/ws_manager/event.dart';
 import 'package:help_match/features/chat/dto/message_dto.dart';
 import 'package:help_match/features/chat/model/message_model.dart';
@@ -15,8 +15,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   StreamSubscription? newMessageSub;
   List<MessageDto> _messages = [];
   final ChatRepository chatRepository;
+  final UserRepo userRepo;
 
-  ChatBloc(this.chatRepository) : super(ChatInitial()) {
+  ChatBloc(this.chatRepository, this.userRepo) : super(ChatInitial()) {
     on<ChatMessagesRequested>((event, emit) async {
       emit(ChatMessagesLoading());
       try {
@@ -30,46 +31,59 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     on<NewMessageListening>((event, emit) async {
       await emit.forEach(
-        chatRepository.messageStream,
-        onData: (data) {
-          emit(NewMessageReceived(data));
+        chatRepository.messageStream.asyncMap((data) async {
+          try {
+            final user = await userRepo.getUserById(data.fromId);
+            if (user != null) {
+              if (user.role == "organization") {
+                return MessageDto(
+                  senderProfileIcon: user.orgInfo!.profileIcon,
+                  senderId: data.fromId,
+                  senderName: user.orgInfo!.name,
+                  senderUsername: user.username,
+                  isAdmin: user.role == "organization",
+                  roomId: data.toRoomId,
+                  message: data.message,
+                  sentTime: data.sentTime,
+                  isSeen: false,
+                );
+              }
+              return MessageDto(
+                senderProfileIcon: user.profilePicUrl,
+                senderId: data.fromId,
+                senderName: user.name,
+                senderUsername: user.username,
+                isAdmin: user.role == "organization",
+                roomId: data.toRoomId,
+                message: data.message,
+                sentTime: data.sentTime,
+                isSeen: false,
+              );
+            } else {
+              throw Exception('User not found');
+            }
+          } catch (e) {
+            throw Exception("Failed to process message: ${e.toString()}");
+          }
+        }),
+        onData: (messageDto) {
+          _messages.insert(0, messageDto);
+          emit(NewMessageReceiveSuccess(messageDto));
+          emit(ChatMessagesLoaded(_messages));
           return state;
         },
-        onError: (error, stackTrace) {
-          emit(NewMessageReceiveFailed(
-              "Failed to listen for new messages: $error"));
+        onError: (e, stackTrace) {
+          emit(
+              NewMessageReceiveFailed("Failed to listen for new messages: $e"));
           return state;
         },
       );
     });
 
-    on<NewMessageSent>((event, emit) async {
+    on<NewMessageSent>((event, emit) {
       try {
         chatRepository.sendMessage(
             WsEvent(type: TypeSendMessage, payload: event.message));
-        // emit(NewMessageReceived(event.message));
-      } catch (e) {
-        emit(NewMessageReceiveFailed(e.toString()));
-      }
-    });
-
-    on<UpdateMessages>((event, emit) async {
-      try {
-        _messages = [
-          ..._messages,
-          MessageDto(
-            senderProfileIcon: Secrets.DummyImage,
-            senderId: event.message.fromId,
-            senderName: 'senderName',
-            senderUsername: '',
-            isAdmin: true,
-            roomId: event.message.toRoomId,
-            message: event.message.message,
-            sentTime: event.message.sentTime,
-            isSeen: false,
-          )
-        ];
-        emit(MessageUpdate(_messages));
       } catch (e) {
         emit(NewMessageReceiveFailed(e.toString()));
       }
