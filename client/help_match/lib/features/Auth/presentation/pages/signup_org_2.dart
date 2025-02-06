@@ -30,9 +30,8 @@ class _SigninState extends State<Signupo2> {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
           } else if (state is AuthSignupSuccess) {
-            await context.read<UserAuthCubit>().isUserAuthenticated();
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => OrgScreen()));
+             context.read<UserAuthCubit>().isUserAuthenticated();
+            
           }
         },
         child: SingleChildScrollView(

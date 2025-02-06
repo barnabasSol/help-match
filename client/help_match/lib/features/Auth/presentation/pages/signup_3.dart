@@ -27,21 +27,15 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<UserAuthCubit, UserAuthState>(
-      listener: (context, state) {
-        if (state is UserAuthIsLoggedIn) {
-          if (state.currentUser.role == "user") {
-            Navigator.pop(context);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const VolunteerScreen()));
-          } else if (state.currentUser.role == "organization") {
-            Navigator.pop(context);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const VolunteerScreen()));
+    return Scaffold(
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: (BuildContext context, state) {
+          if (state is AuthSignupFailure) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.error)));
+          } else if (state is AuthSignupSuccess) {
+            context.read<UserAuthCubit>().isUserAuthenticated();
+ 
           }
         }
       },

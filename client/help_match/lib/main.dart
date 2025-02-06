@@ -27,6 +27,7 @@ import 'package:help_match/features/notifications/repository/notif_repository.da
 import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
 
 import 'package:help_match/features/organization/bloc/org_bloc.dart';
+import 'package:help_match/features/organization/cubit/org_cubit.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
@@ -146,6 +147,7 @@ Future<void> main() async {
                 create: (_) =>
                     NotificationBloc(context.read<NotificationRepository>()),
               ),
+              BlocProvider(create: (_)=>OrgCubit( orgRepository: context.read<OrgRepository>()))
             ],
             child: const MyApp(),
           );
