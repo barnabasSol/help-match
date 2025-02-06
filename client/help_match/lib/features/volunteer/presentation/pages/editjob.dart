@@ -26,6 +26,11 @@ class _OrganizationSignUpScreenState extends State<Editjob> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                
+                 // left arrow
+                _left_arrow_to_home(),
+                const SizedBox(height: 24),
+              
                 // Logo
                 Icon(Icons.business, size: 80,color: Theme.of(context).colorScheme.primary),
                 const SizedBox(height: 24),
@@ -121,6 +126,42 @@ class _OrganizationSignUpScreenState extends State<Editjob> {
       ),
     );
   }
+
+
+
+Widget _left_arrow_to_home() {
+  return GestureDetector(
+    onTap: () {
+        Navigator.pop(context);
+        Navigator.pushNamed(context, '/homeo');  
+      },
+    child: Container(
+      alignment: Alignment.topLeft,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.arrow_back_ios,
+            size: 18,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Back to Home',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   
   @override

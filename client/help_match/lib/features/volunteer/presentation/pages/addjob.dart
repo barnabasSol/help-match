@@ -128,20 +128,18 @@ class _OrganizationSignUpScreenState extends State<Addjob> {
     );
   }
 
-  Widget _left_arrow_to_home() {
-    // return
-
-    //  GestureDetector(onTap: () {
-    //   Navigator.pop(context);
-    //   Navigator.pushNamed(context, '/homeo');
-    //   // Navigator.of(context).pushReplacement(
-    //     // MaterialPageRoute(builder: (context) => const HomePage()),
-    //   // );
-    // });
-    // return Padding(
-      // padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-     return Row(
-        // mainAxisAlignment: MainAxisAlignment.end,
+// modified
+Widget _left_arrow_to_home() {
+  return GestureDetector(
+    onTap: () {
+        Navigator.pop(context);
+        Navigator.pushNamed(context, '/homeo');  
+      },
+    child: Container(
+      alignment: Alignment.topLeft,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -149,24 +147,21 @@ class _OrganizationSignUpScreenState extends State<Addjob> {
             Icons.arrow_back_ios,
             size: 18,
             color: Theme.of(context).colorScheme.onPrimary,
-                 
           ),
           const SizedBox(width: 8),
-       
           Text(
             'Back to Home',
             style: TextStyle(
-              
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Theme.of(context).colorScheme.onPrimary,
-                 
             ),
-            // textAlign: TextAlign.left
           ),
-
-
         ],
-    );
-  }
+      ),
+    ),
+  );
 }
+
+}
+
