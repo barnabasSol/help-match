@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:help_match/features/Auth/presentation/pages/login.dart';
 import 'package:help_match/features/Auth/presentation/pages/signup_1.dart';
 import 'package:help_match/features/Auth/presentation/pages/signup_org.dart';
 
@@ -69,7 +70,9 @@ class Signup extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Navigate to login
+                      Navigator.pop(context);
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const Login()));
                     },
                     child: const Text(
                       'Log In',
@@ -107,7 +110,6 @@ class AccountTypeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-
         // ignore: deprecated_member_use
         backgroundColor: color.withOpacity(0.1),
         foregroundColor: color,
@@ -122,13 +124,13 @@ class AccountTypeCard extends StatelessWidget {
         // Handle account type selection
 
         if (title == 'Volunteer') {
-            Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (con)=>const Signupv1()));
-               
-        }
-        else if(title == 'Organization'){
-            Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (con)=>const Signupo1()));
+          Navigator.pop(context);
+          Navigator.push(
+              context, MaterialPageRoute(builder: (con) => const Signupv1()));
+        } else if (title == 'Organization') {
+          Navigator.pop(context);
+          Navigator.push(
+              context, MaterialPageRoute(builder: (con) => const Signupo1()));
         }
       },
       child: SizedBox(

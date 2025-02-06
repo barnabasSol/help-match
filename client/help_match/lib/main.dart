@@ -23,6 +23,7 @@ import 'package:help_match/features/notifications/repository/notif_repository.da
 import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
 
 import 'package:help_match/features/organization/bloc/org_bloc.dart';
+import 'package:help_match/features/organization/cubit/org_cubit.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
 // import 'package:help_match/features/organization/presentation/pages/screen.dart';
@@ -46,6 +47,10 @@ Future<void> main() async {
   final dio = Dio();
 
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
+
+  //await initializeHive();
+
+  // await secureStorage.deleteAll();
 
   final themeModeString = await secureStorage.read(key: "theme_mode");
   if (themeModeString == null) {
@@ -122,6 +127,7 @@ Future<void> main() async {
                 create: (_) =>
                     NotificationBloc(context.read<NotificationRepository>()),
               ),
+              BlocProvider(create: (_)=>OrgCubit( orgRepository: context.read<OrgRepository>()))
             ],
             child: const MyApp(),
           );
@@ -161,6 +167,23 @@ class _MyAppState extends State<MyApp> {
                 context.read<WebsocketCubit>().connectCubit();
                 context.read<OnlineStatusCubit>().listenOnlineStatusChange();
                 context.read<ChatBloc>().add(NewMessageListening());
+                if (state.currentUser.role == "user") {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const VolunteerScreen(),
+                    ),
+                  );
+                } else if (state.currentUser.role == "organization") {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OrgScreen(),
+                    ),
+                  );
+                }
               }
             },
             child: BlocBuilder<UserAuthCubit, UserAuthState>(

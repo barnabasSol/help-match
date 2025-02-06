@@ -20,6 +20,7 @@ class UserAuthCubit extends Cubit<UserAuthState> {
   }
 
   Future<void> isUserAuthenticated() async {
+    
     emit(UserAuthChecking());
     try {
       final accessToken = await secureStorage.read(key: 'access_token');

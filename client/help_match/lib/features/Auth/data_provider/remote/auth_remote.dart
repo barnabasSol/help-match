@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:help_match/core/secrets/secrets.dart';
-import 'package:help_match/features/Auth/dto/login_dto.dart';
-import 'package:help_match/features/Auth/dto/signup_dto.dart';
 
 class AuthDataProvider {
   final Dio _dio;
@@ -34,7 +32,7 @@ class AuthDataProvider {
       if (response.statusCode == 200) {
         return response.data;
       } else {
-        throw Exception('Failed to signup user: ${response.statusMessage}');
+        throw Exception('Failed to signup : ${response.statusMessage}');
       }
     } on DioException catch (e) {
       if (e.response != null) {

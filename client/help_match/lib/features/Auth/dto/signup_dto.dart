@@ -130,11 +130,13 @@ LatLng? location;
         'org_name': orgname,
         'description': description,
         'location': location!=null
-            ? Map.from({
+            ? {
                 "latitude": location!.latitude,
-                "logitude": location!.longitude
-              })
-            : {},
+                "longitude": location!.longitude
+              }
+            : {
+              
+            },
         'type':convert(type)
       },
       "name": name,

@@ -189,7 +189,7 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
                           if (_loc != null) {
                             setState(() {
                               info =
-                                  "Latitude: ${_loc!.latitude} Longitude: ${_loc!.longitude}";
+                                  "Latitude: ${_loc!.latitude} \n  Longitude: ${_loc!.longitude}";
                             });
                           }
                         },
