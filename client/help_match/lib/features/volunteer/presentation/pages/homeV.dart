@@ -13,17 +13,11 @@ class _HomePageState extends State<Home_Page_V> {
   final List<Category> _categories = const [
     Category('Non-Profit', Icons.volunteer_activism),
     Category('For-Profit', Icons.attach_money),
-    // Category('Charity', Icons.volunteer_activism),
-    Category('Government', Icons.account_balance), // was Religous
+    Category('Government', Icons.account_balance), 
     Category('Community', Icons.people), //
     Category('Education', Icons.school),
     Category('Healthcare', Icons.medical_services),
     Category('Cultural', Icons.spoke_rounded)
-
-    // Category('Environment', Icons.eco),
-    // Category('Animals', Icons.pets),
-    // Category('Disaster', Icons.emergency),
-    // Category('Social', Icons.group_work),
   ];
 
   @override
@@ -62,11 +56,12 @@ class _HomePageState extends State<Home_Page_V> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+         Text(
           'Welcome, Dear user',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
        
@@ -75,9 +70,10 @@ class _HomePageState extends State<Home_Page_V> {
         children: [
         CircleAvatar(
           radius: 24,
-          backgroundColor: Colors.yellow[200],
-          child: const Icon(Icons.person, size: 32),
+          backgroundColor: Theme.of(context).colorScheme.primary,     
+               child: const Icon(Icons.person, size: 32),
         ),
+        
         SizedBox(width: 52,),
           Icon(
             color: Theme.of(context).colorScheme.primary,
@@ -98,7 +94,8 @@ class _HomePageState extends State<Home_Page_V> {
       decoration: InputDecoration(
         hintText: 'Search for Organization',
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
+
         prefixIcon: const Icon(Icons.search),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -143,9 +140,9 @@ class _HomePageState extends State<Home_Page_V> {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
-      items: const [
+      selectedItemColor: Theme.of(context).colorScheme.primary,
+      unselectedItemColor: Theme.of(context).colorScheme.tertiary,
+     items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.location_on),
           label: 'Location',
@@ -218,7 +215,8 @@ class CategoryItem extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: Theme.of(context).colorScheme.onSecondary,
+                          
             shape: BoxShape.circle,
           ),
           child: Icon(category.icon, size: 32),
@@ -251,7 +249,8 @@ class OrganizationCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             child: Container(
               // height: 120,   // might be an issue forward
-              color: Colors.yellow[200], // Replace with actual image
+              color: Theme.of(context).colorScheme.primary,
+                           // Replace with actual image
             ),
           ),
           Positioned(
@@ -273,7 +272,7 @@ class OrganizationCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+              color: Theme.of(context).colorScheme.onSecondary,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -286,9 +285,9 @@ class OrganizationCard extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  const Text(
+                   Text(
                     'Organization Type',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Theme.of(context).colorScheme.tertiary,),
                   ),
                 ],
               ),

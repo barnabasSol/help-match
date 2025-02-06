@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:help_match/shared/widgets/gradient_button.dart';
 class Signupo1 extends StatefulWidget {
   const Signupo1({super.key});
 
@@ -37,16 +37,16 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Logo
-                const Icon(Icons.business, size: 80, color: Colors.green),
+                Icon(Icons.business, size: 80, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(height: 24),
 
                 // Title
-                const Text(
+                 Text(
                   'Your Organization',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -56,7 +56,7 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
                   'Create an account for non-profit',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.tertiary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -64,7 +64,7 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
 
                 // Custom Stepper
                 // _buildStepper(),
-                const SizedBox(height: 32),
+                // const SizedBox(height: 32),
 
                 // Organization Name
                 TextFormField(
@@ -76,8 +76,7 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[100],
-                  ),
+                     fillColor: Theme.of(context).colorScheme.onSecondary,),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter organization name';
@@ -97,8 +96,7 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[100],
-                  ),
+                     fillColor: Theme.of(context).colorScheme.onSecondary,),
                   items: _organizationTypes
                       .map((type) => DropdownMenuItem(
                             value: type,
@@ -131,7 +129,7 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[100],
+                     fillColor: Theme.of(context).colorScheme.onSecondary,
                     helperText: 'Brief description (max 300 characters)',
                   ),
                   inputFormatters: [
@@ -163,13 +161,12 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.green[50],
+                            color: Theme.of(context).colorScheme.onSecondary,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.green[100]!),
+                            border: Border.all(color: Theme.of(context).colorScheme.primary),
                             boxShadow: [
                               BoxShadow(
-                                // ignore: deprecated_member_use
-                                color: Colors.green.withOpacity(0.1),
+                                color: Theme.of(context).colorScheme.primary,
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -177,15 +174,15 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
                           ),
                           child: Column(
                             children: [
-                              const Icon(Icons.my_location,
-                                  size: 40, color: Colors.green),
+                               Icon(Icons.my_location,
+                                  size: 40, color: Theme.of(context).colorScheme.primary,),
                               const SizedBox(height: 12),
-                              const Text(
+                               Text(
                                 'Click to Obtain Location',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.green,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -194,7 +191,7 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey[600],
+                                     color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                             ],
@@ -209,27 +206,16 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
                 const SizedBox(height: 40),
 
                 // Continue Button
-                SizedBox(
+                   SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                    ),
+                  child: GradientButton(
+                    // key: _formKey,
+                    text: 'Continue',
                     onPressed: _change_to_o2,
-                    child: const Text(
-                      'Continue',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    fontSize: 16,
                   ),
-                ),
+                ),    
+              
               ],
             ),
           ),

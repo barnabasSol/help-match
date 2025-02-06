@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:help_match/shared/widgets/gradient_button.dart';
 
 class Signupv1 extends StatefulWidget {
   const Signupv1({super.key});
@@ -26,17 +27,17 @@ class _VolunteerSignUpScreenState extends State<Signupv1> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Logo
-                const Icon(Icons.volunteer_activism,
-                    size: 80, color: Colors.blue),
+                Icon(Icons.volunteer_activism,
+                    size: 80, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(height: 24),
 
                 // Title
-                const Text(
+                 Text(
                   'Your Volunteer',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -46,7 +47,7 @@ class _VolunteerSignUpScreenState extends State<Signupv1> {
                   'Create account to Volunteer',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.tertiary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -65,27 +66,11 @@ class _VolunteerSignUpScreenState extends State<Signupv1> {
                 // Continue Button
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      // backgroundColor: Theme.of(context).colorScheme.primary,
-                      backgroundColor: Colors.blue,
-                    
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () {
-                      _change_to_v2();
-                    },
-                    child: const Text(
-                      'Continue',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  child: GradientButton(
+                    // key: _formKey,
+                    text: 'Continue',
+                    onPressed: _change_to_v2,
+                    fontSize: 16,
                   ),
                 ),
               ],
@@ -106,7 +91,7 @@ class _VolunteerSignUpScreenState extends State<Signupv1> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -130,7 +115,7 @@ class _VolunteerSignUpScreenState extends State<Signupv1> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
         hintText: '@username',
       ),
       validator: (value) {
@@ -156,7 +141,7 @@ class _VolunteerSignUpScreenState extends State<Signupv1> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {

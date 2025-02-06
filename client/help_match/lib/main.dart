@@ -15,7 +15,7 @@ import 'package:help_match/features/auth/presentation/pages/SignupO2.dart';
 import 'package:help_match/features/auth/presentation/pages/SignupV1.dart';
 import 'package:help_match/features/auth/presentation/pages/SignupV2.dart';
 import 'package:help_match/features/auth/presentation/pages/SignupV3.dart';
-import 'package:help_match/features/auth/presentation/pages/homeO.dart';
+// import 'package:help_match/features/auth/presentation/pages/homeO.dart';
 import 'package:help_match/features/auth/presentation/pages/login.dart';
 import 'package:help_match/features/auth/presentation/pages/signup.dart';
 import 'package:help_match/features/chat/dataprovider/remote/chat_remote.dart';
@@ -24,6 +24,7 @@ import 'package:help_match/features/chat/repository/chat_repository.dart';
 import 'package:help_match/features/onboarding/screen/onboarding_screen.dart';
 import 'package:help_match/features/volunteer/presentation/pages/addjob.dart';
 import 'package:help_match/features/volunteer/presentation/pages/editjob.dart';
+import 'package:help_match/features/volunteer/presentation/pages/homeO.dart';
 import 'package:help_match/features/volunteer/presentation/pages/homeV.dart';
 import 'package:help_match/features/volunteer/presentation/pages/joblisting.dart';
 import 'package:help_match/features/volunteer/presentation/pages/navO.dart';
@@ -137,16 +138,16 @@ class _MyAppState extends State<MyApp> {
 
 
            '/homev' : (context) => Home_Page_V(),
+           '/joblist' : (context) => Joblisting(),
            '/profilev' : (context) => Profile_Page_V(),
            '/navv' : (context) => Navigation_Page_v(),
-           '/joblist' : (context) => Joblisting(),
 
            
 
            
            '/homeo' : (context) => Home_Page_O(),
-           '/profileo' : (context) => Profile_Page_O(),
            '/navo' : (context) => Navigation_Page_o(),
+           '/profileo' : (context) => Profile_Page_O(),
            '/addjob' : (context) => Addjob(),
            '/editjob' : (context) => Editjob(),
 

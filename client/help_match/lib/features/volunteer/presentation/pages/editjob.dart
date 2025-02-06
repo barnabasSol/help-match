@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:help_match/shared/widgets/gradient_button.dart';
 
 class Editjob extends StatefulWidget {
   const Editjob({super.key});
@@ -26,16 +27,16 @@ class _OrganizationSignUpScreenState extends State<Editjob> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Logo
-                const Icon(Icons.business, size: 80, color: Colors.green),
+                Icon(Icons.business, size: 80,color: Theme.of(context).colorScheme.primary),
                 const SizedBox(height: 24),
 
                 // Title
-                const Text(
+                 Text(
                   'Organization Name',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -45,28 +46,25 @@ class _OrganizationSignUpScreenState extends State<Editjob> {
                   'Edit Job title and description for non-profit',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).colorScheme.tertiary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 32),
 
-                // Custom Stepper
-                // _buildStepper(),
                 const SizedBox(height: 32),
 
                 // Job Title
                 TextFormField(
                   controller: _job_title_Controller,
                   decoration: InputDecoration(
-                    labelText: 'Job Title',
+                    labelText: 'Edit Job Title',
                     prefixIcon: const Icon(Icons.work),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[100],
-                  ),
+                    fillColor: Theme.of(context).colorScheme.onSecondary,
+                     ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter organization name';
@@ -82,14 +80,14 @@ class _OrganizationSignUpScreenState extends State<Editjob> {
                   maxLines: 4,
                   maxLength: 300,
                   decoration: InputDecoration(
-                    labelText: 'Job Description',
+                    labelText: 'Edit Job Description',
                     alignLabelWithHint: true,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[100],
-                    helperText: 'Brief description (max 300 characters)',
+                    fillColor: Theme.of(context).colorScheme.onSecondary,
+                  helperText: 'Brief description (max 300 characters)',
                   ),
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(300),
@@ -109,27 +107,14 @@ class _OrganizationSignUpScreenState extends State<Editjob> {
 
                 // Continue Button
                 SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: (){},
-                    child: const Text(
-                      ' Changes',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                 width: double.infinity,
+                 child: GradientButton(
+                 text: 'Confirm Changes',
+                 onPressed: (){},
+                 fontSize: 16,)
+                ),     
+               
+                ],
             ),
           ),
         ),

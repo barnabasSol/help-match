@@ -67,6 +67,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 ? GradientButton(
                     text: "Get Started",
                     onPressed: () {},
+                    fontSize: 16,
                   )
                 : SmoothPageIndicator(
                     controller: _pageController,

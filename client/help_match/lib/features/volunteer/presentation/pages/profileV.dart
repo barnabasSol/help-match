@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:help_match/shared/widgets/gradient_button.dart';
 
 class Profile_Page_V extends StatefulWidget {
   const Profile_Page_V({super.key});
@@ -9,7 +10,7 @@ class Profile_Page_V extends StatefulWidget {
 
 class _Profile_Page_VState extends State<Profile_Page_V> {
   int _selectedIndex = 4; // Profile is selected
-  
+
   final _formKey_for_profile = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
@@ -73,16 +74,17 @@ class _Profile_Page_VState extends State<Profile_Page_V> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+        Text(
           'Manage Your Profile',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
         CircleAvatar(
           radius: 24,
-          backgroundColor: Colors.grey[200],
+          backgroundColor: Theme.of(context).colorScheme.primary,
           child: const Icon(Icons.person, size: 32),
         ),
       ],
@@ -92,17 +94,15 @@ class _Profile_Page_VState extends State<Profile_Page_V> {
   Widget _buildProfilePictureSection() {
     return Column(
       children: [
-      Align(alignment: Alignment.center,),
-      // mainAxisAlignment: MainAxisAlignment.center,
-      // crossAxisAlignment: CrossAxisAlignment.center,
+        const Align(
+          alignment: Alignment.center,
+        ),
         Stack(
           alignment: Alignment.center,
-
           children: [
             const CircleAvatar(
               radius: 60,
-              // backgroundImage: 
-              // AssetImage('assets/placeholder.png'), 
+              // backgroundImage:
             ),
             Positioned(
               // bottom: 0,
@@ -111,22 +111,24 @@ class _Profile_Page_VState extends State<Profile_Page_V> {
                 onTap: () => _changeProfilePicture(),
                 child: Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 24),
+                  child: Icon(Icons.camera_alt,
+                      color: Theme.of(context).colorScheme.onSecondary,
+                      size: 24),
                 ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'Change Profile Picture',
           style: TextStyle(
             fontWeight: FontWeight.w500,
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
       ],
@@ -143,7 +145,7 @@ class _Profile_Page_VState extends State<Profile_Page_V> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Please enter your name';
@@ -162,7 +164,7 @@ class _Profile_Page_VState extends State<Profile_Page_V> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Please enter a username';
@@ -197,12 +199,14 @@ class _Profile_Page_VState extends State<Profile_Page_V> {
                 });
               },
               // ignore: deprecated_member_use
-              selectedColor: Colors.blue.withOpacity(0.2),
-              checkmarkColor: Colors.blue,
+              selectedColor: Theme.of(context).colorScheme.primary,
+
+              checkmarkColor: Theme.of(context).colorScheme.onSecondary,
+
               labelStyle: TextStyle(
                 color: _selectedCategories.contains(category)
-                    ? Colors.blue
-                    : Colors.black87,
+                    ? Theme.of(context).colorScheme.onSecondary
+                    : Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.w500,
               ),
             );
@@ -214,34 +218,23 @@ class _Profile_Page_VState extends State<Profile_Page_V> {
 
   Widget _buildConfirmButton() {
     return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-        ),
-        onPressed: _saveProfile,
-        child: const Text(
-          'Confirm Changes',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
+        width: double.infinity,
+        child: GradientButton(
+          // key: _formKey,
+          text: 'Confirm Changes',
+          // _change_to_Home,
+          onPressed: _saveProfile,
+          // _selectedInterests.isEmpty? null : _change_to_Home,
+          fontSize: 16,)
+          );
   }
 
   Widget _buildBottomNavBar() {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: Theme.of(context).colorScheme.primary,
+      unselectedItemColor: Theme.of(context).colorScheme.tertiary,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.location_on),
@@ -264,59 +257,29 @@ class _Profile_Page_VState extends State<Profile_Page_V> {
           label: 'Profile',
         ),
       ],
-      // onTap: (index) => setState(() => _selectedIndex = index),
-        onTap: (index) => setState(() => _selectedIndex = _change_to_pages(index)),
+      onTap: (index) =>
+          setState(() => _selectedIndex = _change_to_pages(index)),
     );
   }
 
 // ignore: non_constant_identifier_names
- _change_to_pages(int index) {
-    
+  _change_to_pages(int index) {
     if (index == 2) {
-        return {
-          Navigator.pop(context),
-          Navigator.pushNamed(context, '/homev')};}
-
-    else if (index == 3) {
-        return {
-          Navigator.pop(context),
-          Navigator.pushNamed(context, '/homec')};}
-
-
-    else if (index == 0) {
-        return {
-          Navigator.pop(context),
-          Navigator.pushNamed(context, '/navv')};}
-
-
-    else if (index == 1) {
-        return {
-          Navigator.pop(context),
-          Navigator.pushNamed(context, '/homen')};}
+      return {Navigator.pop(context), Navigator.pushNamed(context, '/homev')};
+    } else if (index == 3) {
+      return {Navigator.pop(context), Navigator.pushNamed(context, '/homec')};
+    } else if (index == 0) {
+      return {Navigator.pop(context), Navigator.pushNamed(context, '/navv')};
+    } else if (index == 1) {
+      return {Navigator.pop(context), Navigator.pushNamed(context, '/homen')};
     }
-
-
-
+  }
 
   void _changeProfilePicture() async {
     // Implement image picker logic
-
-  // final picker = ImagePicker();
-  // final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-  // if (pickedFile != null) {
-  //   // Handle the picked image
-  // }
-  
   }
 
-  void _saveProfile() {
-    // if (_formKey_for_profile.currentState!.validate()) {
-      // // Save profile changes
-      // print('Name: ${_nameController.text}');
-      // print('Username: ${_usernameController.text}');
-      // print('Selected Categories: $_selectedCategories');
-    // }
-  }
+  void _saveProfile() {}
 
   @override
   void dispose() {

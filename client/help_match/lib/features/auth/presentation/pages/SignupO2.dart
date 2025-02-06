@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:help_match/shared/widgets/gradient_button.dart';
 
 class Signupo2 extends StatefulWidget {
   const Signupo2({super.key});
@@ -27,17 +28,17 @@ class _SigninState extends State<Signupo2> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(Icons.business, size: 80, color: Colors.green),
+                 Icon(Icons.business, size: 80, color: Theme.of(context).colorScheme.primary,),
                 const SizedBox(height: 24),
 
                 // Title
-                const Text(
+                 Text(
                   'Your Organization',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                   color: Theme.of(context).colorScheme.onPrimary,
+                   ),
                 ),
                 const SizedBox(height: 8),
 
@@ -45,8 +46,8 @@ class _SigninState extends State<Signupo2> {
                 Text(
                   'Create user account that will manage the Organization',
                   style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
+                    fontSize: 16,  
+                    color: Theme.of(context).colorScheme.tertiary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -84,7 +85,8 @@ class _SigninState extends State<Signupo2> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[100],
+                    fillColor: Theme.of(context).colorScheme.onSecondary,
+                 
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -99,33 +101,52 @@ class _SigninState extends State<Signupo2> {
                 const SizedBox(height: 28),
 
                 // Sign In Button
-                SizedBox(
+               SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      // backgroundColor: Theme.of(context).colorScheme.primary,
-                      // backgroundColor: Colors.blue,
-                         backgroundColor: Colors.green,
-                   
-
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () {
-                      _change_to_Home();
-                    },
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  child: GradientButton(
+                    // key: _formKey,
+                    text: 'Continue',
+                    onPressed: _change_to_Home,
+                    fontSize: 16,
                   ),
                 ),
+
+
+               
+               
+                // SizedBox(
+                //   width: double.infinity,
+                //   child: ElevatedButton(
+                //     style: ElevatedButton.styleFrom(
+                //       padding: const EdgeInsets.symmetric(vertical: 16),
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(12),
+                //       ),
+                //       // backgroundColor: Theme.of(context).colorScheme.primary,
+                //       // backgroundColor: Colors.blue,
+                //          backgroundColor: Colors.green,
+                   
+
+                //       foregroundColor: Colors.white,
+                //     ),
+                //     onPressed: () {
+                //       _change_to_Home();
+                //     },
+                //     child: const Text(
+                //       'Sign Up',
+                //       style: TextStyle(
+                //         fontSize: 16,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ),
+                // ),
+
+
+
+
+
+
                 const SizedBox(height: 24),
                ],
             ),
@@ -150,7 +171,7 @@ void _change_to_Home() {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -171,8 +192,8 @@ Widget _buildEmailField() {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        filled: true,
-        fillColor: Colors.grey[100],
+        filled: true,   
+        fillColor: Theme.of(context).colorScheme.onSecondary              
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -199,7 +220,7 @@ Widget _buildEmailField() {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
         hintText: '@username',
       ),
       validator: (value) {

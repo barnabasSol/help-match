@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:help_match/shared/widgets/gradient_button.dart';
 
 class Signupv2 extends StatefulWidget {
   const Signupv2({super.key});
@@ -27,17 +28,17 @@ class _VolunteerPasswordScreenState extends State<Signupv2> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Logo
-                const Icon(Icons.volunteer_activism,
-                    size: 80, color: Colors.blue),
+                 Icon(Icons.volunteer_activism,
+                    size: 80, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(height: 24),
 
                 // Title
-                const Text(
+                 Text(
                   'Your Volunteer',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -47,7 +48,7 @@ class _VolunteerPasswordScreenState extends State<Signupv2> {
                   'Create account to Volunteer',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
+                     color: Theme.of(context).colorScheme.tertiary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -59,32 +60,17 @@ class _VolunteerPasswordScreenState extends State<Signupv2> {
                 _buildConfirmPasswordField(),
                 const SizedBox(height: 40),
 
-                // Continue Button
+                // Continue Button            
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Colors.blue,
-                      // backgroundColor: Theme.of(context).colorScheme.primary,
-
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () {
-                      _change_to_v3();
-                    },
-                    child: const Text(
-                      'Continue',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  child: GradientButton(
+                    // key: _formKey,
+                    text: 'Continue',
+                    onPressed: _change_to_v3,
+                    fontSize: 16,
                   ),
-                ),
+                ), 
+
               ],
             ),
           ),
@@ -103,7 +89,7 @@ class _VolunteerPasswordScreenState extends State<Signupv2> {
         suffixIcon: IconButton(
           icon: Icon(
             _obscurePassword ? Icons.visibility_off : Icons.visibility,
-            color: Colors.grey[600],
+           color: Theme.of(context).colorScheme.tertiary,
           ),
           onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
         ),
@@ -111,7 +97,7 @@ class _VolunteerPasswordScreenState extends State<Signupv2> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+     fillColor: Theme.of(context).colorScheme.onSecondary,
       ),
       validator: (value) {
         if (value == null || value.isEmpty) return 'Please enter a password';
@@ -131,7 +117,7 @@ class _VolunteerPasswordScreenState extends State<Signupv2> {
         suffixIcon: IconButton(
           icon: Icon(
             _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-            color: Colors.grey[600],
+            color:Theme.of(context).colorScheme.tertiary,
           ),
           onPressed: () => setState(
               () => _obscureConfirmPassword = !_obscureConfirmPassword),
@@ -140,7 +126,7 @@ class _VolunteerPasswordScreenState extends State<Signupv2> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+     fillColor: Theme.of(context).colorScheme.onSecondary,
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {

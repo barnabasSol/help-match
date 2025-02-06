@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:help_match/shared/widgets/gradient_button.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Navigation_Page_v extends StatefulWidget {
   const Navigation_Page_v({super.key});
@@ -11,7 +12,7 @@ class Navigation_Page_v extends StatefulWidget {
 class _Navigation_Page_vState extends State<Navigation_Page_v> {
   int _selectedIndex = 0; // navigation is selected
   bool _showMap = true;
-  late GoogleMapController _mapController;
+  // late GoogleMapController _mapController;
   // final LatLng _initialPosition = const LatLng(37.42796133580664, -122.085749655962);
 
   @override
@@ -30,53 +31,39 @@ class _Navigation_Page_vState extends State<Navigation_Page_v> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                         Text(
                           'Organization Name',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
+                          color: Theme.of(context).colorScheme.onPrimary,
+                      ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Organization Description',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.tertiary,
+                           fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const CircleAvatar(
+                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: Colors.yellow,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+      
                     // backgroundImage: AssetImage('assets/organization_logo.png'),
                   ),
                 ],
               ),
             ),
 
-            // Map/Jobs Toggle
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  // Expanded(
-                  //   child: _buildToggleButton('Map', _showMap),
-                  // ),
-                  // // const SizedBox(width: 16),
-                  // Expanded(
-                  //   child: _buildToggleButton('Available Jobs', !_showMap),
-                  // ),
-                ],
-              ),
-            ),
-
-            // Map/Jobs Content
+  
+            // Map Content
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -88,7 +75,7 @@ class _Navigation_Page_vState extends State<Navigation_Page_v> {
                       BoxShadow(
                         // ignore: deprecated_member_use
                         // color: Colors.grey.withOpacity(0.2),
-                        color: Colors.yellow,
+                        color: Theme.of(context).colorScheme.primary,
                         spreadRadius: 2,
                         blurRadius: 10,
                         offset: const Offset(0, 4),
@@ -117,22 +104,17 @@ class _Navigation_Page_vState extends State<Navigation_Page_v> {
     
 
             // Volunteer Button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton.icon(
-                // icon: const Icon(Icons.volunteer_activism),
-                label: const Text('Ready to Volunteer'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {},
-              ),
-            ),
+            SizedBox(
+          width: double.infinity,
+          child: GradientButton(
+          // key: _formKey,
+          text: 'Ready to Volunteer',
+          // _change_to_Home,
+          onPressed: (){},
+          // _selectedInterests.isEmpty? null : _change_to_Home,
+          fontSize: 16,)
+          ),
+         
           ],
         ),
       ),
@@ -140,49 +122,14 @@ class _Navigation_Page_vState extends State<Navigation_Page_v> {
     );
   }
 
-  Widget _buildToggleButton(String text, bool isActive) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isActive ? Colors.green : Colors.grey[200],
-        foregroundColor: isActive ? Colors.white : Colors.grey[600],
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-      ),
-      onPressed: () => setState(() => _showMap = text == 'Map'),
-      child: Text(text),
-    );
-  }
 
-  Widget _buildJobsList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: 5,
-      itemBuilder: (context, index) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            leading: const Icon(Icons.work, color: Colors.green),
-            title: const Text('Volunteer Job Title'),
-            subtitle: Text('Volunteer Job Description'),
-            // trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-          ),
-        );
-      },
-    );
-  }
-
+  
   Widget _buildBottomNavBar() {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: Theme.of(context).colorScheme.primary,
+      unselectedItemColor: Theme.of(context).colorScheme.tertiary,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.location_on),
@@ -237,7 +184,7 @@ class _Navigation_Page_vState extends State<Navigation_Page_v> {
 
   @override
   void dispose() {
-    _mapController.dispose();
+    // _mapController.dispose();
     super.dispose();
   }
 }

@@ -9,6 +9,7 @@ ThemeData lightTheme = ThemeData(
     tertiary: Color.fromARGB(255, 66, 66, 66),
     onPrimary: Colors.black,
     onSecondary: Colors.white,
+
   ),
   scaffoldBackgroundColor: Colors.white,
   actionIconTheme: const ActionIconThemeData(),

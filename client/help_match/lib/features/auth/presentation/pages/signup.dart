@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 
 class Signup extends StatelessWidget {
   const Signup({super.key});
@@ -13,17 +14,17 @@ class Signup extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Logo
-              const Icon(Icons.volunteer_activism,
-                  size: 80, color: Colors.blue),
+               Icon(Icons.volunteer_activism,
+                  size: 80, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 32),
 
               // Title
-              const Text(
+               Text(
                 'Create Account',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
               const SizedBox(height: 12),
@@ -33,27 +34,27 @@ class Signup extends StatelessWidget {
                 'Which type of account would you like?',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.tertiary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 40),
 
               // Account Type Cards
-              const AccountTypeCard(
+               AccountTypeCard(
                 title: 'Volunteer',
                 subtitle: 'I am a professional looking to volunteer',
                 icon: Icons.person,
-                color: Colors.blue,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
               const SizedBox(height: 24),
 
-              const AccountTypeCard(
+               AccountTypeCard(
                 title: 'Organization',
                 subtitle:
                     'My non-profit Organization is looking for volunteers',
                 icon: Icons.business,
-                color: Colors.green,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
               const SizedBox(height: 40),
 
@@ -63,17 +64,17 @@ class Signup extends StatelessWidget {
                 children: [
                   Text(
                     'Already have an account? ',
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(color: Theme.of(context).colorScheme.tertiary,),
                   ),
                   TextButton(
                     onPressed: () {
                       // Navigate to login
                     },
-                    child: const Text(
+                    child:  Text(
                       'Log In',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),

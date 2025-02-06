@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:help_match/shared/widgets/gradient_button.dart';
 
 class Profile_Page_O extends StatefulWidget {
   const Profile_Page_O({super.key});
@@ -89,7 +90,7 @@ class _Profile_Page_OState extends State<Profile_Page_O> {
         ),
         CircleAvatar(
           radius: 24,
-          backgroundColor: Colors.grey[200],
+          backgroundColor: Theme.of(context).colorScheme.primary,
           child: const Icon(Icons.person, size: 32),
         ),
       ],
@@ -119,24 +120,24 @@ class _Profile_Page_OState extends State<Profile_Page_O> {
                 onTap: () => _changeProfilePicture(),
                 child: Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
+                  decoration:  BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt,
-                      color: Colors.white, size: 24),
+                  child:  Icon(Icons.camera_alt,
+                    color: Theme.of(context).colorScheme.onSecondary, size: 24),
                 ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
-        const Text(
+         Text(
           'Change Profile Picture',
-          style: TextStyle(
+            style: TextStyle(
             fontWeight: FontWeight.w500,
-            color: Colors.blue,
-          ),
+            color: Theme.of(context).colorScheme.onPrimary,
+               ),
         ),
       ],
     );
@@ -152,7 +153,7 @@ class _Profile_Page_OState extends State<Profile_Page_O> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -173,7 +174,7 @@ class _Profile_Page_OState extends State<Profile_Page_O> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
       ),
       items: _organizationTypes
           .map((type) => DropdownMenuItem(
@@ -207,7 +208,7 @@ class _Profile_Page_OState extends State<Profile_Page_O> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
         helperText: 'Brief description (max 300 characters)',
       ),
       inputFormatters: [
@@ -227,35 +228,24 @@ class _Profile_Page_OState extends State<Profile_Page_O> {
 
   Widget _buildConfirmButton() {
     return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-        ),
-        onPressed: _saveProfile,
-        child: const Text(
-          'Confirm Changes',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
+        width: double.infinity,
+        child: GradientButton(
+          // key: _formKey,
+          text: 'Confirm Changes',
+          // _change_to_Home,
+          onPressed: _saveProfile,
+          // _selectedInterests.isEmpty? null : _change_to_Home,
+          fontSize: 16,)
+          );
   }
 
   Widget _buildBottomNavBar() {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
-      items: const [
+      selectedItemColor: Theme.of(context).colorScheme.primary,
+      unselectedItemColor: Theme.of(context).colorScheme.tertiary,
+  items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.location_on),
           label: 'Location',
@@ -301,20 +291,10 @@ class _Profile_Page_OState extends State<Profile_Page_O> {
   void _changeProfilePicture() async {
     // Implement image picker logic
 
-    // final picker = ImagePicker();
-    // final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    // if (pickedFile != null) {
-    //   // Handle the picked image
-    // }
   }
 
   void _saveProfile() {
-    // if (_formKey_for_profile.currentState!.validate()) {
-    // // Save profile changes
-    // print('Name: ${_nameController.text}');
-    // print('Username: ${_usernameController.text}');
-    // print('Selected Categories: $_selectedCategories');
-    // }
+
   }
 
   @override

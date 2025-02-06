@@ -15,17 +15,12 @@ class _HomePageState extends State<Home_Page_O> {
   final List<Category> _categories = const [
     Category('Non-Profit', Icons.volunteer_activism),
     Category('For-Profit', Icons.attach_money),
-    // Category('Charity', Icons.volunteer_activism),
-    Category('Government', Icons.account_balance), // was Religous
+    Category('Government', Icons.account_balance),
     Category('Community', Icons.people), //
     Category('Education', Icons.school),
     Category('Healthcare', Icons.medical_services),
     Category('Cultural', Icons.spoke_rounded)
 
-    // Category('Environment', Icons.eco),
-    // Category('Animals', Icons.pets),
-    // Category('Disaster', Icons.emergency),
-    // Category('Social', Icons.group_work),
   ];
 
   @override
@@ -39,19 +34,10 @@ class _HomePageState extends State<Home_Page_O> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Drawer Section
              
               // Header Section
               _buildHeader(),
               const SizedBox(height: 24),
-
-              // Search Bar
-              // _buildSearchBar(),
-              // const SizedBox(height: 32),
-
-              // Categories
-              // _buildCategorySection(),
-              // const SizedBox(height: 32),
 
               // Organization Grid
               _buildOrganizationGrid(),
@@ -73,8 +59,8 @@ class _HomePageState extends State<Home_Page_O> {
           UserAccountsDrawerHeader(
             accountName: const Text("Organization Name"),
             accountEmail: const Text("organization@email.com"),
-            currentAccountPicture: const CircleAvatar(
-              backgroundColor: Colors.yellow,
+            currentAccountPicture:  CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.onSecondary,
               // backgroundImage: AssetImage('assets/organization_logo.png'),
             ),
             decoration: BoxDecoration(
@@ -107,14 +93,6 @@ class _HomePageState extends State<Home_Page_O> {
               Navigator.pushNamed(context, '/editjob');
             },
           ),
-          // const Divider(),
-          // ListTile(
-          //   leading: const Icon(Icons.logout),
-          //   title: const Text('Sign Out'),
-          //   onTap: () {
-          //     // Add sign out logic
-          //   },
-          // ),
         ],
       ),
     );
@@ -139,12 +117,6 @@ class _HomePageState extends State<Home_Page_O> {
         ),
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
          
-          // CircleAvatar(
-          //   radius: 24,
-          //   backgroundColor: Colors.yellow[200],
-          //   child: const Icon(Icons.person, size: 32),
-          // ),
-
           SizedBox(
             width: 52,
           ),
@@ -159,34 +131,6 @@ class _HomePageState extends State<Home_Page_O> {
     );
   }
 
-  // Widget _buildSearchBar() {
-  //   return TextField(
-  //     decoration: InputDecoration(
-  //       hintText: 'Search for Organization',
-  //       filled: true,
-  //       fillColor: Colors.grey[100],
-  //       prefixIcon: const Icon(Icons.search),
-  //       border: OutlineInputBorder(
-  //         borderRadius: BorderRadius.circular(16),
-  //         borderSide: BorderSide.none,
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Widget _buildCategorySection() {
-  //   return SizedBox(
-  //     height: 100,
-  //     child: ListView.separated(
-  //       scrollDirection: Axis.horizontal,
-  //       itemCount: _categories.length,
-  //       separatorBuilder: (_, __) => const SizedBox(width: 20),
-  //       itemBuilder: (context, index) {
-  //         return CategoryItem(category: _categories[index]);
-  //       },
-  //     ),
-  //   );
-  // }
 
   Widget _buildOrganizationGrid() {
     return GridView.builder(
@@ -209,8 +153,8 @@ class _HomePageState extends State<Home_Page_O> {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: Theme.of(context).colorScheme.primary,
+      unselectedItemColor: Theme.of(context).colorScheme.tertiary,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.location_on),
@@ -269,7 +213,7 @@ class CategoryItem extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: Theme.of(context).colorScheme.onSecondary,
             shape: BoxShape.circle,
           ),
           child: Icon(category.icon, size: 32),
@@ -302,7 +246,7 @@ class OrganizationCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             child: Container(
               // height: 120,   // might be an issue forward
-              color: Colors.yellow[200], // Replace with actual image
+              color: Theme.of(context).colorScheme.primary, // Replace with actual image
             ),
           ),
           Positioned(
@@ -323,7 +267,7 @@ class OrganizationCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSecondary,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -336,9 +280,9 @@ class OrganizationCard extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  const Text(
+                   Text(
                     'Job Description',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
                   ),
                 ],
               ),

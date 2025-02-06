@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Joblisting extends StatefulWidget {
   const Joblisting({super.key});
@@ -10,9 +10,9 @@ class Joblisting extends StatefulWidget {
 
 class _JoblistingState extends State<Joblisting> {
   int _selectedIndex = 2; 
-  bool _showMap = true;
-  late GoogleMapController _mapController;
-  final LatLng _initialPosition = const LatLng(37.42796133580664, -122.085749655962);
+  // bool _showMap = true;
+  // late GoogleMapController _mapController;
+  // final LatLng _initialPosition = const LatLng(37.42796133580664, -122.085749655962);
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +30,12 @@ class _JoblistingState extends State<Joblisting> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                         Text(
                           'Organization Name',
                           style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -43,7 +43,7 @@ class _JoblistingState extends State<Joblisting> {
                           'Organization Description',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[600],
+                            color: Theme.of(context).colorScheme.tertiary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -51,9 +51,10 @@ class _JoblistingState extends State<Joblisting> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const CircleAvatar(
+                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: Colors.yellow,
+                    backgroundColor:
+                       Theme.of(context).colorScheme.primary,
                     // backgroundImage: AssetImage('assets/organization_logo.png'),
                   ),
                 ],
@@ -71,9 +72,7 @@ class _JoblistingState extends State<Joblisting> {
                     // color: Colors.yellow ,
                     boxShadow: [
                       BoxShadow(
-                        // ignore: deprecated_member_use
-                        color: Colors.grey.withOpacity(0.2),
-                        // color: Colors.yellow,
+                    color: Theme.of(context).colorScheme.onSecondary,
                         spreadRadius: 2,
                         blurRadius: 10,
                         offset: const Offset(0, 4),
@@ -115,9 +114,10 @@ class _JoblistingState extends State<Joblisting> {
           ),
           child: ListTile(
             contentPadding: const EdgeInsets.all(16),
-            leading: const Icon(Icons.work, color: Colors.green),
+            leading:  Icon(Icons.work, 
+                    color: Theme.of(context).colorScheme.primary,),
             title: const Text('Volunteer Job Title'),
-            subtitle: Text('Volunteer Job Description'),
+            subtitle: const Text('Volunteer Job Description'),
             // trailing: const Icon(Icons.arrow_forward_ios, size: 16),
           ),
         );
@@ -129,8 +129,8 @@ class _JoblistingState extends State<Joblisting> {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
+      selectedItemColor: Theme.of(context).colorScheme.primary,
+      unselectedItemColor: Theme.of(context).colorScheme.tertiary,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.location_on),
@@ -188,7 +188,7 @@ class _JoblistingState extends State<Joblisting> {
 
   @override
   void dispose() {
-    _mapController.dispose();
+    // _mapController.dispose();
     super.dispose();
   }
 }

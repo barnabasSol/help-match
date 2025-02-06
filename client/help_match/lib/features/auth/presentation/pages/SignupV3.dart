@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:help_match/shared/widgets/gradient_button.dart';
 
 class Signupv3 extends StatefulWidget {
   const Signupv3({super.key});
@@ -30,17 +31,17 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Logo
-              const Icon(Icons.volunteer_activism,
-                  size: 80, color: Colors.blue),
+               Icon(Icons.volunteer_activism,
+                  size: 80, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 24),
 
               // Title
-              const Text(
+               Text(
                 'Your Volunteer',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -50,7 +51,7 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
                 'Create account to Volunteer',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.tertiary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -61,30 +62,18 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
               const SizedBox(height: 40),
 
               // Signup Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    backgroundColor: Colors.blue,
-                    // backgroundColor: Theme.of(context).colorScheme.primary,
-
-                    foregroundColor: Colors.white,
+             
+                SizedBox(
+                  width: double.infinity,
+                  child: GradientButton(
+                    // key: _formKey,
+                    text: 'Sign Up',         
+                    // _change_to_Home,
+                     onPressed: _selectedInterests.isEmpty ? null : () => _change_to_Home(),
+                    // _selectedInterests.isEmpty? null : _change_to_Home,       
+                    fontSize: 16,
                   ),
-                  onPressed:
-                      _selectedInterests.isEmpty ? null : _change_to_Home,
-                  child: const Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
+                ), 
             ],
           ),
         ),
@@ -111,18 +100,19 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
             });
           },
           labelStyle: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+            color: isSelected ?  Theme.of(context).colorScheme.onSecondary :  Theme.of(context).colorScheme.onPrimary,
             fontWeight: FontWeight.w500,
           ),
-          backgroundColor: Colors.grey[200],
-          selectedColor: Colors.blue,
+          backgroundColor:  Theme.of(context).colorScheme.onSecondary,
+          selectedColor: Theme.of(context).colorScheme.primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
             side: BorderSide(
-              color: isSelected ? Colors.blue : Colors.grey[300]!,
+              color: isSelected ?  Theme.of(context).colorScheme.primary :  Theme.of(context).colorScheme.tertiary,
               width: 1,
             ),
           ),
+
         );
       }),
     );
