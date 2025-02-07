@@ -14,6 +14,7 @@ class VolunteerHome extends StatefulWidget {
 
 class _HomePageState extends State<VolunteerHome> {
   int _selectedIndex = 2; // Home is selected by default
+  int _selectedCat = -1;
   final TextEditingController _searchController = TextEditingController();
   final List<Category> _categories = const [
     Category('Non-Profit', Icons.volunteer_activism),
@@ -105,10 +106,13 @@ class _HomePageState extends State<VolunteerHome> {
         fillColor: Theme.of(context).colorScheme.onSecondary,
         prefixIcon: IconButton(
             onPressed: () {
+              String type = '';
+              if (_selectedCat != -1) {
+                type = _categories[_selectedIndex].label;
+              }
               context.read<VolunteerBloc>().add(SearchPressed(
                   dto: SearchDto(
-                      org_name: _searchController.text,
-                      org_type: _categories[_selectedIndex].label)));
+                      org_name: _searchController.text, org_type: type)));
             },
             icon: const Icon(Icons.search)),
         border: OutlineInputBorder(
@@ -130,8 +134,11 @@ class _HomePageState extends State<VolunteerHome> {
           return GestureDetector(
               onTap: () {
                 setState(() {
-                  _selectedIndex = index;
+                  _selectedCat = index;
                 });
+                print(_searchController.text +
+                    "Org type" +
+                    _categories[index].label);
                 context.read<VolunteerBloc>().add(SearchPressed(
                     dto: SearchDto(
                         org_name: _searchController.text,

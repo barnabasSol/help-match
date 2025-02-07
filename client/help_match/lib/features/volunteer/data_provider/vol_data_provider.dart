@@ -7,17 +7,9 @@ import 'package:latlong2/latlong.dart';
 class VolunteerDataProvider {
   final Dio dio;
   VolunteerDataProvider({required this.dio});
-  Future<dynamic> fetchOrgs(SearchDto dto) async {
-    String queryParams = "";
+  Future<dynamic> fetchOrgs(SearchDto dto,String queryParams) async {
     try {
-      if (dto.org_name.isNotEmpty && dto.org_type.isNotEmpty) {
-        queryParams = "org_name=${dto.org_name}&org_type=${dto.org_type}";
-      } else if (dto.org_name.isEmpty && dto.org_type.isEmpty) {
-      } else {
-        queryParams = dto.org_name.isNotEmpty
-            ? "org_name=${dto.org_name}"
-            : "org_type=${dto.org_type}";
-      }
+   
       //uncomment this for fetching the current location
       // LatLng loc = await LocationProvider.getCurrentLocation();
       // Map<String, dynamic> body = {
