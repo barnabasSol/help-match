@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/features/Auth/presentation/bloc/auth_bloc.dart';
 import 'package:help_match/features/Auth/presentation/bloc/auth_cubit.dart';
-import 'package:help_match/features/organization/presentation/pages/screen.dart';
 
 class Signupo2 extends StatefulWidget {
   const Signupo2({super.key});
