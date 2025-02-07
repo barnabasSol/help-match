@@ -33,7 +33,10 @@ import 'package:help_match/features/organization/presentation/pages/screen.dart'
 import 'package:help_match/features/organization/repository/org_repository.dart';
 import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/features/online_status/repository/online_status_repository.dart';
+import 'package:help_match/features/volunteer/bloc/volunteer_bloc.dart';
+import 'package:help_match/features/volunteer/data_provider/vol_data_provider.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
+import 'package:help_match/features/volunteer/repository/volunteer_repository.dart';
 import 'package:help_match/shared/widgets/loading_indicator.dart';
 
 Future<void> main() async {
@@ -50,9 +53,9 @@ Future<void> main() async {
 
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
 
-  await initializeHive();
+  // await initializeHive();
 
-  await secureStorage.deleteAll();
+  // await secureStorage.deleteAll(); 
 
   final themeModeString = await secureStorage.read(key: "theme_mode");
   if (themeModeString == null) {
@@ -106,12 +109,20 @@ Future<void> main() async {
         RepositoryProvider(create: (context) => AuthDataProvider(dio: dio)),
         RepositoryProvider(
             create: (context) =>
-                AuthRepository(context.read<AuthDataProvider>()))
+                AuthRepository(context.read<AuthDataProvider>())),
+        RepositoryProvider(
+            create: (context) => VolunteerDataProvider(dio: dio)),
+        RepositoryProvider(
+            create: (context) => VolunteerRepository(
+                dataProvider: context.read<VolunteerDataProvider>())),
       ],
       child: Builder(
         builder: (context) {
           return MultiBlocProvider(
             providers: [
+              BlocProvider(
+                  create: (context) => VolunteerBloc(
+                      volRepo: context.read<VolunteerRepository>())),
               BlocProvider(create: (context) => SignUpUserCubit()),
               BlocProvider(create: (context) => SignUpOrgCubit()),
               BlocProvider(
@@ -147,7 +158,9 @@ Future<void> main() async {
                 create: (_) =>
                     NotificationBloc(context.read<NotificationRepository>()),
               ),
-              BlocProvider(create: (_)=>OrgCubit( orgRepository: context.read<OrgRepository>()))
+              BlocProvider(
+                  create: (_) =>
+                      OrgCubit(orgRepository: context.read<OrgRepository>()))
             ],
             child: const MyApp(),
           );
@@ -187,23 +200,7 @@ class _MyAppState extends State<MyApp> {
                 context.read<WebsocketCubit>().connectCubit();
                 context.read<OnlineStatusCubit>().listenOnlineStatusChange();
                 context.read<ChatBloc>().add(NewMessageListening());
-                if (state.currentUser.role == "user") {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const VolunteerScreen(),
-                    ),
-                  );
-                } else if (state.currentUser.role == "organization") {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const OrgScreen(),
-                    ),
-                  );
-                }
+               
               }
             },
             child: BlocBuilder<UserAuthCubit, UserAuthState>(

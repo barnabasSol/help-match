@@ -30,15 +30,19 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (BuildContext context, state) {
-          if (state is AuthSignupFailure) {
+         if (state is AuthSignupFailure) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
-          } else if (state is AuthSignupSuccess) {
+          } else if (state is AuthSignupLoading)
+            // ignore: curly_braces_in_flow_control_structures
+            const Center(
+              child: CircularProgressIndicator(),
+            );
+          else if (state is AuthSignupSuccess) {
             context.read<UserAuthCubit>().isUserAuthenticated();
- 
-          }
-        }
-      },
+            Navigator.pop(context);
+                }
+        },      
       child: Scaffold(
         body: BlocListener<AuthBloc, AuthState>(
           listener: (BuildContext context, state) async {
@@ -120,7 +124,7 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildCategoryChips() {

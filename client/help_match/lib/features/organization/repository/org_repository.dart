@@ -23,7 +23,7 @@ class OrgRepository {
     }
   }
 
-  Future updateStatus(UpdateStatusDto dto) async {
+  Future<void> updateStatus(UpdateStatusDto dto) async {
     try {
       //modify the dto by adding the user id
       // final response = await _dataProvider.getUserId(dto.username);

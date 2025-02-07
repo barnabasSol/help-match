@@ -19,7 +19,7 @@ class ApplicantCard extends StatelessWidget {
     return Align(
       alignment: Alignment.center,
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.1,
+        height: MediaQuery.of(context).size.height * 0.15,
         width: MediaQuery.of(context).size.width * 0.8,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
@@ -81,7 +81,7 @@ class ApplicantCard extends StatelessWidget {
                                     context.read<OrgCubit>().applicantAccepted(
                                         UpdateStatusDto(
                                             jobId: jobId,
-                                            userId: '',
+                                            userId: userId,
                                             status: "accepted"));
                                   },
                                   child: Text(
@@ -106,7 +106,7 @@ class ApplicantCard extends StatelessWidget {
                                           .read<OrgCubit>()
                                           .applicantRejected(UpdateStatusDto(
                                               jobId: jobId,
-                                              userId: '',
+                                              userId: userId,
                                               status: "rejected"));
                                     },
                                     child: Text(

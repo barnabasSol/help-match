@@ -18,7 +18,7 @@ class VolunteerScreen extends StatefulWidget {
 class _VolunteerScreen extends State<VolunteerScreen> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
-    const HomePage(),
+    const VolunteerHome(),
     const ProfilePage(),
     const RoomListPage(),
     const NotificationListPage(),

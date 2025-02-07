@@ -26,13 +26,19 @@ class _SigninState extends State<Signupo2> {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (BuildContext context, state) async {
-          if (state is AuthSignupFailure) {
+
+       if (state is AuthSignupFailure) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
-          } else if (state is AuthSignupSuccess) {
-             context.read<UserAuthCubit>().isUserAuthenticated();
-            
-          }
+          } else if (state is AuthSignupLoading)
+            // ignore: curly_braces_in_flow_control_structures
+            const Center(
+              child: CircularProgressIndicator(),
+            );
+          else if (state is AuthSignupSuccess) {
+            context.read<UserAuthCubit>().isUserAuthenticated();
+            Navigator.pop(context);
+                }
         },
         child: SingleChildScrollView(
           child: Padding(

@@ -42,7 +42,7 @@ func (oh *Organization) GetOrganizations(
 	r *http.Request,
 	_ httprouter.Params,
 ) {
-	var userLocation dto.Location
+	var userLocation dto.Loc	ation
 	err := utils.ReadJSON(w, r, &userLocation)
 	if err != nil {
 		utils.CreateResponse(w, err, nil, http.StatusBadRequest, "")
