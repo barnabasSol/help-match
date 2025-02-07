@@ -82,7 +82,7 @@ func (n *Notification) GetOrganizationNotifications(
 			&notif.VolunteerId,
 			&notif.VolunteerProfileIcon,
 			&notif.VolunteerName,
-			&notif.VolunteerUsernameName,
+			&notif.VolunteerUsername,
 			&notif.OnlineStatus,
 			&notif.Message,
 		)

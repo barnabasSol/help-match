@@ -65,7 +65,7 @@ class _HomePageState extends State<VolunteerHome> {
   }
 
   Widget _buildHeader() {
-    String name = context.read<UserAuthCubit>().currentUser!.username;
+    String name = context.read<UserAuthCubit>().currentUser.username;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -83,7 +83,7 @@ class _HomePageState extends State<VolunteerHome> {
             backgroundColor: Theme.of(context).colorScheme.primary,
             child: const Icon(Icons.person, size: 32),
           ),
-          SizedBox(
+          const SizedBox(
             width: 52,
           ),
           Icon(
@@ -172,7 +172,7 @@ class _HomePageState extends State<VolunteerHome> {
             itemBuilder: (context, index) {
               return OrganizationCard(
                 index: index,
-                orgName: orgs[index].org_name,
+                orgName: orgs[index].name,
                 orgType: orgs[index].type,
               );
             },
@@ -307,7 +307,6 @@ class OrganizationCard extends StatelessWidget {
               // icon: const Icon(Icons.bookmark_border),
               icon: const Icon(Icons.add),
               onPressed: () {
-                Navigator.pop(context);
                 Navigator.pushNamed(context, '/joblist');
               },
             ),

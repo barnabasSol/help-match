@@ -8,6 +8,8 @@ import 'package:help_match/core/current_user/data_provider/user_remote.dart';
 import 'package:help_match/core/current_user/repository/user_repo.dart';
 import 'package:help_match/core/interceptor/interceptor.dart';
 import 'package:help_match/core/local_storage/app_local.dart';
+import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
+import 'package:help_match/core/online_status/repository/online_status_repository.dart';
 import 'package:help_match/core/theme/colors.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/core/ws_manager/cubit/websocket_cubit.dart';
@@ -31,8 +33,6 @@ import 'package:help_match/features/organization/cubit/org_cubit.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
-import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
-import 'package:help_match/core/online_status/repository/online_status_repository.dart';
 import 'package:help_match/features/volunteer/bloc/volunteer_bloc.dart';
 import 'package:help_match/features/volunteer/data_provider/vol_data_provider.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
@@ -53,7 +53,7 @@ Future<void> main() async {
 
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
 
-  // await initializeHive();
+  await initializeHive();
 
   // await secureStorage.deleteAll();
 
@@ -126,11 +126,9 @@ Future<void> main() async {
               BlocProvider(create: (context) => SignUpUserCubit()),
               BlocProvider(create: (context) => SignUpOrgCubit()),
               BlocProvider(
-                create: (context) => AuthBloc(
-                  secureStorage: secureStorage,
-                  authRepository: context.read<AuthRepository>(),
-                ),
-              ),
+                  create: (context) => AuthBloc(
+                      secureStorage: secureStorage,
+                      authRepository: context.read<AuthRepository>())),
               BlocProvider(
                   create: (context) => OrgBloc(context.read<OrgRepository>())),
               BlocProvider(
@@ -188,30 +186,31 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<UserAuthCubit, UserAuthState>(
-      listener: (context, state) {
-        if (state is UserAuthIsLoggedIn) {
-          context.read<WebsocketCubit>().connectCubit();
-          context.read<ChatBloc>().add(NewMessageListening());
-          context.read<OnlineStatusCubit>().listenOnlineStatusChange();
-        }
-      },
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, themeState) {
-          return MaterialApp(
-            title: 'HelpMatch',
-            debugShowCheckedModeBanner: false,
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: themeState,
-            home: BlocBuilder<UserAuthCubit, UserAuthState>(
+    return BlocBuilder<ThemeCubit, ThemeMode>(
+      builder: (context, themeState) {
+        return MaterialApp(
+          title: 'HelpMatch',
+          debugShowCheckedModeBanner: false,
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: themeState,
+          home: BlocListener<UserAuthCubit, UserAuthState>(
+            listener: (context, state) {
+              if (state is UserAuthIsLoggedIn) {
+                context.read<WebsocketCubit>().connectCubit();
+                context.read<OnlineStatusCubit>().listenOnlineStatusChange();
+                context.read<ChatBloc>().add(NewMessageListening());
+              }
+            },
+            child: BlocBuilder<UserAuthCubit, UserAuthState>(
               builder: (context, state) {
                 if (state is UserAuthChecking) {
                   return const LoadingIndicator();
                 } else if (state is UserAuthIsLoggedIn) {
-                  if (state.currentUser.role == "organization") {
+                  final currentUser = context.read<UserAuthCubit>().currentUser;
+                  if (currentUser.role == "organization") {
                     return const OrgScreen();
-                  } else if (state.currentUser.role == "user") {
+                  } else if (currentUser.role == "user") {
                     return const VolunteerScreen();
                   }
                   return const OnBoardingScreen();
@@ -222,9 +221,9 @@ class _MyAppState extends State<MyApp> {
                 }
               },
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

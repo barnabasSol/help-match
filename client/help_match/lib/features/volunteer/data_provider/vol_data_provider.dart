@@ -7,19 +7,12 @@ import 'package:latlong2/latlong.dart';
 class VolunteerDataProvider {
   final Dio dio;
   VolunteerDataProvider({required this.dio});
-  Future<dynamic> fetchOrgs(SearchDto dto,String queryParams) async {
+  Future<dynamic> fetchOrgs(SearchDto dto, String queryParams) async {
     try {
-   
-      //uncomment this for fetching the current location
-      // LatLng loc = await LocationProvider.getCurrentLocation();
-      // Map<String, dynamic> body = {
-      //   "latitude": loc.latitude,
-      //   "longitude": loc.longitude
-      // };
-      
-Map<String, dynamic> body = {
-        "latitude": 0.2,
-        "longitude": 5.5
+      LatLng loc = await LocationProvider.getCurrentLocation();
+      Map<String, dynamic> body = {
+        "latitude": loc.latitude,
+        "longitude": loc.longitude
       };
 
       dio.interceptors.add(LogInterceptor(
@@ -30,7 +23,7 @@ Map<String, dynamic> body = {
       final response = await dio.post(
         '${Secrets.DOMAIN}/v1/org?$queryParams',
         data: body,
-              );
+      );
       if (response.statusCode == 200) {
         return response.data;
       } else {

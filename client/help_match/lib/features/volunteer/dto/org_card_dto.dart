@@ -1,93 +1,94 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
-import 'package:latlong2/latlong.dart';
-
 class OrgCardDto {
-  final String org_id;
-  final String org_name;
-  final String user_id;
-  final String profile_icon;
-  final String description;
-  final double proximity;
-  final LatLng location;
-  final String type;
-  final bool is_verified;
+  String id;
+  String name;
+  String userId;
+  String profileIcon;
+  String description;
+  double proximity;
+  Location location;
+  bool isVerified;
+  DateTime createdAt;
+  String type;
+  int version;
 
   OrgCardDto({
-    required this.org_id,
-    required this.org_name,
-    required this.user_id,
-    required this.profile_icon,
+    required this.id,
+    required this.name,
+    required this.userId,
+    required this.profileIcon,
     required this.description,
     required this.proximity,
     required this.location,
+    required this.isVerified,
+    required this.createdAt,
     required this.type,
-    required this.is_verified,
+    required this.version,
   });
 
- 
+  static String invertConvert(String interests) {
+    if (interests == "for_profit") return "For Profit";
+    if (interests == "non_profit") return "Non Profit";
+    if (interests == "government") return "Government";
+    if (interests == "community") return "Community";
+    if (interests == "educational") return "Education";
+    if (interests == "healthcare") return "Healthcare";
+    return "Cultural";
+  }
 
-static String invertConvert(String interests) {
-  if (interests == "for_profit") return "For Profit";
-  if (interests == "non_profit") return "Non Profit";
-  if (interests == "government") return "Government";
-  if (interests == "community") return "Community";
-  if (interests == "educational") return "Education";
-  if (interests == "healthcare") return "Healthcare";
-  return "Cultural";
-}
-
-
-  factory OrgCardDto.fromJson(Map<String, dynamic> map) {
+  factory OrgCardDto.fromJson(Map<String, dynamic> json) {
     return OrgCardDto(
-      org_id: map['org_id'] as String,
-      org_name: map['org_name'] as String,
-      user_id: map['user_id'] as String,
-      profile_icon: map['profile_icon'] as String,
-      description: map['description'] as String,
-      proximity: map['proximity'] as double,
-      location: LatLng(map['location']['latitude'],map['location']['longitude']),
-      type: invertConvert(map['type'] as String),
-      is_verified: map['is_verified'] as bool,
+      id: json['org_id'],
+      name: json['org_name'],
+      userId: json['user_id'],
+      profileIcon: json['profile_icon'],
+      description: json['description'],
+      proximity: json['proximity'].toDouble(),
+      location: Location.fromJson(json['location']),
+      isVerified: json['is_verified'],
+      createdAt: DateTime.parse(json['created_at']),
+      type: json['type'],
+      version: json['version'],
     );
   }
 
-  // String toJson() => json.encode(toMap());
+  // Convert OrgListResponse to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'org_id': id,
+      'org_name': name,
+      'user_id': userId,
+      'profile_icon': profileIcon,
+      'description': description,
+      'proximity': proximity,
+      'location': location.toJson(),
+      'is_verified': isVerified,
+      'created_at': createdAt.toIso8601String(),
+      'type': type,
+      'version': version,
+    };
+  }
+}
 
-  // factory OrgCardDto.fromJson(String source) => OrgCardDto.fromMap(json.decode(source) as Map<String, dynamic>);
+class Location {
+  double latitude;
+  double longitude;
 
-  @override
-  String toString() {
-    return 'OrgCardDto(org_id: $org_id, org_name: $org_name, user_id: $user_id, profile_icon: $profile_icon, description: $description, proximity: $proximity, location: $location, type: $type, is_verified: $is_verified)';
+  Location({
+    required this.latitude,
+    required this.longitude,
+  });
+
+  factory Location.fromJson(Map<String, dynamic> json) {
+    return Location(
+      latitude: json['latitude'].toDouble(),
+      longitude: json['longitude'].toDouble(),
+    );
   }
 
-  @override
-  bool operator ==(covariant OrgCardDto other) {
-    if (identical(this, other)) return true;
-  
-    return 
-      other.org_id == org_id &&
-      other.org_name == org_name &&
-      other.user_id == user_id &&
-      other.profile_icon == profile_icon &&
-      other.description == description &&
-      other.proximity == proximity &&
-      other.location == location &&
-      other.type == type &&
-      other.is_verified == is_verified;
-  }
-
-  @override
-  int get hashCode {
-    return org_id.hashCode ^
-      org_name.hashCode ^
-      user_id.hashCode ^
-      profile_icon.hashCode ^
-      description.hashCode ^
-      proximity.hashCode ^
-      location.hashCode ^
-      type.hashCode ^
-      is_verified.hashCode;
+  Map<String, dynamic> toJson() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+    };
   }
 }
