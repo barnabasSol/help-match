@@ -129,13 +129,15 @@ class OrgSignUpDto {
       "org_info": {
         'org_name': orgname,
         'description': description,
-        'location': location != null
-            ? Map.from({
+        'location': location!=null
+            ? {
                 "latitude": location!.latitude,
-                "logitude": location!.longitude
-              })
-            : {},
-        'type': convert(type)
+                "longitude": location!.longitude
+              }
+            : {
+         
+            },
+        'type':convert(type)
       },
       "name": name,
       "username": username,

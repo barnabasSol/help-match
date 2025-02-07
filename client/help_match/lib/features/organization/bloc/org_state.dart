@@ -15,3 +15,4 @@ class FetchFailed extends OrgState {
   String error;
   FetchFailed(this.error);
 }
+

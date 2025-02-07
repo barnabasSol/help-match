@@ -32,7 +32,7 @@ class AuthDataProvider {
       if (response.statusCode == 200) {
         return response.data;
       } else {
-        throw Exception('Failed to signup user: ${response.statusMessage}');
+        throw Exception('Failed to signup : ${response.statusMessage}');
       }
     } on DioException catch (e) {
       if (e.response != null) {
