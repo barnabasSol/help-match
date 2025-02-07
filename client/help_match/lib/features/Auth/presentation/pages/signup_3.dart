@@ -34,6 +34,7 @@ class _VolunteerInterestScreenState extends State<Signupv3> {
                 .showSnackBar(SnackBar(content: Text(state.error)));
           } else if (state is AuthSignupSuccess) {
             context.read<UserAuthCubit>().isUserAuthenticated();
+            Navigator.pop(context);
           }
         },
         child: SafeArea(

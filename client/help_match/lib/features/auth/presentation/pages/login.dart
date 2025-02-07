@@ -38,6 +38,7 @@ class _LoginState extends State<Login> {
             );
           } else if (state is AuthLoginSuccess) {
             context.read<UserAuthCubit>().isUserAuthenticated();
+            Navigator.pop(context);
           }
         },
         child: SingleChildScrollView(
