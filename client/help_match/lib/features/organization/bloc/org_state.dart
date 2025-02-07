@@ -16,3 +16,11 @@ class FetchFailed extends OrgState {
   FetchFailed(this.error);
 }
 
+class OrgJobAddFailure extends OrgState {
+  String error;
+  OrgJobAddFailure(this.error);
+}
+
+class OrgJobAddSuccess extends OrgState {}
+
+class OrgJobAddLoading extends OrgState {}

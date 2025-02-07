@@ -30,7 +30,9 @@ class WsManager {
     }
 
     const domain = "wss://hm.barney-host.site";
-    final wsUrl = '$domain/v1/ws?otp=$otp';
+
+    final encodedOtp = Uri.encodeComponent(otp);
+    final wsUrl = '$domain/v1/ws?otp=$encodedOtp';
 
     for (int i = 0; i < retries; i++) {
       try {

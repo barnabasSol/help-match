@@ -6,7 +6,7 @@ class OrgDataProvider {
   OrgDataProvider({required dio}) : _dio = dio;
   Future<dynamic> getJobApplicants() async {
     try {
-      final response = await _dio.get('${Secrets.DOMAIN}/v1/job/applicants/');
+      final response = await _dio.get('${Secrets.DOMAIN}/v1/job/applicants');
       if (response.statusCode == 200) {
         return response.data;
       } else {
@@ -24,9 +24,10 @@ class OrgDataProvider {
     }
   }
 
-  Future<void> updateStatus(Map<String,dynamic> json) async {
+  Future<void> updateStatus(Map<String, dynamic> json) async {
     try {
-      final response = await _dio.patch('${Secrets.DOMAIN}/v1/job/status',data: json);
+      final response =
+          await _dio.patch('${Secrets.DOMAIN}/v1/job/status', data: json);
       if (response.statusCode == 200) {
       } else {
         throw Exception('Failed to update status: ${response.statusMessage}');
@@ -47,6 +48,27 @@ class OrgDataProvider {
     try {
       final response =
           await _dio.get('${Secrets.DOMAIN}/v1/user-by?username=$name');
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw Exception('Failed to fetch user: ${response.statusMessage}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(
+            'Error: ${e.response?.statusCode} - ${e.response?.statusMessage}');
+      } else {
+        throw Exception('Error: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Unexpected error: $e');
+    }
+  }
+
+  Future<dynamic> addJob(Map<String, dynamic> jobDto) async {
+    try {
+      final response =
+          await _dio.post('${Secrets.DOMAIN}/v1/job/add', data: jobDto);
       if (response.statusCode == 200) {
         return response.data;
       } else {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/core/secrets/secrets.dart';
-import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
+import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/features/volunteer/presentation/widgets/vonteer_appbar.dart';
 import 'package:help_match/shared/widgets/snack_bar.dart';
 

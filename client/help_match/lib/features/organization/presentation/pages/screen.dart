@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:help_match/features/organization/presentation/pages/home.dart';
 import 'package:help_match/features/organization/presentation/pages/notification.dart';
-import 'package:help_match/features/organization/presentation/pages/org_profile.dart';
+import 'package:help_match/features/organization/presentation/pages/add_job.dart';
 
 class OrgScreen extends StatefulWidget {
   const OrgScreen({super.key});
@@ -11,11 +11,11 @@ class OrgScreen extends StatefulWidget {
 }
 
 class _OrgScreenState extends State<OrgScreen> {
-  int _selectedPage = 0;
+  int _selectedPage = 2;
   final List _pages = [
     const OrgNotification(),
     const OrgHome(),
-    const OrgProfile()
+    const AddJobPage()
   ];
   void _changePage(int index) {
     setState(() {
@@ -34,9 +34,10 @@ class _OrgScreenState extends State<OrgScreen> {
             label: "Applicants",
           ),
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.person_2), label: "Profile")
+          BottomNavigationBarItem(icon: Icon(Icons.add), label: "Add Job")
         ],
         onTap: _changePage,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }

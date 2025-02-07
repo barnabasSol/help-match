@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
+import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
 
 class VolunteerAppbar extends StatelessWidget {
   final String profileIcon;

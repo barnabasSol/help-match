@@ -5,7 +5,7 @@ import 'package:help_match/features/chat/dto/room_dto.dart';
 import 'package:help_match/features/chat/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
 import 'package:help_match/features/chat/presentation/widgets/input_field.dart';
-import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
+import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/shared/widgets/snack_bar.dart';
 import 'package:intl/intl.dart';
 
@@ -81,17 +81,13 @@ class _RoomMessagesState extends State<RoomMessagesPage> {
           BlocConsumer<ChatBloc, ChatState>(
             listener: (context, state) {
               if (state is NewMessageReceiveSuccess) {
-                if (state.message.senderId != currentUser!.sub) {
+                if (state.message.senderId != currentUser.sub) {
                   showCustomSnackBar(
                     context: context,
                     message: state.message.message,
                     color: Colors.green,
                   );
                 }
-                print("LISTENINGNNGNGNGNG");
-                print("LISTENINGNNGNGNGNG");
-                print("LISTENINGNNGNGNGNG");
-                print("LISTENINGNNGNGNGNG");
                 context.read<RoomsBloc>().add(
                       RoomsUpdated(
                         RoomDto(

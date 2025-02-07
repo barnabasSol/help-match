@@ -31,8 +31,8 @@ import 'package:help_match/features/organization/cubit/org_cubit.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
-import 'package:help_match/features/online_status/cubit/online_status_cubit.dart';
-import 'package:help_match/features/online_status/repository/online_status_repository.dart';
+import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
+import 'package:help_match/core/online_status/repository/online_status_repository.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
 import 'package:help_match/shared/widgets/loading_indicator.dart';
 
@@ -52,7 +52,7 @@ Future<void> main() async {
 
   await initializeHive();
 
-  await secureStorage.deleteAll();
+  // await secureStorage.deleteAll();
 
   final themeModeString = await secureStorage.read(key: "theme_mode");
   if (themeModeString == null) {
@@ -115,9 +115,11 @@ Future<void> main() async {
               BlocProvider(create: (context) => SignUpUserCubit()),
               BlocProvider(create: (context) => SignUpOrgCubit()),
               BlocProvider(
-                  create: (context) => AuthBloc(
-                      secureStorage: secureStorage,
-                      authRepository: context.read<AuthRepository>())),
+                create: (context) => AuthBloc(
+                  secureStorage: secureStorage,
+                  authRepository: context.read<AuthRepository>(),
+                ),
+              ),
               BlocProvider(
                   create: (context) => OrgBloc(context.read<OrgRepository>())),
               BlocProvider(
