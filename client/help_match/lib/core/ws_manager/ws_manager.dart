@@ -24,41 +24,52 @@ class WsManager {
     }
   }
 
-  Future<void> connect(String otp) async {
+  Future<void> connect(String otp, {int retries = 3, int delay = 1000}) async {
     final accessToken = await secureStorage.read(key: 'access_token');
     if (accessToken == null) {
       throw Exception('Access token not found');
     }
 
-    final wsUrl =
-        '${Secrets.APP_DOMAIN.replaceFirst('https', 'wss')}/v1/ws?otp=$otp';
+    const domain = "wss://hm.barney-host.site";
+    final wsUrl = '$domain/v1/ws?otp=$otp';
 
-    try {
-      _channel = IOWebSocketChannel.connect(
-        Uri.parse(wsUrl),
-        headers: {'Authorization': 'Bearer $accessToken'},
-      );
+    for (int i = 0; i < retries; i++) {
+      try {
+        _channel = IOWebSocketChannel.connect(
+          Uri.parse(wsUrl),
+          headers: {'Authorization': 'Bearer $accessToken'},
+        );
 
-      _channel.stream.listen(
-        (data) {
-          final decodedData = jsonDecode(data);
-          final event = WsEvent.fromJSON(decodedData);
-          _messageStream.add(event);
-        },
-        onError: (err) {
-          _messageStream.addError(err);
-        },
-        onDone: () {
-          _messageStream.close();
-        },
-      );
-    } catch (e) {
-      rethrow;
+        _channel.stream.listen(
+          (data) {
+            final decodedData = jsonDecode(data);
+            final event = WsEvent.fromJSON(decodedData);
+            _messageStream.add(event);
+          },
+          onError: (err) {
+            _messageStream.addError(err);
+          },
+          onDone: () {
+            _messageStream.close();
+          },
+        );
+
+        break;
+      } catch (e) {
+        if (i == retries - 1) {
+          rethrow;
+        }
+        await Future.delayed(Duration(milliseconds: delay));
+      }
     }
   }
 
   void dispose() {
-    _channel.sink.close();
-    _messageStream.close();
+    if (_channel.closeCode != null) {
+      _channel.sink.close();
+    }
+    if (!_messageStream.isClosed) {
+      _messageStream.close();
+    }
   }
 }

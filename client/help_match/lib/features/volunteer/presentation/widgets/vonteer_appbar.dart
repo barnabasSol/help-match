@@ -27,7 +27,7 @@ class VolunteerAppbar extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    theme.primaryColor,
+                    theme.colorScheme.primary,
                     theme.colorScheme.secondary,
                   ],
                   begin: Alignment.topLeft,
@@ -49,10 +49,9 @@ class VolunteerAppbar extends StatelessWidget {
                             : profileIcon,
                       ),
                     ),
-                    // Green or gray dot/badge
                     Positioned(
-                      right: 0, // Adjust the position of the dot
-                      bottom: 0, // Adjust the position of the dot
+                      right: 0,
+                      bottom: 0,
                       child: BlocBuilder<OnlineStatusCubit, OnlineStatusState>(
                         builder: (context, state) {
                           Color dotColor;

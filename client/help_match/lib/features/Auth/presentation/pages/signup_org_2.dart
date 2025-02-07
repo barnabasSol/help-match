@@ -25,14 +25,12 @@ class _SigninState extends State<Signupo2> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
-        listener: (BuildContext context, state) async {
+        listener: (BuildContext context, state) {
           if (state is AuthSignupFailure) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
           } else if (state is AuthSignupSuccess) {
-            await context.read<UserAuthCubit>().isUserAuthenticated();
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => OrgScreen()));
+            context.read<UserAuthCubit>().isUserAuthenticated();
           }
         },
         child: SingleChildScrollView(

@@ -17,7 +17,6 @@ class WebsocketCubit extends Cubit<WebsocketState> {
     emit((WebsocketLoading()));
     try {
       final res = await dio.get('${Secrets.APP_DOMAIN}/v1/otp');
-
       final data = jsonDecode(res.data);
 
       final otp = data['otp'].toString();

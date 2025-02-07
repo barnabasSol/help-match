@@ -19,6 +19,8 @@ class UserAuthCubit extends Cubit<UserAuthState> {
     }
   }
 
+  late CurrentUser currentUser;
+
   Future<void> isUserAuthenticated() async {
     emit(UserAuthChecking());
     try {
@@ -27,23 +29,16 @@ class UserAuthCubit extends Cubit<UserAuthState> {
         emit(UserAuthInitial());
         return;
       }
-      final CurrentUser user = CurrentUser.fromToken(accessToken);
+      currentUser = CurrentUser.fromToken(accessToken);
 
-      await secureStorage.write(key: 'username', value: user.username);
-      await secureStorage.write(key: 'userId', value: user.sub);
+      await secureStorage.write(key: 'username', value: currentUser.username);
+      await secureStorage.write(key: 'userId', value: currentUser.sub);
 
-      emit(UserAuthIsLoggedIn(user));
+      emit(UserAuthIsLoggedIn(currentUser));
     } catch (e) {
       emit(UserAuthError(
         'An error occurred during authentication: ${e.toString()}',
       ));
     }
-  }
-
-  CurrentUser? get currentUser {
-    if (state is UserAuthIsLoggedIn) {
-      return (state as UserAuthIsLoggedIn).currentUser;
-    }
-    return null;
   }
 }

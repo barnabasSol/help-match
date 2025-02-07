@@ -171,48 +171,30 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeCubit, ThemeMode>(
-      builder: (context, themeState) {
-        return MaterialApp(
-          title: 'HelpMatch',
-          debugShowCheckedModeBanner: false,
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          themeMode: themeState,
-          home: BlocListener<UserAuthCubit, UserAuthState>(
-            listener: (context, state) {
-              if (state is UserAuthIsLoggedIn) {
-                context.read<WebsocketCubit>().connectCubit();
-                context.read<OnlineStatusCubit>().listenOnlineStatusChange();
-                context.read<ChatBloc>().add(NewMessageListening());
-                if (state.currentUser.role == "user") {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const VolunteerScreen(),
-                    ),
-                  );
-                } else if (state.currentUser.role == "organization") {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const OrgScreen(),
-                    ),
-                  );
-                }
-              }
-            },
-            child: BlocBuilder<UserAuthCubit, UserAuthState>(
+    return BlocListener<UserAuthCubit, UserAuthState>(
+      listener: (context, state) {
+        if (state is UserAuthIsLoggedIn) {
+          context.read<WebsocketCubit>().connectCubit();
+          context.read<ChatBloc>().add(NewMessageListening());
+          context.read<OnlineStatusCubit>().listenOnlineStatusChange();
+        }
+      },
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeState) {
+          return MaterialApp(
+            title: 'HelpMatch',
+            debugShowCheckedModeBanner: false,
+            theme: lightTheme,
+            darkTheme: darkTheme,
+            themeMode: themeState,
+            home: BlocBuilder<UserAuthCubit, UserAuthState>(
               builder: (context, state) {
                 if (state is UserAuthChecking) {
                   return const LoadingIndicator();
                 } else if (state is UserAuthIsLoggedIn) {
-                  final currentUser = context.read<UserAuthCubit>().currentUser;
-                  if (currentUser!.role == "organization") {
+                  if (state.currentUser.role == "organization") {
                     return const OrgScreen();
-                  } else if (currentUser.role == "user") {
+                  } else if (state.currentUser.role == "user") {
                     return const VolunteerScreen();
                   }
                   return const OnBoardingScreen();
@@ -223,9 +205,9 @@ class _MyAppState extends State<MyApp> {
                 }
               },
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

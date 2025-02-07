@@ -6,7 +6,6 @@ import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/features/Auth/dto/login_dto.dart';
 import 'package:help_match/features/Auth/presentation/bloc/auth_bloc.dart';
 import 'package:help_match/features/Auth/presentation/pages/sign_up.dart';
-import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -33,12 +32,11 @@ class _LoginState extends State<Login> {
           if (state is AuthLoginFailure) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.error)));
-          } else if (state is AuthLoginLoading)
-            // ignore: curly_braces_in_flow_control_structures
+          } else if (state is AuthLoginLoading) {
             const Center(
               child: CircularProgressIndicator(),
             );
-          else if (state is AuthLoginSuccess) {
+          } else if (state is AuthLoginSuccess) {
             context.read<UserAuthCubit>().isUserAuthenticated();
           }
         },

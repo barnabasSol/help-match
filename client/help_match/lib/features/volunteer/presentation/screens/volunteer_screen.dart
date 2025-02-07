@@ -43,7 +43,7 @@ class _VolunteerScreen extends State<VolunteerScreen> {
         final currentUser = context.read<UserAuthCubit>().currentUser;
         context
             .read<NotificationBloc>()
-            .add(NotificationListRequested(role: currentUser!.role));
+            .add(NotificationListRequested(role: currentUser.role));
       }
     });
   }
@@ -55,7 +55,7 @@ class _VolunteerScreen extends State<VolunteerScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: _bottomNavItems,
-        selectedItemColor: Theme.of(context).primaryColor,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
         unselectedItemColor: Colors.grey,
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         type: BottomNavigationBarType.fixed,
