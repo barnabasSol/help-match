@@ -40,16 +40,12 @@ func (e *EventRepository) SendMessageHandler(event Event, c *Client) error {
 	}
 	c.manager.RLock()
 	for client := range c.manager.Clients {
-		for _, roomId := range client.roomIds {
-			if roomId == sendEvent.ToRoomId {
-				client.egress <- Event{
-					Type:    TypeNewMessage,
-					Payload: marshalledNewEvent,
-				}
-				break
+		if _, exists := client.roomIds[sendEvent.ToRoomId]; exists {
+			client.egress <- Event{
+				Type:    TypeNewMessage,
+				Payload: marshalledNewEvent,
 			}
 		}
-
 	}
 	c.manager.RUnlock()
 	err = e.ChatRepository.InsertMessage(

@@ -82,11 +82,14 @@ func (m *Manager) ServeWS(
 		http.Error(w, "Some bullshit happened when serving ws", http.StatusInternalServerError)
 		return
 	}
-
+	roomMap := make(map[string]struct{}, len(roomIds))
+	for _, id := range roomIds {
+		roomMap[id] = struct{}{}
+	}
 	newClient := NewClient(
 		conn,
 		m,
-		roomIds,
+		roomMap,
 		claims.Subject,
 		claims.Username,
 	)

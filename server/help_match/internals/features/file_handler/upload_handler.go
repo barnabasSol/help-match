@@ -58,7 +58,6 @@ func (f *FileUploadHandler) Upload(
 		http.Error(w, "Invalid file", http.StatusBadRequest)
 		return
 	}
-
 	if !isValidFileType(fileBytes) {
 		http.Error(w, "Invalid file type", http.StatusUnsupportedMediaType)
 		return
@@ -87,11 +86,20 @@ func (f *FileUploadHandler) Upload(
 		err := f.fr.InsertPost(r.Context(), fullPath, claims.OrgId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 	} else if uploadType == "profile" {
+		if claims.Role == string(dto.Organization) {
+			err := f.fr.UpdateOrgProfile(r.Context(), fullPath, claims.Subject)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
 		err := f.fr.UpdateProfile(r.Context(), fullPath, claims.Subject)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 	}
 	utils.CreateResponse(

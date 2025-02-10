@@ -7,6 +7,7 @@ import (
 	auth_errors "hm.barney-host.site/internals/features/auth/errors"
 	common "hm.barney-host.site/internals/features/common/dto"
 	org_r "hm.barney-host.site/internals/features/organization/repository"
+	user_dto "hm.barney-host.site/internals/features/users/dto"
 	user_errors "hm.barney-host.site/internals/features/users/errors"
 	"hm.barney-host.site/internals/features/users/repository"
 )
@@ -21,6 +22,11 @@ func NewUserService(
 	orgRepo org_r.OrgRepository,
 ) *User {
 	return &User{repo, orgRepo}
+}
+
+func (u *User) UpdateUserInfo(ctx context.Context, userInfo user_dto.UpdateUserInfo, userId string) error {
+	err := u.repo.UpdateUserInfo(ctx, userInfo, userId)
+	return err
 }
 
 func (u *User) GetUserInfo(ctx context.Context, userId string) (*common.User, error) {

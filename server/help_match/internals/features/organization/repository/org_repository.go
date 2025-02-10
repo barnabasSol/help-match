@@ -16,6 +16,7 @@ import (
 type OrgRepository interface {
 	WithTransaction(ctx context.Context, fn func(pgx.Tx) error) error
 	Insert(ctx context.Context, tx pgx.Tx, orgModel *model.Organization, userId string) error
+	UpdateOrgInfo(ctx context.Context, tx pgx.Tx, orgInfo dto.OrgInfoUpdateDto, orgId string) error
 	GetOrganizationByOwnerId(ctx context.Context, tx pgx.Tx, userId string) (*model.Organization, error)
 	GetOrganization(ctx context.Context, orgId string) (*model.Organization, error)
 	GetOrganizationByJobId(ctx context.Context, jobId string) (*model.Organization, error)
@@ -54,7 +55,7 @@ func (or *Organization) Insert(
 	query := `
 		INSERT INTO organizations 
 		(user_id, organization_name, description, location, org_type)
-		VALUES ($1, $2, $3, POINT($4, $5), $6)
+		VALUES ($1, $2, $3, POINT($4, $5), $6::organization_type)
 		RETURNING id, created_at, version, is_verified
 	`
 
@@ -324,4 +325,32 @@ func (o *Organization) GetOrganizationByJobId(ctx context.Context, jobId string)
 		Longitude: location.P.Y,
 	}
 	return &orgModel, nil
+}
+
+func (o *Organization) UpdateOrgInfo(
+	ctx context.Context,
+	tx pgx.Tx,
+	orgInfo dto.OrgInfoUpdateDto,
+	orgId string,
+) error {
+	cmd := `
+			UPDATE organizations
+				SET
+				 organization_name = COALESCE($1, organization_name),
+				 org_type = COALESCE($2::organization_type, org_type),
+				 description = COALESCE($3, description),
+				 location = COALESCE(POINT($4, $5), location)
+			WHERE id = $6
+		   `
+
+	args := []any{
+		orgInfo.OrgName,
+		orgInfo.OrgType,
+		orgInfo.Description,
+		orgInfo.Location.Longitude,
+		orgInfo.Location.Latitude,
+		orgId,
+	}
+	_, err := o.pgPool.Exec(ctx, cmd, args...)
+	return err
 }

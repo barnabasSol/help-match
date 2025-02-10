@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"hm.barney-host.site/internals/features/users/dto"
 	user_errors "hm.barney-host.site/internals/features/users/errors"
 	model "hm.barney-host.site/internals/features/users/model"
 	"hm.barney-host.site/internals/features/utils"
@@ -17,6 +19,7 @@ type UserRepository interface {
 	Insert(ctx context.Context, tx pgx.Tx, user *model.User) error
 	FindUserByUsername(ctx context.Context, username string) (*model.User, error)
 	FindUserById(ctx context.Context, userId string) (*model.User, error)
+	UpdateUserInfo(ctx context.Context, userInfo dto.UpdateUserInfo, userId string) error
 }
 
 type User struct {
@@ -131,4 +134,50 @@ func (ur *User) FindUserById(
 		}
 	}
 	return &userModel, nil
+}
+func (u *User) UpdateUserInfo(ctx context.Context, userInfo dto.UpdateUserInfo, userId string) error {
+	err := utils.TransactionScope(ctx, u.pgPool, func(tx pgx.Tx) error {
+		cmd := `
+		UPDATE users
+		SET
+			name = COALESCE($1, name),
+			username = COALESCE($2, username),
+			email = COALESCE($3, email)
+		WHERE id = $4;
+	`
+		args := []any{
+			userInfo.Name,
+			userInfo.Username,
+			userInfo.Email,
+			userId,
+		}
+		_, err := tx.Exec(ctx, cmd, args...)
+		if err != nil {
+			return err
+		}
+
+		if userInfo.Interests != nil {
+			if len(userInfo.Interests.Add) > 0 {
+				add_cmd := `UPDATE users SET interests = array_cat(interests, $1::interest_type[]) WHERE id = $2`
+				_, err := tx.Exec(ctx, add_cmd, userInfo.Interests.Add, userId)
+				if err != nil {
+					return fmt.Errorf("failed to add interests: %w", err)
+				}
+			}
+
+			if len(userInfo.Interests.Remove) > 0 {
+				rm_cmd := `
+				UPDATE users
+				SET interests = array_remove(interests, unnest_element)
+				FROM unnest($1::interest_type[]) AS unnest_element
+				WHERE id = $2;`
+				_, err := tx.Exec(ctx, rm_cmd, userInfo.Interests.Remove, userId)
+				if err != nil {
+					return fmt.Errorf("failed to remove interests: %w", err)
+				}
+			}
+		}
+		return nil
+	})
+	return err
 }

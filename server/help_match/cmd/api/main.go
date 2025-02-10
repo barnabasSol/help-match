@@ -25,7 +25,7 @@ func main() {
 
 	appServer := server.New()
 	if err := appServer.Serve(pgPool, wsManager, wg); err != nil {
-		log.Printf("failed to serve: %v", err)
+		log.Fatalf("failed to serve: %v", err)
 		return
 	}
 }

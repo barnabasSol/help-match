@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	auth_dto "hm.barney-host.site/internals/features/auth/dto"
 	auth_errors "hm.barney-host.site/internals/features/auth/errors"
+	"hm.barney-host.site/internals/features/users/dto"
 	"hm.barney-host.site/internals/features/users/service"
 	"hm.barney-host.site/internals/features/utils"
 )
@@ -61,4 +63,32 @@ func (u *User) GetByUsernameOrId(
 		return
 	}
 	utils.CreateResponse(w, err, user, http.StatusOK, "here's the user")
+}
+
+func (u *User) UpdateUserInfo(
+	w http.ResponseWriter,
+	r *http.Request,
+	p httprouter.Params,
+) {
+	userInfo := new(dto.UpdateUserInfo)
+	err := utils.ReadJSON(w, r, userInfo)
+	if err != nil {
+		utils.CreateResponse(w, err, nil, http.StatusBadRequest, "")
+		return
+	}
+	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
+	ctx, cancel := context.WithTimeout(r.Context(), contextTimeout)
+	defer cancel()
+	if userInfo.Interests != nil {
+		if claims.Role == string(auth_dto.Organization) {
+			utils.CreateResponse(w, err, nil, http.StatusForbidden, "")
+			return
+		}
+	}
+	err = u.us.UpdateUserInfo(ctx, *userInfo, claims.Subject)
+	if err != nil {
+		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
+		return
+	}
+	utils.CreateResponse(w, nil, nil, http.StatusOK, "successfully updated user info")
 }

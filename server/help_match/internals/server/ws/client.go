@@ -14,7 +14,7 @@ type ClientList map[*Client]bool
 type Client struct {
 	userId     string
 	username   string
-	roomIds    []string
+	roomIds    map[string]struct{}
 	connection *websocket.Conn
 	manager    *Manager
 	egress     chan Event
@@ -28,7 +28,7 @@ var (
 func NewClient(
 	conn *websocket.Conn,
 	manager *Manager,
-	roomIds []string,
+	roomIds map[string]struct{},
 	userId string,
 	username string,
 ) *Client {

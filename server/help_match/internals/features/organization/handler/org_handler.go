@@ -42,7 +42,7 @@ func (oh *Organization) GetOrganizations(
 	r *http.Request,
 	_ httprouter.Params,
 ) {
-	var userLocation dto.Loc	ation
+	var userLocation dto.Location
 	err := utils.ReadJSON(w, r, &userLocation)
 	if err != nil {
 		utils.CreateResponse(w, err, nil, http.StatusBadRequest, "")
@@ -94,9 +94,34 @@ func (oh *Organization) GetOrganizations(
 	}
 
 	result, metadata, err := oh.os.GetOrganizations(ctx, queryParams, claims.Subject, userLocation)
+
 	if err != nil {
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
 		return
 	}
 	utils.CreateResponse(w, err, response{Result: result, Metadata: metadata}, http.StatusOK, "")
+}
+
+func (o *Organization) UpdateOrgInfo(
+	w http.ResponseWriter,
+	r *http.Request,
+	p httprouter.Params,
+) {
+	orgInfo := new(dto.OrgInfoUpdateDto)
+	err := utils.ReadJSON(w, r, orgInfo)
+	if err != nil {
+		utils.CreateResponse(w, err, nil, http.StatusBadRequest, "")
+		return
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), timeout)
+	defer cancel()
+	claims := ctx.Value(utils.ClaimsKey).(utils.Claims)
+
+	err = o.os.UpdateOrgInfo(ctx, claims.OrgId, *orgInfo)
+	if err != nil {
+		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "")
+		return
+	}
+
+	utils.CreateResponse(w, nil, nil, http.StatusOK, "organization info has been updated")
 }

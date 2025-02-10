@@ -24,9 +24,11 @@ func (as *AppServer) routes() http.Handler {
 	router.POST("/v1/auth/refresh", as.authHandler.Refresh)
 	//user
 	router.GET("/v1/user", mw.AuthMiddleware(as.userHandler.GetUser))
+	router.PATCH("/v1/user", mw.AuthMiddleware(as.userHandler.UpdateUserInfo))
 	router.GET("/v1/user-by/", mw.AuthMiddleware(as.userHandler.GetByUsernameOrId))
 	//organization
 	router.GET("/v1/org/:id", mw.AuthMiddleware(as.orgHandler.GetOrganization))
+	router.PATCH("/v1/org", mw.AuthMiddleware(mw.RequireRole(string(dto.Organization), as.orgHandler.UpdateOrgInfo)))
 	router.POST("/v1/org", mw.AuthMiddleware(mw.RequireRole(string(dto.User), as.orgHandler.GetOrganizations)))
 	//jobs
 	router.GET("/v1/job/applicants", mw.AuthMiddleware(mw.RequireRole(
