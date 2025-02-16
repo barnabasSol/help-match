@@ -72,7 +72,7 @@ class _HomePageState extends State<VolunteerHome> {
         Text(
           'Welcome, Dear $name',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.onPrimary,
           ),
@@ -131,20 +131,19 @@ class _HomePageState extends State<VolunteerHome> {
         itemCount: _categories.length,
         separatorBuilder: (_, __) => const SizedBox(width: 20),
         itemBuilder: (context, index) {
+          final isSelected = _selectedCat == index;
           return GestureDetector(
               onTap: () {
                 setState(() {
                   _selectedCat = index;
                 });
-                print(_searchController.text +
-                    "Org type" +
-                    _categories[index].label);
+
                 context.read<VolunteerBloc>().add(SearchPressed(
                     dto: SearchDto(
                         org_name: _searchController.text,
                         org_type: _categories[index].label)));
               },
-              child: CategoryItem(category: _categories[index]));
+              child: CategoryItem(category: _categories[index],isSelected:isSelected));
         },
       ),
     );
@@ -188,54 +187,8 @@ class _HomePageState extends State<VolunteerHome> {
     );
   }
 
-  Widget _buildBottomNavBar() {
-    return BottomNavigationBar(
-      currentIndex: _selectedIndex,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: Theme.of(context).colorScheme.primary,
-      unselectedItemColor: Theme.of(context).colorScheme.tertiary,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.location_on),
-          label: 'Location',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.notifications),
-          label: 'Alerts',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.chat),
-          label: 'Chat',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
-      onTap: (index) =>
-          setState(() => _selectedIndex = _change_to_pages(index)),
-    );
-  }
 
   // ignore: non_constant_identifier_names
-  _change_to_pages(int index) {
-    if (index == 4) {
-      return {
-        Navigator.pop(context),
-        Navigator.pushNamed(context, '/profilev')
-      };
-    } else if (index == 3) {
-      return {Navigator.pop(context), Navigator.pushNamed(context, '/homec')};
-    } else if (index == 0) {
-      return {Navigator.pop(context), Navigator.pushNamed(context, '/navv')};
-    } else if (index == 1) {
-      return {Navigator.pop(context), Navigator.pushNamed(context, '/homen')};
-    }
-  }
 }
 
 class Category {
@@ -247,8 +200,9 @@ class Category {
 
 class CategoryItem extends StatelessWidget {
   final Category category;
+  final bool isSelected;
 
-  const CategoryItem({super.key, required this.category});
+  const CategoryItem({super.key, required this.category, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -257,10 +211,16 @@ class CategoryItem extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSecondary,
+           color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSecondary,
             shape: BoxShape.circle,
           ),
-          child: Icon(category.icon, size: 32),
+          child: Icon(
+            category.icon,
+            size: 32,
+          
+          ),
         ),
         const SizedBox(height: 8),
         Text(

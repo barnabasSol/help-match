@@ -1,6 +1,7 @@
 import 'package:help_match/features/volunteer/data_provider/vol_data_provider.dart';
 import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
 import 'package:help_match/features/volunteer/dto/search_dto.dart';
+import 'package:help_match/features/volunteer/dto/vol_profile_dto.dart';
 
 class VolunteerRepository {
   final VolunteerDataProvider dataProvider;
@@ -27,6 +28,17 @@ class VolunteerRepository {
       } else {
         return [];
       }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateUserData(VolProfileDto dto) async {
+    try {
+      if(dto.img!=null){
+      await dataProvider.upload_image(dto.img!);
+      }
+      await dataProvider.UpdateUser(dto.toJson());
     } catch (e) {
       rethrow;
     }

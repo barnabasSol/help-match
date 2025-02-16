@@ -273,13 +273,7 @@ class _OrganizationSignUpScreenState extends State<Signupo1> {
   }
 
   void _change_to_o2() {
-    print(_loc!.latitude);
-    print(_loc!.latitude);
-    print(_loc!.latitude);
-    print(_loc!.longitude);
-    print(_loc!.longitude);
-    print(_loc!.longitude);
-    print(_loc!.longitude);
+   
     if (_formKey.currentState!.validate()) {
       context.read<SignUpOrgCubit>().updateOrgName(_nameController.text);
       context.read<SignUpOrgCubit>().updateDesc(_descriptionController.text);

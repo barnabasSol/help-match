@@ -26,7 +26,7 @@ class OrgBloc extends Bloc<OrgEvent, OrgState> {
   Future<void> _addJob(OrgJobAdded event, Emitter<OrgState> emit) async {
     emit(OrgJobAddLoading());
     try {
-      final applicants = await orgRepo.addJob(event.jobDto);
+     await orgRepo.addJob(event.jobDto);
       emit(OrgJobAddSuccess());
     } catch (e) {
       emit(OrgJobAddFailure(e.toString()));

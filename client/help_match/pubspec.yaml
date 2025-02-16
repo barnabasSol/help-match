@@ -32,7 +32,9 @@ dependencies:
   hive_ce_flutter: ^2.1.0
   shared_preferences: ^2.5.1
   intl: ^0.20.2
-
+  image_picker: ^1.0.4
+  google_nav_bar: ^5.0.6
+  fluttertoast: ^8.2.12
 
 dev_dependencies:
   flutter_test:

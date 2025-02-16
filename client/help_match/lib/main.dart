@@ -7,7 +7,7 @@ import 'package:help_match/core/current_user/data_provider/local.dart';
 import 'package:help_match/core/current_user/data_provider/user_remote.dart';
 import 'package:help_match/core/current_user/repository/user_repo.dart';
 import 'package:help_match/core/interceptor/interceptor.dart';
-import 'package:help_match/core/local_storage/app_local.dart';
+import 'package:help_match/core/local_storage/app_local.dart'; 
 import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/core/online_status/repository/online_status_repository.dart';
 import 'package:help_match/core/theme/colors.dart';
@@ -54,7 +54,6 @@ Future<void> main() async {
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
 
   await initializeHive();
-
   // await secureStorage.deleteAll();
 
   final themeModeString = await secureStorage.read(key: "theme_mode");
@@ -111,7 +110,7 @@ Future<void> main() async {
             create: (context) =>
                 AuthRepository(context.read<AuthDataProvider>())),
         RepositoryProvider(
-            create: (context) => VolunteerDataProvider(dio: dio)),
+            create: (context) => VolunteerDataProvider(dio: dio,sec: secureStorage)),
         RepositoryProvider(
             create: (context) => VolunteerRepository(
                 dataProvider: context.read<VolunteerDataProvider>())),
@@ -121,7 +120,7 @@ Future<void> main() async {
           return MultiBlocProvider(
             providers: [
               BlocProvider(
-                  create: (context) => VolunteerBloc(
+                  create: (context) => VolunteerBloc(context.read<UserRepo>(),
                       volRepo: context.read<VolunteerRepository>())),
               BlocProvider(create: (context) => SignUpUserCubit()),
               BlocProvider(create: (context) => SignUpOrgCubit()),
