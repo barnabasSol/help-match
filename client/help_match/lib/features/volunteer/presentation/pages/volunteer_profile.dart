@@ -3,11 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-// import 'package:fluttertoast/fluttertoast.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/core/image_picker.dart';
-import 'package:help_match/features/volunteer/bloc/volunteer_bloc.dart';
-import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
+import 'package:help_match/features/volunteer/bloc/profile_bloc/profile_bloc.dart';
 import 'package:help_match/features/volunteer/dto/vol_profile_dto.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
 import 'package:help_match/shared/widgets/gradient_button.dart';
@@ -26,6 +24,7 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
   final List<String> _selectedCategories = [];
   final List<String> _previousSelectedCategories = [];
   Uint8List? _profile_image;
+  final String _remoteName = "https://hm.barney-host.site/";
   bool _isInitialized = false;
   final List<String> _categories = const [
     'Non Profit',
@@ -38,63 +37,62 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
   ];
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     final id = context.read<UserAuthCubit>().currentUser.sub;
-    context.read<VolunteerBloc>().add(ProfileInfoFetched(id));
+    context.read<ProfileBloc>().add(ProfileInfoFetched(id));
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<VolunteerBloc, VolunteerState>(
+    return BlocConsumer<ProfileBloc, ProfileState>(
       builder: (context, state) {
         if (state is ProfileInfoFetchSuccess) {
+          var user = state.user;
           if (!_isInitialized) {
-            var user = state.user;
             _nameController.text = user.name;
             _usernameController.text = user.username;
-            _selectedCategories.addAll(user.interests!
-                .map((cat) => OrgCardDto.invertConvert(cat))
-                .toList());
-            _previousSelectedCategories.addAll(user.interests!
-                .map((cat) => OrgCardDto.invertConvert(cat))
-                .toList());
+            _selectedCategories.addAll(
+                user.interests!.map((cat) => _invertConvert(cat)).toList());
+            _previousSelectedCategories.addAll(
+                user.interests!.map((cat) => _invertConvert(cat)).toList());
             _isInitialized = true;
           }
-          return Scaffold(
-            body: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Form(
-                  key: _formKey_for_profile,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header
-                      _buildProfileHeader(),
-                      const SizedBox(height: 24),
+          return SafeArea(
+            child: Scaffold(
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _formKey_for_profile,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header
+                        _buildProfileHeader(),
+                        const SizedBox(height: 20),
 
-                      // Divider
-                      const Divider(thickness: 2, height: 2),
-                      const SizedBox(height: 32),
+                        // Divider
+                        const Divider(thickness: 2, height: 2),
+                        const SizedBox(height: 32),
 
-                      // Profile Picture Section
-                      _buildProfilePictureSection(),
-                      const SizedBox(height: 32),
+                        // Profile Picture Section
+                        _buildProfilePictureSection(user.profilePicUrl),
+                        const SizedBox(height: 32),
 
-                      // Name Fields
-                      _buildNameField(),
-                      const SizedBox(height: 20),
-                      _buildUsernameField(),
-                      const SizedBox(height: 32),
+                        // Name Fields
+                        _buildNameField(),
+                        const SizedBox(height: 20),
+                        _buildUsernameField(),
+                        const SizedBox(height: 32),
 
-                      // Categories
-                      _buildCategorySection(),
-                      const SizedBox(height: 40),
+                        // Categories
+                        _buildCategorySection(),
+                        const SizedBox(height: 40),
 
-                      // Confirm Button
-                      _buildConfirmButton(),
-                    ],
+                        // Confirm Button
+                        _buildConfirmButton(),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -108,15 +106,15 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
           );
         }
       },
-      listener: (BuildContext context, VolunteerState state) {
+      listener: (BuildContext context, ProfileState state) {
         if (state is ProfileUpdateSuccess) {
           Fluttertoast.showToast(
-  msg: "User data updated!",
-  toastLength: Toast.LENGTH_SHORT,
-  gravity: ToastGravity.BOTTOM,
-  backgroundColor:Theme.of(context).colorScheme.onPrimary,
-  textColor:Theme.of(context).colorScheme.onSecondary,
-);
+            msg: "User data updated!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Theme.of(context).colorScheme.onPrimary,
+            textColor: Theme.of(context).colorScheme.onSecondary,
+          );
           Navigator.push(context,
               MaterialPageRoute(builder: (con) => const VolunteerScreen()));
         } else if (state is ProfileUpdateFailure) {
@@ -129,26 +127,22 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
 
   Widget _buildProfileHeader() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           'Manage Your Profile',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: Theme.of(context).colorScheme.primary,
           ),
-        ),
-        CircleAvatar(
-          radius: 24,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(Icons.person, size: 32),
         ),
       ],
     );
   }
 
-  Widget _buildProfilePictureSection() {
+  Widget _buildProfilePictureSection(String profileUrl) {
+    profileUrl = _remoteName+profileUrl;
     return Column(
       children: [
         const Align(
@@ -157,17 +151,18 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
         Stack(
           alignment: Alignment.center,
           children: [
-            const CircleAvatar(
-              radius: 60,
-              // backgroundImage:
-            ),
+            CircleAvatar(
+                radius: 60,
+                backgroundImage: _profile_image != null
+                    ? MemoryImage(_profile_image!)
+                    : NetworkImage(profileUrl)),
             Positioned(
-              // bottom: 0,
+              bottom: 10,
               // right: 0,
               child: GestureDetector(
                 onTap: _changeProfilePicture,
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
                     shape: BoxShape.circle,
@@ -290,10 +285,13 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
   // ignore: non_constant_identifier_names
 
   void _changeProfilePicture() async {
-    // Implement image picker logic
-   _profile_image = await pickImageAsBytes();
+    final pickedImage = await pickImageAsBytes();
+    if (pickedImage != null) {
+      setState(() {
+        _profile_image = pickedImage;
+      });
+    }
   }
-
 
   void _saveProfile() {
     if (_formKey_for_profile.currentState!.validate()) {
@@ -306,14 +304,24 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
           .where((category) => !_selectedCategories.contains(category))
           .toList();
 
-      context.read<VolunteerBloc>().add(UpdateProfilePressed(
+      context.read<ProfileBloc>().add(UpdateProfilePressed(
           dto: VolProfileDto(
-            img: _profile_image,
+              img: _profile_image,
               name: _nameController.text,
               username: _usernameController.text,
               addedInterests: addedInterests,
               removedInterests: removedInterests)));
     }
+  }
+
+  String _invertConvert(String interests) {
+    if (interests == "for_profit") return "For Profit";
+    if (interests == "non_profit") return "Non Profit";
+    if (interests == "government") return "Government";
+    if (interests == "community") return "Community";
+    if (interests == "educational") return "Education";
+    if (interests == "healthcare") return "Healthcare";
+    return "Cultural";
   }
 
   @override

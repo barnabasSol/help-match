@@ -5,27 +5,27 @@ import 'package:help_match/features/Auth/dto/signup_dto.dart';
 class AuthRepository {
   final AuthDataProvider authDataProvider;
   AuthRepository(this.authDataProvider);
-  Future<String> signIn(LoginDTO login) async {
+  Future<dynamic> signIn(LoginDTO login) async {
     try {
       final response = await authDataProvider.login(login.toJson());
-        return response["data"]["access_token"];
+        return response["data"] ;
     } catch (e) {
       rethrow;
     }
   }
 
-   Future<String> signUpUser(UserSignUpDto dto) async {
+   Future<dynamic> signUpUser(UserSignUpDto dto) async {
     try {
       final response = await authDataProvider.signUp(dto.toMap());
-        return response["data"]["tokens"]["access_token"];
+        return response["data"]["tokens"] ;
     } catch (e) {
       rethrow;
     }
   }
-   Future<String> signUpOrg(OrgSignUpDto dto) async {
+   Future<dynamic> signUpOrg(OrgSignUpDto dto) async {
     try {
       final response = await authDataProvider.signUp(dto.toMap());
-        return response["data"]["tokens"]["access_token"];
+      return response["data"]["tokens"];
     } catch (e) {
       rethrow;
     }

@@ -7,7 +7,7 @@ import 'package:help_match/core/current_user/data_provider/local.dart';
 import 'package:help_match/core/current_user/data_provider/user_remote.dart';
 import 'package:help_match/core/current_user/repository/user_repo.dart';
 import 'package:help_match/core/interceptor/interceptor.dart';
-import 'package:help_match/core/local_storage/app_local.dart'; 
+import 'package:help_match/core/local_storage/app_local.dart';
 import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
 import 'package:help_match/core/online_status/repository/online_status_repository.dart';
 import 'package:help_match/core/theme/colors.dart';
@@ -33,8 +33,10 @@ import 'package:help_match/features/organization/cubit/org_cubit.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
-import 'package:help_match/features/volunteer/bloc/volunteer_bloc.dart';
+import 'package:help_match/features/volunteer/bloc/profile_bloc/profile_bloc.dart';
+import 'package:help_match/features/volunteer/bloc/search_bloc/volunteer_bloc.dart';
 import 'package:help_match/features/volunteer/data_provider/vol_data_provider.dart';
+import 'package:help_match/features/volunteer/presentation/pages/org_details.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
 import 'package:help_match/features/volunteer/repository/volunteer_repository.dart';
 import 'package:help_match/shared/widgets/loading_indicator.dart';
@@ -101,6 +103,9 @@ Future<void> main() async {
             context.read<NotificationProvider>(),
           ),
         ),
+        RepositoryProvider(create: (context) => const FlutterSecureStorage(aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),)),
         RepositoryProvider(create: (context) => OrgDataProvider(dio: dio)),
         RepositoryProvider(
             create: (context) =>
@@ -110,7 +115,8 @@ Future<void> main() async {
             create: (context) =>
                 AuthRepository(context.read<AuthDataProvider>())),
         RepositoryProvider(
-            create: (context) => VolunteerDataProvider(dio: dio,sec: secureStorage)),
+            create: (context) =>
+                VolunteerDataProvider(dio: dio, sec: secureStorage)),
         RepositoryProvider(
             create: (context) => VolunteerRepository(
                 dataProvider: context.read<VolunteerDataProvider>())),
@@ -120,7 +126,11 @@ Future<void> main() async {
           return MultiBlocProvider(
             providers: [
               BlocProvider(
-                  create: (context) => VolunteerBloc(context.read<UserRepo>(),
+                  create: (context) => ProfileBloc(
+                      volRepo: context.read<VolunteerRepository>(),
+                      userRepo: context.read<UserRepo>())),
+              BlocProvider(
+                  create: (context) => VolunteerBloc(
                       volRepo: context.read<VolunteerRepository>())),
               BlocProvider(create: (context) => SignUpUserCubit()),
               BlocProvider(create: (context) => SignUpOrgCubit()),
@@ -210,7 +220,7 @@ class _MyAppState extends State<MyApp> {
                   if (currentUser.role == "organization") {
                     return const OrgScreen();
                   } else if (currentUser.role == "user") {
-                    return const VolunteerScreen();
+                    return   const OrgDetails( );
                   }
                   return const OnBoardingScreen();
                 } else if (state is UserAuthInitial) {

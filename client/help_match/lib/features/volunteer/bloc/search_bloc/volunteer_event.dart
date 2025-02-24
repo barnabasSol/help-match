@@ -12,16 +12,3 @@ class SearchPressed extends VolunteerEvent {
 
 class InitialFetch extends VolunteerEvent {}
 
-class UpdateProfilePressed extends VolunteerEvent {
-  final VolProfileDto dto;
-
-  UpdateProfilePressed({required this.dto});
-
-}
-
-class ProfileInfoFetched extends VolunteerEvent {
-  final String userId;
-  ProfileInfoFetched(
-    this.userId,
-  );
-}

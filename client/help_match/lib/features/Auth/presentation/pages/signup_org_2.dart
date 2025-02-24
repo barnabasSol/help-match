@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/features/Auth/presentation/bloc/auth_bloc.dart';
 import 'package:help_match/features/Auth/presentation/bloc/auth_cubit.dart';
+import 'package:help_match/shared/widgets/gradient_button.dart';
 
 class Signupo2 extends StatefulWidget {
   const Signupo2({super.key});
@@ -30,6 +31,7 @@ class _SigninState extends State<Signupo2> {
                 .showSnackBar(SnackBar(content: Text(state.error)));
           } else if (state is AuthSignupSuccess) {
             context.read<UserAuthCubit>().isUserAuthenticated();
+            Navigator.pop(context);
           }
         },
         child: SingleChildScrollView(
@@ -40,16 +42,20 @@ class _SigninState extends State<Signupo2> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Icon(Icons.business, size: 80, color: Colors.green),
+                  Icon(
+                    Icons.business,
+                    size: 80,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   const SizedBox(height: 24),
 
                   // Title
-                  const Text(
+                  Text(
                     'Your Organization',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -59,7 +65,7 @@ class _SigninState extends State<Signupo2> {
                     'Create user account that will manage the Organization',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey[600],
+                      color: Theme.of(context).colorScheme.tertiary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -98,7 +104,7 @@ class _SigninState extends State<Signupo2> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       filled: true,
-                      fillColor: Colors.grey[100],
+                      fillColor: Theme.of(context).colorScheme.onSecondary,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -115,28 +121,10 @@ class _SigninState extends State<Signupo2> {
                   // Sign In Button
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        // backgroundColor: Theme.of(context).colorScheme.primary,
-                        // backgroundColor: Colors.blue,
-                        backgroundColor: Colors.green,
-
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: () {
-                        _change_to_Home();
-                      },
-                      child: const Text(
-                        'Sign Up',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    child: GradientButton(
+                      // key: _formKey,
+                      text: 'Continue',
+                      onPressed: _change_to_Home,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -157,7 +145,6 @@ class _SigninState extends State<Signupo2> {
     context
         .read<AuthBloc>()
         .add(OrgAuthSignupPressed(dto: context.read<SignUpOrgCubit>().state));
-    // Navigator.pushNamed(context, '/homeo');
     // Navigator.pop(context);
   }
 
@@ -165,14 +152,13 @@ class _SigninState extends State<Signupo2> {
     return TextFormField(
       controller: _nameController,
       decoration: InputDecoration(
-        labelText: 'Full Name',
-        prefixIcon: const Icon(Icons.person_outline),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        filled: true,
-        fillColor: Colors.grey[100],
-      ),
+          labelText: 'Full Name',
+          prefixIcon: const Icon(Icons.person_outline),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          filled: true,
+          fillColor: Theme.of(context).colorScheme.onSecondary),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter your full name';
@@ -187,14 +173,13 @@ class _SigninState extends State<Signupo2> {
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
-        labelText: 'Email Address',
-        prefixIcon: const Icon(Icons.email_outlined),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        filled: true,
-        fillColor: Colors.grey[100],
-      ),
+          labelText: 'Email Address',
+          prefixIcon: const Icon(Icons.email_outlined),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          filled: true,
+          fillColor: Theme.of(context).colorScheme.onSecondary),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter your email';
@@ -220,7 +205,7 @@ class _SigninState extends State<Signupo2> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Theme.of(context).colorScheme.onSecondary,
         hintText: '@username',
       ),
       validator: (value) {

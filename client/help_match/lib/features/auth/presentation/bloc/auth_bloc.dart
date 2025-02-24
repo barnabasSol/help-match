@@ -17,9 +17,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLoginPressed>((event, emit) async {
       emit(AuthLoginLoading());
       try {
-        final token = await authRepository.signIn(event.loginDto);
-        await secureStorage.write(key: 'access_token', value: token);
-        emit(AuthLoginSuccess(token));
+        final tokens = await authRepository.signIn(event.loginDto);
+        await secureStorage.write(key: 'access_token', value: tokens['access_token']);
+        await secureStorage.write(key: 'refresh_token', value: tokens['refresh_token']);
+        emit(AuthLoginSuccess());
       } catch (e) {
         emit(AuthLoginFailure(e.toString()));
       }
@@ -27,8 +28,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<UserAuthSignupPressed>((event, emit) async {
       emit(AuthSignupLoading());
       try {
-        final token = await authRepository.signUpUser(event._dto);
-        await secureStorage.write(key: 'access_token', value: token);
+        final tokens = await authRepository.signUpUser(event._dto);
+        await secureStorage.write(key: 'access_token', value: tokens['access_token']);
+        await secureStorage.write(key: 'refresh_token', value: tokens['refresh_token']);
+
         emit(AuthSignupSuccess());
       } catch (e) {
         emit(AuthSignupFailure(e.toString()));
@@ -37,8 +40,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<OrgAuthSignupPressed>((event, emit) async {
       emit(AuthSignupLoading());
       try {
-        final token = await authRepository.signUpOrg(event._dto);
-        await secureStorage.write(key: 'access_token', value: token);
+        final tokens = await authRepository.signUpOrg(event._dto);
+        await secureStorage.write(key: 'access_token', value: tokens['access_token']);
+        await secureStorage.write(key: 'refresh_token', value: tokens['refresh_token']);
         emit(AuthSignupSuccess());
       } catch (e) {
         emit(AuthSignupFailure(e.toString()));

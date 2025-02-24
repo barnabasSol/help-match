@@ -25,15 +25,7 @@ class OrgCardDto {
     required this.version,
   });
 
-  static String invertConvert(String interests) {
-    if (interests == "for_profit") return "For Profit";
-    if (interests == "non_profit") return "Non Profit";
-    if (interests == "government") return "Government";
-    if (interests == "community") return "Community";
-    if (interests == "educational") return "Education";
-    if (interests == "healthcare") return "Healthcare";
-    return "Cultural";
-  }
+
 
   factory OrgCardDto.fromJson(Map<String, dynamic> json) {
     return OrgCardDto(

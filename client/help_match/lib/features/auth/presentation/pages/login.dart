@@ -50,18 +50,18 @@ class _LoginState extends State<Login> {
                 children: [
                   const SizedBox(height: 40),
                   // Logo
-                  const Icon(Icons.volunteer_activism,
-                      size: 80, color: Colors.blue),
+                    Icon(Icons.volunteer_activism,
+                      size: 80, color: Theme.of(context).colorScheme.primary ),
                   const SizedBox(height: 32),
 
                   const SizedBox(height: 32),
 
-                  const Text(
+                    Text(
                     'Welcome Back',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color:  Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -71,7 +71,7 @@ class _LoginState extends State<Login> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
+                 color: Theme.of(context).colorScheme.tertiary
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -103,7 +103,7 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       filled: true,
-                      fillColor: Colors.grey[100],
+                      fillColor:Theme.of(context).scaffoldBackgroundColor
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -127,9 +127,8 @@ class _LoginState extends State<Login> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         // backgroundColor: Theme.of(context).colorScheme.primary,
-                        backgroundColor: Colors.blue,
-
-                        foregroundColor: Colors.white,
+                        backgroundColor:Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onSecondary,
                       ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
@@ -155,7 +154,7 @@ class _LoginState extends State<Login> {
                   Text(
                     'or sign in with',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color:Theme.of(context).colorScheme.tertiary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -170,11 +169,11 @@ class _LoginState extends State<Login> {
                         icon: const Icon(Icons.g_mobiledata, size: 24),
                         label: const Text('Google'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.black87,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          side: BorderSide(color: Colors.grey[300]!),
+                          side: BorderSide(color: Theme.of(context).colorScheme.onSecondary),
                         ),
                         onPressed: () {
                           // Handle Google sign in
@@ -187,12 +186,11 @@ class _LoginState extends State<Login> {
                         icon: const Icon(Icons.facebook, size: 24),
                         label: const Text('Facebook'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.black87,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          side: BorderSide(color: Colors.grey[300]!),
-                        ),
+                          side: BorderSide(color: Theme.of(context).colorScheme.onSecondary),                        ),
                         onPressed: () {
                           // Handle Facebook sign in
                           // Loginaccounttype();
@@ -208,7 +206,7 @@ class _LoginState extends State<Login> {
                     children: [
                       Text(
                         "Don't have an account? ",
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
                       ),
                       TextButton(
                         onPressed: () {
@@ -219,11 +217,11 @@ class _LoginState extends State<Login> {
                               MaterialPageRoute(
                                   builder: (context) => const Signup()));
                         },
-                        child: const Text(
+                        child: Text(
                           'Join us',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue,
+                        color:  Theme.of(context).colorScheme.primary
                           ),
                         ),
                       ),
@@ -251,7 +249,7 @@ class _LoginState extends State<Login> {
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+ fillColor:Theme.of(context).scaffoldBackgroundColor,
         hintText: '@username',
       ),
       validator: (value) {
