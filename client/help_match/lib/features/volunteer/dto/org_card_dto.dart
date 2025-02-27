@@ -1,3 +1,5 @@
+import 'package:latlong2/latlong.dart';
+
 class OrgCardDto {
   String id;
   String name;
@@ -5,7 +7,7 @@ class OrgCardDto {
   String profileIcon;
   String description;
   double proximity;
-  Location location;
+  LatLng location;
   bool isVerified;
   DateTime createdAt;
   String type;
@@ -35,7 +37,7 @@ class OrgCardDto {
       profileIcon: json['profile_icon'],
       description: json['description'],
       proximity: json['proximity'].toDouble(),
-      location: Location.fromJson(json['location']),
+      location: LatLng.fromMap(json['location']),
       isVerified: json['is_verified'],
       createdAt: DateTime.parse(json['created_at']),
       type: json['type'],

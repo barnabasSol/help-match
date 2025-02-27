@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
+import 'package:help_match/features/volunteer/presentation/widgets/job_card.dart';
 import 'package:help_match/shared/widgets/map_ui.dart';
 import 'package:latlong2/latlong.dart';
 
 class OrgDetails extends StatefulWidget {
-  const OrgDetails({super.key});
+  final OrgCardDto _orgCardDto;
+  const OrgDetails({super.key, required orgDto}) : _orgCardDto = orgDto;
 
   @override
   State<OrgDetails> createState() => _OrgDetailsState();
@@ -29,9 +32,12 @@ class _OrgDetailsState extends State<OrgDetails> {
                         child: ClipRRect(
                       borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(30)),
-                      child: Image.network(
-                        "https://imgs.search.brave.com/XUJeiz6wORWCNK-xAu78igkfR7GRKMfE0AvshQ8yOrQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LmdyZWF0bm9ucHJv/Zml0cy5vcmcvd3At/Y29udGVudC91cGxv/YWRzLzIwMjIvMTEv/Z2l2ZS13aXRoLWhl/YXJ0LnBuZw",
-                        fit: BoxFit.cover,
+                      child: Hero(
+                        tag: 'org ${widget._orgCardDto.name}',
+                        child: Image.network(
+                          "https://imgs.search.brave.com/XUJeiz6wORWCNK-xAu78igkfR7GRKMfE0AvshQ8yOrQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/LmdyZWF0bm9ucHJv/Zml0cy5vcmcvd3At/Y29udGVudC91cGxv/YWRzLzIwMjIvMTEv/Z2l2ZS13aXRoLWhl/YXJ0LnBuZw",
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     )),
                     Positioned(
@@ -40,10 +46,14 @@ class _OrgDetailsState extends State<OrgDetails> {
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: Container(
-                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Theme.of(context).colorScheme.secondary.withOpacity(0.7)),
-                   
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondary
+                                    .withOpacity(0.7)),
                             child: Text(
-                              "Mekedonia Charity",
+                              widget._orgCardDto.name,
                               style: TextStyle(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontSize: 19,
@@ -65,12 +75,11 @@ class _OrgDetailsState extends State<OrgDetails> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
-                child: Text(
-                    "Mekedonia Home is a charitable organization that provides sanctuary and support for the poor, the sick, the weak, and the friendless, with a specific focus on elderly and mentally disabled women. The organization operates in multiple locations across Ethiopia, including Addis Ababa, Harar, Gore, Dessie, Dire Dawa, Adama, Gambella, Shashemane, Beke, and Adwa. ",
+                child: Text(widget._orgCardDto.description,
                     style: Theme.of(context).textTheme.bodyMedium),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 7.0),
+                padding: const EdgeInsets.symmetric(horizontal: 7.0, ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -91,7 +100,9 @@ class _OrgDetailsState extends State<OrgDetails> {
                               style: TextStyle(
                                 color: selectedPage == 0
                                     ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.onTertiaryContainer,
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onTertiaryContainer,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -101,7 +112,9 @@ class _OrgDetailsState extends State<OrgDetails> {
                                 thickness: 2,
                                 color: selectedPage == 0
                                     ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.onTertiaryContainer,
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onTertiaryContainer,
                               ),
                             )
                           ],
@@ -123,7 +136,9 @@ class _OrgDetailsState extends State<OrgDetails> {
                                   fontWeight: FontWeight.bold,
                                   color: selectedPage == 1
                                       ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context).colorScheme.onTertiaryContainer,
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onTertiaryContainer,
                                 )),
                             SizedBox(
                               width: MediaQuery.of(context).size.width * 0.45,
@@ -131,7 +146,9 @@ class _OrgDetailsState extends State<OrgDetails> {
                                 thickness: 2,
                                 color: selectedPage == 1
                                     ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.onTertiaryContainer,
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onTertiaryContainer,
                               ),
                             )
                           ],
@@ -142,21 +159,36 @@ class _OrgDetailsState extends State<OrgDetails> {
                 ),
               ),
               SizedBox(
-                height: 500,
+                height: selectedPage==0?370:400,
                 child: PageView(
                   onPageChanged: (value) {
                     setState(() {
-                       selectedPage = value; 
+                      selectedPage = value;
                     });
-                  
                   },
                   controller: _pageController,
-                  children: const [
+                  children: [
                     SizedBox(
                       height: 350,
-                      child: MapUi(LatLng(9.2, 9.5)),
+                      child: MapUi(widget._orgCardDto.location),
                     ),
-                    Center(child: Text("Hello 2nd page"))
+                    Container(
+                      height: 500,
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 4 ),
+                      child: ListView.separated( 
+                        separatorBuilder: (context, index) => SizedBox(
+                          height: 5,
+                        ),
+                        itemCount: 5,
+                        itemBuilder: (BuildContext context, int index) {
+                          return JobCard(
+                            title: 'Cleaner in the room',
+                            desc:
+                                'Hilcoe is a good place to learn if u got a good gut to tolerate some miserables really I mean that',
+                          );
+                        },
+                      ),
+                    )
                   ],
                 ),
               )

@@ -38,6 +38,7 @@ import 'package:help_match/features/volunteer/bloc/search_bloc/volunteer_bloc.da
 import 'package:help_match/features/volunteer/data_provider/vol_data_provider.dart';
 import 'package:help_match/features/volunteer/presentation/pages/org_details.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
+import 'package:help_match/features/volunteer/presentation/widgets/job_card.dart';
 import 'package:help_match/features/volunteer/repository/volunteer_repository.dart';
 import 'package:help_match/shared/widgets/loading_indicator.dart';
 
@@ -220,7 +221,7 @@ class _MyAppState extends State<MyApp> {
                   if (currentUser.role == "organization") {
                     return const OrgScreen();
                   } else if (currentUser.role == "user") {
-                    return   const OrgDetails( );
+                    return   const VolunteerScreen();
                   }
                   return const OnBoardingScreen();
                 } else if (state is UserAuthInitial) {

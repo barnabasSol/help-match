@@ -93,7 +93,7 @@ class _HomePageState extends State<VolunteerHome> {
       decoration: InputDecoration(
         hintText: 'Search for Organization',
         filled: true,
-        fillColor: Theme.of(context).colorScheme.secondary,
+        fillColor: Theme.of(context).colorScheme.onTertiaryContainer,
         prefixIcon: IconButton(
             onPressed: () {
               String type = '';
@@ -158,10 +158,7 @@ class _HomePageState extends State<VolunteerHome> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       return OrganizationCard(
-                        orgName: orgs[index].name,
-                        type: orgs[index].type,
-                        imageUrl: orgs[index].profileIcon,
-                        isVerified: true,
+                        orgDto: orgs[index],
                       );
                     },
                     childCount: orgs.length,
