@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
+import 'package:help_match/features/volunteer/bloc/load_more/load_more_cubit.dart';
 import 'package:help_match/features/volunteer/bloc/search_bloc/volunteer_bloc.dart';
 import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
 import 'package:help_match/features/volunteer/dto/search_dto.dart';
@@ -16,8 +17,13 @@ class VolunteerHome extends StatefulWidget {
 }
 
 class _HomePageState extends State<VolunteerHome> {
+  int _page = 1;
+  bool _hasMore = true;
+  bool _isLoading = false;
+  ScrollController _scrollController = ScrollController();
   int _selectedIndex = 2; // Home is selected by default
   int _selectedCat = -1;
+  late List<OrgCardDto> _organizations;
   final TextEditingController _searchController = TextEditingController();
   final List<Category> _categories = const [
     Category('Non-Profit', Icons.volunteer_activism),
@@ -34,6 +40,31 @@ class _HomePageState extends State<VolunteerHome> {
     // TODO: implement initState
     super.initState();
     context.read<VolunteerBloc>().add(InitialFetch());
+    _scrollController.addListener(() async {
+      if (_scrollController.position.maxScrollExtent ==
+          _scrollController.offset) {
+        if (_isLoading || !_hasMore) return;
+        _isLoading = true;
+        fetch();
+      }
+    });
+  }
+
+  Future<void> fetch() async {
+    String type = '';
+    if (_selectedCat > -1) {
+      type = _categories[_selectedCat].label;
+    }
+    await context.read<LoadMoreCubit>().fetchMore(SearchDto(
+        page: ++_page, org_name: _searchController.text, org_type: type));
+    List<OrgCardDto> orgs = context.read<LoadMoreCubit>().state;
+    setState(() {
+      if (orgs.length < 4) {
+        _hasMore = false;
+      }
+      _isLoading = false;
+      _organizations.addAll(orgs);
+    });
   }
 
   @override
@@ -70,9 +101,10 @@ class _HomePageState extends State<VolunteerHome> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-      const CircleAvatar(
+        const CircleAvatar(
           radius: 24,
-         backgroundImage: NetworkImage("https://th.bing.com/th/id/OIP.YoTUWMoKovQT0gCYOYMwzwHaHa?rs=1&pid=ImgDetMain"),
+          backgroundImage: NetworkImage(
+              "https://th.bing.com/th/id/OIP.YoTUWMoKovQT0gCYOYMwzwHaHa?rs=1&pid=ImgDetMain"),
         ),
         const SizedBox(
           width: 52,
@@ -89,22 +121,25 @@ class _HomePageState extends State<VolunteerHome> {
 
   Widget _buildSearchBar() {
     return TextField(
+      style:TextStyle(color: Theme.of(context).colorScheme.primary),
       controller: _searchController,
       decoration: InputDecoration(
         hintText: 'Search for Organization',
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
         filled: true,
         fillColor: Theme.of(context).colorScheme.onTertiaryContainer,
         prefixIcon: IconButton(
             onPressed: () {
               String type = '';
               if (_selectedCat != -1) {
-                type = _categories[_selectedIndex].label;
+                type = _categories[_selectedCat].label;
               }
               context.read<VolunteerBloc>().add(SearchPressed(
                   dto: SearchDto(
                       org_name: _searchController.text, org_type: type)));
             },
-            icon:  Icon(Icons.search,color: Theme.of(context).colorScheme.primary)),
+            icon: Icon(Icons.search,
+                color: Theme.of(context).colorScheme.primary)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -148,29 +183,54 @@ class _HomePageState extends State<VolunteerHome> {
             child: Text(state.error),
           );
         } else if (state is OrgsFetchedSuccessfully) {
-          List<OrgCardDto> orgs = state.organizations;
+          _organizations = state.organizations;
           // return OrganizationCard(name: orgs[0].name, description: orgs[0].description, type: orgs[0].type, imageUrl: orgs[0].profileIcon);
-          return CustomScrollView(
-            slivers: [
-              SliverPadding(
-                padding: const EdgeInsets.all(4),
-                sliver: SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return OrganizationCard(
-                        orgDto: orgs[index],
-                      );
-                    },
-                    childCount: orgs.length,
-                  ),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 200,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 10,
+          return RefreshIndicator(
+            displacement: 20,
+            onRefresh: () async {
+              setState(() {
+                _hasMore = true;
+                _page = 1;
+              });
+            context.read<VolunteerBloc>().add(SearchPressed(
+                  dto: SearchDto(
+                      org_name: _searchController.text, org_type:_selectedCat>-1? _categories[_selectedCat].label:"")));
+            },
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.all(4),
+                  sliver: SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return OrganizationCard(
+                          orgDto: _organizations[index],
+                        );
+                      },
+                      childCount: _organizations.length,
+                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 200,
+                      crossAxisSpacing: 15,
+                      mainAxisSpacing: 10,
+                    ),
                   ),
                 ),
-              ),
-            ],
+                if (_hasMore)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+                if (!_hasMore)
+                    SliverToBoxAdapter(
+                    child: Center(child: Text("That is all",style: TextStyle(color: Theme.of(context).colorScheme.onTertiaryContainer),)),
+                  ),
+              ],
+            ),
           );
         } else {
           return Center(

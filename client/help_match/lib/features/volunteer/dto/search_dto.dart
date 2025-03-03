@@ -1,7 +1,7 @@
 class SearchDto {
   final String org_name;
   final String org_type;
-
+   int page;
   static String convert(String interests) {
     if (interests == "For-Profit") return "for_profit";
     if (interests == "Non-Profit") return "non_profit";
@@ -16,6 +16,6 @@ class SearchDto {
       return '';
   }
 
-  SearchDto({required this.org_name, required org_type})
+  SearchDto({required this.org_name, required org_type,this.page=1})
       : org_type = convert(org_type);
 }

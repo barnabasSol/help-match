@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
+import 'package:help_match/features/organization/dto/job_add_dto.dart';
+import 'package:help_match/features/volunteer/bloc/job_bloc/jobs_bloc.dart';
 import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
 import 'package:help_match/features/volunteer/presentation/widgets/job_card.dart';
 import 'package:help_match/shared/widgets/map_ui.dart';
@@ -15,6 +19,13 @@ class OrgDetails extends StatefulWidget {
 class _OrgDetailsState extends State<OrgDetails> {
   final _pageController = PageController();
   int selectedPage = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<JobsBloc>().add(FetchedJobs(org_id: widget._orgCardDto.id));
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -79,7 +90,9 @@ class _OrgDetailsState extends State<OrgDetails> {
                     style: Theme.of(context).textTheme.bodyMedium),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 7.0, ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 7.0,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -159,7 +172,7 @@ class _OrgDetailsState extends State<OrgDetails> {
                 ),
               ),
               SizedBox(
-                height: selectedPage==0?370:400,
+                height: selectedPage == 0 ? 370 : 400,
                 child: PageView(
                   onPageChanged: (value) {
                     setState(() {
@@ -172,22 +185,36 @@ class _OrgDetailsState extends State<OrgDetails> {
                       height: 350,
                       child: MapUi(widget._orgCardDto.location),
                     ),
-                    Container(
-                      height: 500,
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 4 ),
-                      child: ListView.separated( 
-                        separatorBuilder: (context, index) => SizedBox(
-                          height: 5,
-                        ),
-                        itemCount: 5,
-                        itemBuilder: (BuildContext context, int index) {
-                          return JobCard(
-                            title: 'Cleaner in the room',
-                            desc:
-                                'Hilcoe is a good place to learn if u got a good gut to tolerate some miserables really I mean that',
+                    BlocBuilder<JobsBloc, JobsState>(
+                      builder: (context, state) {
+                        if (state is JobsFetchFailed) {
+                          return Center(child: Text(state.error));
+                        } else if (state is JobsFetchedSuccessfully) {
+                          List<JobDto> jobs = state.jobs;
+                          print("Number of jobs " + jobs.length.toString());
+                          return Container(
+                            height: 500,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0, vertical: 4),
+                            child: ListView.separated(
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(
+                                height: 5,
+                              ),
+                              itemCount: jobs.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return JobCard(
+                                  title: jobs[index].title,
+                                  desc: jobs[index].description,
+                                );
+                              },
+                            ),
                           );
-                        },
-                      ),
+                        }
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
                     )
                   ],
                 ),

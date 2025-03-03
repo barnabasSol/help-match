@@ -11,4 +11,10 @@ class SearchPressed extends VolunteerEvent {
 }
 
 class InitialFetch extends VolunteerEvent {}
+class FetchMore extends VolunteerEvent {
+  final SearchDto dto;
+
+  FetchMore({required this.dto});
+}
+
 

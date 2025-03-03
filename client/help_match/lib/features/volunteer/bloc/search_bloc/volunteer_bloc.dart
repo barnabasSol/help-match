@@ -37,4 +37,5 @@ class VolunteerBloc extends Bloc<VolunteerEvent, VolunteerState> {
       emit(OrgsFetchedFailed(error: e.toString()));
     }
   }
+ 
 }

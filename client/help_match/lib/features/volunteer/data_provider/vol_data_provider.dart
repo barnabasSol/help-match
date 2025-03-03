@@ -9,9 +9,11 @@ import 'package:latlong2/latlong.dart';
 class VolunteerDataProvider {
   final FlutterSecureStorage _secureStorage;
   final Dio dio;
-  
-  VolunteerDataProvider({required this.dio,required sec}):_secureStorage=sec;
+
+  VolunteerDataProvider({required this.dio, required sec})
+      : _secureStorage = sec;
   Future<dynamic> fetchOrgs(SearchDto dto, String queryParams) async {
+    queryParams += "&page_size=4";
     try {
       LatLng loc = await LocationProvider.getCurrentLocation();
       Map<String, dynamic> body = {
@@ -45,7 +47,7 @@ class VolunteerDataProvider {
     }
   }
 
-  Future<dynamic> UpdateUser(Map<String, dynamic> json) async {
+  Future<dynamic> updateUser(Map<String, dynamic> json) async {
     try {
       final response = await dio.patch(
         '${Secrets.DOMAIN}/v1/user',
@@ -74,19 +76,42 @@ class VolunteerDataProvider {
       var form_data = FormData.fromMap(
           {"the_file": MultipartFile.fromBytes(img, filename: "uploaded.jpg")});
       var token = await _secureStorage.read(key: 'access_token');
-      final response =
-          await dio.patch('${Secrets.DOMAIN}/v1/upload?type=profile',
-              data: form_data,
-              options: Options(headers: {
-                "Content-Type": "multipart/form-data",
-                "Authorization":
-                    "Bearer $token" }));
+      final response = await dio.patch(
+          '${Secrets.DOMAIN}/v1/upload?type=profile',
+          data: form_data,
+          options: Options(headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": "Bearer $token"
+          }));
       if (response.statusCode == 200) {
         // print("Successfully uploaded");
         return response.data;
       } else {
         throw Exception(
             'Failed to upload the image: ${response.statusMessage}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(
+            'Error: ${e.response?.statusCode} - ${e.response?.statusMessage}');
+      } else {
+        throw Exception('Error: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Unexpected error: $e');
+    }
+  }
+
+  Future<dynamic> fetchJobs(String org_id)async {
+    try{
+         final response = await dio.get(
+          '${Secrets.DOMAIN}/v1/org/$org_id',
+           );
+      if (response.statusCode == 200) { 
+        return response.data["data"]["jobs"];
+      } else {
+        throw Exception(
+            'Failed to fetch jobs: ${response.statusMessage}');
       }
     } on DioException catch (e) {
       if (e.response != null) {
