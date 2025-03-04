@@ -8,9 +8,3 @@ class FetchedJobs extends JobsEvent {
 
   FetchedJobs({required this.org_id});
 }
-
-class ApplyJob extends JobsEvent {
-  final String job_id;
-
-  ApplyJob({required this.job_id});
-}

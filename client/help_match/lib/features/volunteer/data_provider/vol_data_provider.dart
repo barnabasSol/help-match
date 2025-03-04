@@ -124,4 +124,29 @@ class VolunteerDataProvider {
       throw Exception('Unexpected error: $e');
     }
   }
+
+Future<dynamic> applyJob(String job_id)async {
+    try{
+         final response = await dio.post(
+          '${Secrets.DOMAIN}/v1/job/apply/$job_id',
+           );
+      if (response.statusCode == 200) { 
+        return response.data["message"];
+      } else {
+        throw Exception(
+            'Failed to apply job: ${response.statusMessage}');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(
+            'Error: ${e.response?.statusCode} - ${e.response?.statusMessage}');
+      } else {
+        throw Exception('Error: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Unexpected error: $e');
+    }
+  }
+
 }
+

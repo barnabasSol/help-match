@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/features/organization/dto/job_add_dto.dart';
 import 'package:help_match/features/volunteer/bloc/job_bloc/jobs_bloc.dart';
+import 'package:help_match/features/volunteer/dto/job_view_dto.dart';
 import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
 import 'package:help_match/features/volunteer/presentation/widgets/job_card.dart';
 import 'package:help_match/shared/widgets/map_ui.dart';
@@ -190,8 +191,7 @@ class _OrgDetailsState extends State<OrgDetails> {
                         if (state is JobsFetchFailed) {
                           return Center(child: Text(state.error));
                         } else if (state is JobsFetchedSuccessfully) {
-                          List<JobDto> jobs = state.jobs;
-                          print("Number of jobs " + jobs.length.toString());
+                          List<JobViewDto> jobs = state.jobs;
                           return Container(
                             height: 500,
                             padding: const EdgeInsets.symmetric(
@@ -203,9 +203,7 @@ class _OrgDetailsState extends State<OrgDetails> {
                               ),
                               itemCount: jobs.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return JobCard(
-                                  title: jobs[index].title,
-                                  desc: jobs[index].description,
+                                return JobCard( jobViewDto: jobs[index],
                                 );
                               },
                             ),

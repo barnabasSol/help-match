@@ -1,5 +1,6 @@
 import 'package:help_match/features/organization/dto/job_add_dto.dart';
 import 'package:help_match/features/volunteer/data_provider/vol_data_provider.dart';
+import 'package:help_match/features/volunteer/dto/job_view_dto.dart';
 import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
 import 'package:help_match/features/volunteer/dto/search_dto.dart';
 import 'package:help_match/features/volunteer/dto/vol_profile_dto.dart';
@@ -46,14 +47,22 @@ class VolunteerRepository {
     }
   }
 
-  Future<List<JobDto>> getJobs(String org_id) async {
+  Future<List<JobViewDto>> getJobs(String org_id) async {
     try {
-      List<JobDto> jobs=[];
-      var data = await dataProvider.fetchJobs(org_id) ;
-      if(data is List) {
-      jobs = data.map((json) => JobDto.fromJson(json)).toList();
+      List<JobViewDto> jobs = [];
+      var data = await dataProvider.fetchJobs(org_id);
+      if (data is List) {
+        jobs = data.map((json) => JobViewDto.fromJson(json)).toList();
       }
       return jobs;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> applyJob(String job_id) async {
+    try {
+      await dataProvider.applyJob(job_id);
     } catch (e) {
       rethrow;
     }

@@ -13,8 +13,9 @@ final class JobsFetchFailed extends JobsState {
   JobsFetchFailed({required this.error});
 }
 
+
 final class JobsFetchedSuccessfully extends JobsState {
-  final List<JobDto> jobs;
+  final List<JobViewDto> jobs;
 
   JobsFetchedSuccessfully({required this.jobs}) ;
 }
