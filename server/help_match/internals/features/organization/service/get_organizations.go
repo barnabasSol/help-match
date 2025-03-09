@@ -16,12 +16,18 @@ func (os *Organization) GetOrganizations(
 	userId string,
 	userLocation dto.Location,
 ) ([]*dto.OrgListResponse, utils.Metadata, error) {
-	result, metadata, err := os.orgRepo.GetOrganizations(ctx, userId, model.Location(userLocation), orgParams)
+	result, metadata, err := os.orgRepo.GetOrganizations(
+		ctx,
+		userId,
+		model.Location(userLocation),
+		orgParams,
+	)
 	if err != nil {
 		return nil, utils.Metadata{}, err
 	}
 	for _, org := range result {
-		org.Proximity = calculateDistance(userLocation, org.Location)
+		org.Proximity = calculateDistance(userLocation, *org.Location)
+		org.Location = nil
 	}
 	if orgParams.Filters.Sort == "proximity" {
 		sort.Slice(result, func(i, j int) bool {

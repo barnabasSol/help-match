@@ -97,7 +97,7 @@ func (m *Manager) ServeWS(
 	go newClient.readMessages()
 	go newClient.writeMessages()
 	go notifyOnlineStatusChange(newClient, true)
-	go m.EventRepository.ChatRepository.UpdateOnlineStatus(context.Background(), claims.Subject, true)
+	go m.EventRepository.ChatRepository.UpdateOnlineStatus(r.Context(), claims.Subject, true)
 }
 
 func (m *Manager) RenewOTP(

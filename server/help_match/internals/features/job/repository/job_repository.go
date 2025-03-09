@@ -14,7 +14,7 @@ import (
 
 type JobRepository interface {
 	WithTransaction(ctx context.Context, fn func(pgx.Tx) error) error
-	GetJobsByOrgId(ctx context.Context, orgId string) ([]*model.Job, error)
+	GetJobsByOrgIdWithUserStatus(ctx context.Context, orgId, userId string) ([]*model.Job, error)
 	GetJobByOrgId(ctx context.Context, orgId string) (model.Job, error)
 	GetJobById(ctx context.Context, id string) (model.Job, error)
 	GetApplicantsByOrgId(ctx context.Context, applicants *[]dto.JobApplicantDto, orgId string) error
@@ -48,16 +48,24 @@ func (j *Job) Insert(ctx context.Context, tx pgx.Tx, job *model.Job) error {
 	return nil
 }
 
-func (j *Job) GetJobsByOrgId(ctx context.Context, orgId string) ([]*model.Job, error) {
-	query := `SELECT id, org_id, job_title, description,
-	    	  created_at, updated_at, version FROM org_jobs WHERE org_id = $1`
+func (j *Job) GetJobsByOrgIdWithUserStatus(ctx context.Context, orgId, userId string) ([]*model.Job, error) {
+	query := `SELECT org_jobs.id, org_id, job_title, description, org_jobs.created_at,
+	 		  org_jobs.updated_at, org_jobs.version,
+			  CASE 
+			  	WHEN user_jobs.user_id IS NULL THEN
+					NULL	
+				ELSE user_jobs.job_status
+			  END AS applicant_status
+			  FROM org_jobs LEFT JOIN user_jobs ON
+			  user_jobs.job_id = org_jobs.id
+			  WHERE org_id = $1 AND (user_jobs.user_id = $2 AND user_jobs.job_status != 'accepted')`
 
-	rows, err := j.pgPool.Query(ctx, query, orgId)
-	defer rows.Close()
-	var jobs []*model.Job
+	rows, err := j.pgPool.Query(ctx, query, orgId, userId)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
+	var jobs []*model.Job
 	for rows.Next() {
 		var job model.Job
 		err := rows.Scan(
@@ -68,6 +76,7 @@ func (j *Job) GetJobsByOrgId(ctx context.Context, orgId string) ([]*model.Job, e
 			&job.CreatedAt,
 			&job.UpdatedAt,
 			&job.Version,
+			&job.ApplicantStatus,
 		)
 		if err != nil {
 			return nil, err

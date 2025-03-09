@@ -44,7 +44,7 @@ func NewClient(
 
 func (c *Client) readMessages() {
 	defer func() {
-		log.Println(c.username, " disconnected")
+		log.Println(c.username, "disconnected")
 		c.manager.removeClient(c)
 		notifyOnlineStatusChange(c, false)
 		c.manager.EventRepository.ChatRepository.UpdateOnlineStatus(context.Background(), c.userId, false)

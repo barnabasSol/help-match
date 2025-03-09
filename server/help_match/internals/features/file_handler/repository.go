@@ -27,7 +27,7 @@ func (f *FileHandler) UpdateProfile(ctx context.Context, path, userId string) er
 }
 
 func (f *FileHandler) UpdateOrgProfile(ctx context.Context, path, userId string) error {
-	query := `UPDATE organiztions SET profile_icon = $1 WHERE id = $2`
+	query := `UPDATE organizations SET profile_icon = $1 WHERE id = $2`
 	_, err := f.pool.Exec(ctx, query, path, userId)
 	return err
 }

@@ -19,9 +19,8 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
-var jwtExpires = time.Now().Add(24 * time.Hour * 7)
-
 func generateJWT(userModel user_model.User, org *org_model.Organization) (string, error) {
+	var jwtExpires time.Time = time.Now().Add(24 * time.Hour * 7)
 	var claims claims
 	if userModel.Role == string(dto.Organization) {
 		claims.OrgId = org.Id

@@ -17,6 +17,7 @@ type MessageRepository interface {
 	GetRoomIdByJobId(ctx context.Context, jobId string) (string, error)
 	GetMembersOfRoomByRoomId(ctx context.Context, roomId string) (*[]dto.MemberInRoom, error)
 	GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.Room, error)
+	// GetRoomById(ctx context.Context, roomId string) (*dto.Room, error)
 	UpdateOnlineStatus(ctx context.Context, userId string, status bool) error
 	JobChatRoomExists(ctx context.Context, jobId string) (bool, error)
 }
@@ -70,13 +71,14 @@ func (m *Message) GetMessagesByRoomId(
 	JOIN job_chat_members jcm ON gm.chat_room_id = jcm.chat_room_id AND gm.sender_id = jcm.user_id
 	JOIN users u ON jcm.user_id = u.id
 	LEFT JOIN organizations o ON jcm.user_id = o.user_id
-	WHERE gm.chat_room_id = $1;
+	WHERE gm.chat_room_id = $1
+	ORDER BY sent_time ASC
 		`
 	rows, err := m.pool.Query(ctx, query, roomId)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	var messagesDto []dto.Message
 	for rows.Next() {
 		var messageDto dto.Message
@@ -129,7 +131,9 @@ func (m *Message) GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.R
 		query,
 		userId,
 	)
-
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
 
 	var roomsDto []dto.Room
@@ -149,9 +153,6 @@ func (m *Message) GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.R
 		}
 		roomsDto = append(roomsDto, roomDto)
 	}
-	if err != nil {
-		return &[]dto.Room{}, err
-	}
 	return &roomsDto, nil
 }
 
@@ -170,10 +171,10 @@ func (m *Message) GetRoomIdsOfUserById(ctx context.Context, userId string) ([]st
 	          JOIN job_chat_members ON job_chat_rooms.id = job_chat_members.chat_room_id
 			  WHERE user_id = $1`
 	rows, err := m.pool.Query(ctx, query, userId)
-	defer rows.Close()
 	if err != nil {
 		return []string{}, err
 	}
+	defer rows.Close()
 	var roomIds []string
 	for rows.Next() {
 		var roomId string
@@ -193,11 +194,10 @@ func (m *Message) GetMembersOfRoomByRoomId(ctx context.Context, roomId string) (
 			  users.is_online  FROM job_chat_members JOIN users ON users.id = job_chat_members.user_id
 			  WHERE job_chat_members.chat_room_id = $1 ORDER BY job_chat_members.joined_at ASC`
 	rows, err := m.pool.Query(ctx, query, roomId)
-	defer rows.Close()
-
 	if err != nil {
 		return &[]dto.MemberInRoom{}, err
 	}
+	defer rows.Close()
 	var members []dto.MemberInRoom
 	for rows.Next() {
 		var member dto.MemberInRoom

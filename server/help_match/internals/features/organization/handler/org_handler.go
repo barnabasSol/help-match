@@ -29,7 +29,8 @@ func (oh *Organization) GetOrganization(
 ) {
 	ctx, cancel := context.WithTimeout(r.Context(), timeout)
 	defer cancel()
-	result, err := oh.os.GetOrganization(ctx, p.ByName("id"))
+	claims := r.Context().Value(utils.ClaimsKey).(utils.Claims)
+	result, err := oh.os.GetOrganization(ctx, p.ByName("id"), claims.Subject)
 	if err != nil {
 		utils.CreateResponse(w, err, nil, http.StatusInternalServerError, "whoopsie daisy")
 		return

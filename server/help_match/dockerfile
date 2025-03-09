@@ -1,7 +1,17 @@
-FROM golang:1.23-alpine
+FROM golang:1.23-alpine AS builder
+
+RUN mkdir /app
+
+COPY . /app
+
 WORKDIR /app
-COPY . .
-RUN go mod download
-RUN mkdir -p bin && go build -o bin/help-match cmd/api/main.go
-EXPOSE 2000
-CMD ["/app/bin/help-match"]
+
+RUN CGO_ENABLED=0 go build -o helpmatch-app ./cmd/api/main.go
+
+FROM alpine:latest
+
+RUN mkdir /app
+
+COPY --from=builder /app/helpmatch-app /app
+
+CMD [ "/app/helpmatch-app" ]

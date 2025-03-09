@@ -55,7 +55,6 @@ func (as *AppServer) Serve(
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
-
 	go gracefulShutDown(shutdownError, srv)
 
 	log.Printf("starting server %v", srv.Addr)

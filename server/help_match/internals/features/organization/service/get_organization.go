@@ -26,7 +26,7 @@ func NewOrgService(
 
 func (os *Organization) GetOrganization(
 	ctx context.Context,
-	orgId string,
+	orgId, userId string,
 ) (*dto.OrgResponseExtras, error) {
 	var orgResult dto.OrgResponseExtras
 	orgResult.OrgResult.Id = orgId
@@ -50,19 +50,20 @@ func (os *Organization) GetOrganization(
 			},
 		},
 	}
-	jobs, err := os.jobRepo.GetJobsByOrgId(ctx, org.Id)
+	jobs, err := os.jobRepo.GetJobsByOrgIdWithUserStatus(ctx, org.Id, userId)
 
 	if err != nil {
 		return nil, err
 	}
 	for _, job := range jobs {
 		orgResult.AvailableJobs = append(orgResult.AvailableJobs, job_dto.JobResponse{
-			Id:          job.Id,
-			Title:       job.Title,
-			Description: job.Description,
-			UpdatedAt:   &job.UpdatedAt,
-			CreatedAt:   job.CreatedAt,
-			Version:     job.Version,
+			Id:              job.Id,
+			Title:           job.Title,
+			Description:     job.Description,
+			ApplicantStatus: job.ApplicantStatus,
+			UpdatedAt:       &job.UpdatedAt,
+			CreatedAt:       job.CreatedAt,
+			Version:         job.Version,
 		})
 	}
 	user, err := os.userRepo.FindUserById(ctx, org.UserId)

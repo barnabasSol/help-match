@@ -69,7 +69,7 @@ func (ur *User) FindUserByUsername(
 	username string,
 ) (*model.User, error) {
 	var userModel model.User
-	query := `SELECT id, name, email, username, created_at, interests,
+	query := `SELECT id, name, email, username, profile_pic_url, created_at, interests,
    			  activated, is_online, password_hash, user_role, version
 			  FROM users where username = $1`
 
@@ -82,6 +82,7 @@ func (ur *User) FindUserByUsername(
 		&userModel.Name,
 		&userModel.Email,
 		&userModel.Username,
+		&userModel.ProfilePicUrl,
 		&userModel.CreatedAt,
 		&userModel.Interests,
 		&userModel.IsActivated,
@@ -105,7 +106,7 @@ func (ur *User) FindUserById(
 	userId string,
 ) (*model.User, error) {
 	var userModel model.User
-	query := `SELECT id, name, email, username, created_at, interests,
+	query := `SELECT id, name, email, username, profile_pic_url, created_at, interests,
    			  activated, is_online, password_hash, user_role, version
 			  FROM users where id = $1`
 
@@ -118,6 +119,7 @@ func (ur *User) FindUserById(
 		&userModel.Name,
 		&userModel.Email,
 		&userModel.Username,
+		&userModel.ProfilePicUrl,
 		&userModel.CreatedAt,
 		&userModel.Interests,
 		&userModel.IsActivated,

@@ -7,7 +7,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
-	geo "github.com/kellydunn/golang-geo"
 	"hm.barney-host.site/internals/features/organization/dto"
 	"hm.barney-host.site/internals/features/organization/model"
 	"hm.barney-host.site/internals/features/utils"
@@ -124,77 +123,6 @@ func (or *Organization) GetOrganization(
 	return &org, nil
 }
 
-func (o *Organization) GetOrganizations(
-	ctx context.Context,
-	userId string,
-	userLocation model.Location,
-	orgParams dto.OrgParams,
-) ([]*dto.OrgListResponse, utils.Metadata, error) {
-	var orgList []*dto.OrgListResponse
-	sortColumn := "organization_name"
-	sortDirection := "ASC"
-	if orgParams.Filters.Sort != "proximity" && orgParams.Filters.Sort != "-proximity" {
-		sortColumn = orgParams.Filters.SortColumn()
-		sortDirection = orgParams.Filters.SortDirection()
-	}
-
-	query := fmt.Sprintf(`
-		SELECT count(*) OVER() AS total_count, 
-		organizations.id, organization_name, user_id, profile_icon, 
-		description, is_verified, organizations.created_at, org_type, organizations.version, location
-		FROM organizations JOIN users on users.id = organizations.user_id
-		WHERE (organization_name ILIKE '%%' || $1 || '%%' OR $1 = '')
-		AND (CASE WHEN $2 = '' THEN true ELSE org_type::text = $2 END)
-		ORDER BY %s %s, organization_name ASC
-		LIMIT $3 OFFSET $4`,
-		sortColumn, sortDirection,
-	)
-
-	args := []any{
-		orgParams.OrgName,
-		orgParams.Type,
-		orgParams.Filters.Limit(),
-		orgParams.Filters.Offset(),
-	}
-
-	rows, err := o.pgPool.Query(ctx, query, args...)
-	defer rows.Close()
-	if err != nil {
-		return nil, utils.Metadata{}, err
-	}
-
-	totalRecords := 0
-	for rows.Next() {
-		var orgModel dto.OrgListResponse
-		var location pgtype.Point
-		err := rows.Scan(
-			&totalRecords,
-			&orgModel.Id,
-			&orgModel.Name,
-			&orgModel.UserId,
-			&orgModel.ProfileIcon,
-			&orgModel.Description,
-			&orgModel.IsVerified,
-			&orgModel.CreatedAt,
-			&orgModel.Type,
-			&orgModel.Version,
-			&location,
-		)
-		if err != nil {
-			return nil, utils.Metadata{}, err
-		}
-		orgModel.Location.Latitude = location.P.X
-		orgModel.Location.Longitude = location.P.Y
-		orgList = append(orgList, &orgModel)
-	}
-	metadata := utils.CalculateMetadata(
-		totalRecords,
-		orgParams.Filters.Page,
-		orgParams.Filters.PageSize,
-	)
-	return orgList, metadata, nil
-}
-
 func (or *Organization) GetOrganizationByOwnerId(
 	ctx context.Context,
 	tx pgx.Tx,
@@ -234,6 +162,75 @@ func (or *Organization) GetOrganizationByOwnerId(
 	return &orgModel, nil
 }
 
+func (o *Organization) GetOrganizations(
+	ctx context.Context,
+	userId string,
+	userLocation model.Location,
+	orgParams dto.OrgParams,
+) ([]*dto.OrgListResponse, utils.Metadata, error) {
+	var orgList []*dto.OrgListResponse
+	sortColumn := "organization_name"
+	sortDirection := "ASC"
+	if orgParams.Filters.Sort != "proximity" && orgParams.Filters.Sort != "-proximity" {
+		sortColumn = orgParams.Filters.SortColumn()
+		sortDirection = orgParams.Filters.SortDirection()
+	}
+
+	query := fmt.Sprintf(`
+		SELECT count(*) OVER() AS total_count, 
+		organizations.id, organization_name, profile_icon, 
+		is_verified, org_type, location FROM organizations
+		JOIN users on users.id = organizations.user_id
+		WHERE (organization_name ILIKE '%%' || $1 || '%%' OR $1 = '')
+		AND (CASE WHEN $2 = '' THEN true ELSE org_type::text = $2 END)
+		ORDER BY %s %s, organization_name ASC
+		LIMIT $3 OFFSET $4`,
+		sortColumn, sortDirection,
+	)
+
+	args := []any{
+		orgParams.OrgName,
+		orgParams.Type,
+		orgParams.Filters.Limit(),
+		orgParams.Filters.Offset(),
+	}
+
+	rows, err := o.pgPool.Query(ctx, query, args...)
+	if err != nil {
+		return nil, utils.Metadata{}, err
+	}
+	defer rows.Close()
+
+	totalRecords := 0
+	for rows.Next() {
+		var orgModel dto.OrgListResponse
+		var location pgtype.Point
+		err := rows.Scan(
+			&totalRecords,
+			&orgModel.Id,
+			&orgModel.Name,
+			&orgModel.ProfileIcon,
+			&orgModel.IsVerified,
+			&orgModel.Type,
+			&location,
+		)
+		if err != nil {
+			return nil, utils.Metadata{}, err
+		}
+		orgModel.Location = &dto.Location{
+			Latitude:  location.P.X,
+			Longitude: location.P.Y,
+		}
+		orgList = append(orgList, &orgModel)
+	}
+	metadata := utils.CalculateMetadata(
+		totalRecords,
+		orgParams.Filters.Page,
+		orgParams.Filters.PageSize,
+	)
+	return orgList, metadata, nil
+}
+
 func (o *Organization) GetRecommendedOrgs(
 	ctx context.Context,
 	userId string,
@@ -241,20 +238,28 @@ func (o *Organization) GetRecommendedOrgs(
 	orgParams dto.OrgParams,
 ) ([]*dto.OrgListResponse, utils.Metadata, error) {
 	var orgList []*dto.OrgListResponse
+	sortColumn := "organization_name"
+	sortDirection := "ASC"
+	if orgParams.Filters.Sort != "proximity" && orgParams.Filters.Sort != "-proximity" {
+		sortColumn = orgParams.Filters.SortColumn()
+		sortDirection = orgParams.Filters.SortDirection()
+	}
 
-	query := fmt.Sprintf(
-		`SELECT count(*) OVER() as total_count, id, user_id, organization_name,
-		 profile_icon, description, created_at, is_verified,
-		 org_type, version, location from organizations
-		 WHERE org_type::text = ANY(SELECT unnest(interests)::text FROM users where id = $1)
-		 ORDER BY %s %s, organization_name ASC
-		 LIMIT $2 OFFSET $3
-		 `,
-		orgParams.Filters.SortColumn(), orgParams.Filters.SortDirection(),
+	query := fmt.Sprintf(`
+		SELECT count(*) OVER() AS total_count, 
+		organizations.id, organization_name, profile_icon, 
+		is_verified, org_type, location FROM organizations
+		JOIN users on users.id = organizations.user_id
+		WHERE (organization_name ILIKE '%%' || $1 || '%%' OR $1 = '')
+		AND (CASE WHEN $2 = '' THEN true ELSE org_type::text = $2 END)
+		ORDER BY %s %s, organization_name ASC
+		LIMIT $3 OFFSET $4`,
+		sortColumn, sortDirection,
 	)
 
 	args := []any{
-		userId,
+		orgParams.OrgName,
+		orgParams.Type,
 		orgParams.Filters.Limit(),
 		orgParams.Filters.Offset(),
 	}
@@ -270,24 +275,17 @@ func (o *Organization) GetRecommendedOrgs(
 		err := rows.Scan(
 			&totalRecords,
 			&orgModel.Id,
-			&orgModel.UserId,
 			&orgModel.Name,
 			&orgModel.ProfileIcon,
-			&orgModel.Description,
-			&orgModel.CreatedAt,
 			&orgModel.IsVerified,
 			&orgModel.Type,
-			&orgModel.Version,
 			&location,
 		)
-		user_location := geo.NewPoint(userLocation.Latitude, userLocation.Longitude)
-		org_location := geo.NewPoint(location.P.X, location.P.Y)
-
-		orgModel.Proximity = user_location.GreatCircleDistance(org_location)
 		orgList = append(orgList, &orgModel)
 		if err != nil {
 			return nil, utils.Metadata{}, err
 		}
+
 	}
 	metadata := utils.CalculateMetadata(
 		totalRecords,
