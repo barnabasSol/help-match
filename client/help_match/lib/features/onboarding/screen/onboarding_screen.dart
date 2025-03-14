@@ -67,7 +67,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             child: isLastPage
                 ? GradientButton(
                     text: "Get Started",
-                    onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context)=>const Login()));},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Login()));
+                    },
                   )
                 : SmoothPageIndicator(
                     controller: _pageController,

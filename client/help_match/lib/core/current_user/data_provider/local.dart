@@ -5,11 +5,11 @@ class UserLocalProvider {
   final Box<User> _userBox = Hive.box<User>('userBox');
 
   Future<void> addOrUpdateUser(User user) async {
-    await _userBox.put(user.username, user);
+    await _userBox.put(user.id, user);
   }
 
-  User? getUser(String username) {
-    return _userBox.get(username);
+  User? getUser(String id) {
+    return _userBox.get(id);
   }
 
   Future<void> deleteUser(String userId) async {

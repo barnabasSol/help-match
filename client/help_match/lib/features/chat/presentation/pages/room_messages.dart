@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grouped_list/grouped_list.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
+import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
+import 'package:help_match/core/ws_manager/cubit/websocket_cubit.dart';
+import 'package:help_match/features/chat/dto/message_dto.dart';
 import 'package:help_match/features/chat/dto/room_dto.dart';
 import 'package:help_match/features/chat/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:help_match/features/chat/presentation/bloc/rooms_bloc/rooms_bloc.dart';
+import 'package:help_match/features/chat/presentation/widgets/chat_appbar.dart';
+import 'package:help_match/features/chat/presentation/widgets/chat_info_card.dart';
 import 'package:help_match/features/chat/presentation/widgets/input_field.dart';
-import 'package:help_match/core/online_status/cubit/online_status_cubit.dart';
+import 'package:help_match/features/chat/presentation/widgets/message_card.dart';
+import 'package:help_match/shared/widgets/loading_indicator.dart';
 import 'package:help_match/shared/widgets/snack_bar.dart';
 import 'package:intl/intl.dart';
 
@@ -30,12 +37,12 @@ class _RoomMessagesState extends State<RoomMessagesPage> {
     context.read<ChatBloc>().add(ChatMessagesRequested(widget.roomId));
   }
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   void dispose() {
     super.dispose();
   }
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -43,61 +50,31 @@ class _RoomMessagesState extends State<RoomMessagesPage> {
     return Scaffold(
       key: _scaffoldKey,
       drawer: const Drawer(),
-      resizeToAvoidBottomInset: true,
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: ChatInput(roomId: widget.roomId),
+      appBar: ChatAppBar(
+        profileIcon: widget.profileIcon,
+        groupName: widget.groupName,
+        scaffoldKey: _scaffoldKey,
+        onSearchPressed: () {},
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            expandedHeight: 200.0,
-            floating: true,
-            pinned: true,
-            leading: IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white),
-              onPressed: () {
-                _scaffoldKey.currentState?.openDrawer();
-              },
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                widget.groupName,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                ),
-              ),
-              background: Image.network(
-                widget.profileIcon,
-                fit: BoxFit.cover,
-              ),
-              centerTitle: true,
-            ),
-          ),
-          BlocConsumer<ChatBloc, ChatState>(
+      body: Column(
+        children: [
+          Expanded(
+              child: BlocConsumer<ChatBloc, ChatState>(
             listener: (context, state) {
-              if (state is NewMessageReceiveSuccess) {
-                if (state.message.senderId != currentUser.sub) {
-                  showCustomSnackBar(
-                    context: context,
-                    message: state.message.message,
-                    color: Colors.green,
-                  );
-                }
+              if (state is ChatError) {
+                if (state.error.startsWith('WebSocketInactive')) {}
+                showCustomSnackBar(
+                    context: context, message: state.error, color: Colors.red);
+              } else if (state is MessageSendSuccess) {
                 context.read<RoomsBloc>().add(
                       RoomsUpdated(
                         RoomDto(
-                          roomProfile: null,
-                          roomId: state.message.roomId,
-                          isAdmin: state.message.isAdmin,
+                          roomProfile: widget.profileIcon,
+                          roomId: widget.roomId,
+                          isAdmin: state.msg.isAdmin,
                           roomName: null,
-                          latestText: state.message.message,
-                          sentTime: state.message.sentTime,
-                          isSeen: false,
+                          latestText: state.msg.message,
+                          sentTime: state.msg.sentTime,
                         ),
                       ),
                     );
@@ -105,91 +82,46 @@ class _RoomMessagesState extends State<RoomMessagesPage> {
             },
             builder: (context, state) {
               if (state is ChatMessagesLoading) {
-                return const SliverToBoxAdapter(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is ChatMessagesLoadingFailed) {
-                return const SliverToBoxAdapter(
-                  child: Center(
-                    child: Text('Failed loading messages'),
-                  ),
-                );
-              } else if (state is ChatMessagesLoaded) {
-                if (state.messages.isEmpty) {
-                  return const SliverToBoxAdapter(
-                    child: Center(
-                      child: Text('No messages'),
-                    ),
-                  );
-                }
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final message = state.messages[index];
-                      return ListTile(
-                        trailing: Text(
-                          DateFormat('HH:mm').format(message.sentTime),
-                        ),
-                        title: Text(message.senderName),
-                        subtitle: Text(message.message),
-                        leading:
-                            BlocBuilder<OnlineStatusCubit, OnlineStatusState>(
-                          builder: (context, state) {
-                            if (state is OnlineStatusChange) {
-                              if (state.osm.userId == message.senderId) {
-                                return Badge(
-                                  smallSize: 14,
-                                  backgroundColor: state.osm.status
-                                      ? Colors.green
-                                      : Colors.transparent,
-                                  child: CircleAvatar(
-                                    child: Text(message.senderProfileIcon == ""
-                                        ? message.senderName[0]
-                                        : message.senderProfileIcon),
-                                  ),
-                                );
-                              }
-                              return Badge(
-                                smallSize: 14,
-                                backgroundColor: Colors.transparent,
-                                child: CircleAvatar(
-                                  child: Text(message.senderProfileIcon == ""
-                                      ? message.senderName[0]
-                                      : message.senderProfileIcon),
-                                ),
-                              );
-                            }
-                            return Badge(
-                              smallSize: 14,
-                              backgroundColor: Colors.transparent,
-                              child: CircleAvatar(
-                                child: Text(message.senderProfileIcon == ""
-                                    ? message.senderName[0]
-                                    : message.senderProfileIcon),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    childCount: state.messages.length,
-                  ),
-                );
-              } else if (state is NewMessageReceiveFailed) {
-                return const SliverToBoxAdapter(
-                  child: Center(
-                    child: Text(
-                      'Dealing with technical problem, try again later',
-                    ),
-                  ),
-                );
-              } else {
-                return const SliverToBoxAdapter(
-                  child: Text('wtf'),
+                return const LoadingIndicator();
+              }
+              if (state.messages.isEmpty) {
+                return const Center(
+                  child: ChatInfoCard('📭 No Messages Yet'),
                 );
               }
+              return GroupedListView<MessageDto, DateTime>(
+                reverse: true,
+                order: GroupedListOrder.DESC,
+                elements: state.messages,
+                groupBy: (msg) => DateTime(
+                  msg.sentTime.year,
+                  msg.sentTime.month,
+                  msg.sentTime.day,
+                ),
+                groupHeaderBuilder: (msg) => SizedBox(
+                  height: 40,
+                  child: Center(
+                    child: Card(
+                      color: Theme.of(context).colorScheme.primary,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          DateFormat.yMMMd().format(msg.sentTime),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                itemBuilder: (context, msg) => MessageCard(
+                  msg: msg,
+                  isSentByme: currentUser.sub == msg.senderId,
+                ),
+              );
             },
-          ),
+          )),
+          const SizedBox(height: 10),
+          ChatInput(roomId: widget.roomId),
         ],
       ),
     );

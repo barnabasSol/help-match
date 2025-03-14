@@ -32,6 +32,7 @@ dependencies:
   hive_ce_flutter: ^2.1.0
   shared_preferences: ^2.5.1
   intl: ^0.20.2
+  grouped_list: ^6.0.0
 
 
 dev_dependencies:

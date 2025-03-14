@@ -33,12 +33,8 @@ class RoomListItem extends StatelessWidget {
       ),
       subtitle: Text(
         seen == null ? 'no messages' : latestText,
-        style: TextStyle(
-          color:
-              seen == null ? Colors.grey : (seen! ? Colors.grey : Colors.black),
-          fontWeight: seen == null
-              ? FontWeight.normal
-              : (seen! ? FontWeight.normal : FontWeight.bold),
+        style: const TextStyle(
+          color: Colors.grey,
         ),
       ),
       trailing: seen == null

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
+import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/features/volunteer/bloc/volunteer_bloc.dart';
 import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
 import 'package:help_match/features/volunteer/dto/search_dto.dart';
@@ -28,7 +29,6 @@ class _HomePageState extends State<VolunteerHome> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     context.read<VolunteerBloc>().add(InitialFetch());
   }
@@ -86,11 +86,14 @@ class _HomePageState extends State<VolunteerHome> {
           const SizedBox(
             width: 52,
           ),
-          Icon(
+          IconButton(
+            icon: Theme.of(context).brightness == Brightness.light
+                ? const Icon(Icons.dark_mode)
+                : const Icon(Icons.light_mode),
+            onPressed: () {
+              context.read<ThemeCubit>().themeChange();
+            },
             color: Theme.of(context).colorScheme.primary,
-            Theme.of(context).brightness == Brightness.light
-                ? Icons.light_mode
-                : Icons.dark_mode,
           ),
         ]),
       ],
@@ -295,9 +298,7 @@ class OrganizationCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Container(
-              // height: 120,   // might be an issue forward
               color: Theme.of(context).colorScheme.primary,
-              // Replace with actual image
             ),
           ),
           Positioned(

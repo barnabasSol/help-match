@@ -40,6 +40,7 @@ class _LoginState extends State<Login> {
               child: CircularProgressIndicator(),
             );
           } else if (state is AuthLoginSuccess) {
+            print("SUCCESS LOGIN");
             context.read<UserAuthCubit>().isUserAuthenticated();
             Navigator.pop(context);
           }

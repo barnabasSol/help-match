@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:help_match/core/secrets/secrets.dart';
 import 'package:help_match/core/ws_manager/event.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -29,10 +30,8 @@ class WsManager {
       throw Exception('Access token not found');
     }
 
-    const domain = "wss://hm.barney-host.site";
-
-    final encodedOtp = Uri.encodeComponent(otp);
-    final wsUrl = '$domain/v1/ws?otp=$encodedOtp';
+    var domain = Secrets.APP_DOMAIN.replaceFirst('https', 'wss');
+    final wsUrl = '$domain/v1/ws?otp=$otp';
 
     for (int i = 0; i < retries; i++) {
       try {

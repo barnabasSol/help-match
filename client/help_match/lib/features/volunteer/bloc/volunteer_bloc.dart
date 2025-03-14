@@ -12,12 +12,13 @@ class VolunteerBloc extends Bloc<VolunteerEvent, VolunteerState> {
   VolunteerBloc({required this.volRepo}) : super(VolunteerInitial()) {
     on<InitialFetch>((event, emit) async {
       try {
-      emit(OrgsLoading());
-      final List<OrgCardDto> orgs = await volRepo.getOrgs(SearchDto(org_name: "", org_type: ""));
-      emit(OrgsFetchedSuccessfully(organizations: orgs));
-    } catch (e) {
-      emit(OrgsFetchedFailed(error: e.toString()));
-    }
+        emit(OrgsLoading());
+        final List<OrgCardDto> orgs =
+            await volRepo.getOrgs(SearchDto(org_name: "", org_type: ""));
+        emit(OrgsFetchedSuccessfully(organizations: orgs));
+      } catch (e) {
+        emit(OrgsFetchedFailed(error: e.toString()));
+      }
     });
     on<SearchPressed>(_searchOrgs);
   }

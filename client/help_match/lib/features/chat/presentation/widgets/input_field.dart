@@ -43,7 +43,6 @@ class ChatInput extends StatelessWidget {
                   hintStyle:
                       TextStyle(color: Theme.of(context).colorScheme.tertiary),
                 ),
-                style: const TextStyle(color: Colors.black87),
                 maxLines: null,
               ),
             ),

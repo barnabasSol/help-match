@@ -14,12 +14,6 @@ class VolunteerDataProvider {
         "latitude": loc.latitude,
         "longitude": loc.longitude
       };
-
-      dio.interceptors.add(LogInterceptor(
-        request: true,
-        requestBody: true,
-        responseBody: true,
-      ));
       final response = await dio.post(
         '${Secrets.DOMAIN}/v1/org?$queryParams',
         data: body,
@@ -32,7 +26,8 @@ class VolunteerDataProvider {
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(
-            'Error: ${e.response?.statusCode} - ${e.response?.statusMessage}');
+          'Error: ${e.response?.statusCode} - ${e.response?.statusMessage}',
+        );
       } else {
         throw Exception('Error: ${e.message}');
       }

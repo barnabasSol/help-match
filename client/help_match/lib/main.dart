@@ -51,6 +51,11 @@ Future<void> main() async {
 
   final dio = Dio();
 
+  dio.interceptors.add(LogInterceptor(
+    request: true,
+    requestBody: true,
+    responseBody: true,
+  ));
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
 
   await initializeHive();
@@ -213,12 +218,10 @@ class _MyAppState extends State<MyApp> {
                   } else if (currentUser.role == "user") {
                     return const VolunteerScreen();
                   }
-                  return const OnBoardingScreen();
                 } else if (state is UserAuthInitial) {
                   return const OnBoardingScreen();
-                } else {
-                  return const Login();
                 }
+                return const Login();
               },
             ),
           ),

@@ -22,7 +22,6 @@ class UserAuthCubit extends Cubit<UserAuthState> {
   late CurrentUser currentUser;
 
   Future<void> isUserAuthenticated() async {
-    
     emit(UserAuthChecking());
     try {
       final accessToken = await secureStorage.read(key: 'access_token');
@@ -34,6 +33,7 @@ class UserAuthCubit extends Cubit<UserAuthState> {
 
       await secureStorage.write(key: 'username', value: currentUser.username);
       await secureStorage.write(key: 'userId', value: currentUser.sub);
+      await secureStorage.write(key: 'orgId', value: currentUser.orgId);
 
       emit(UserAuthIsLoggedIn(currentUser));
     } catch (e) {

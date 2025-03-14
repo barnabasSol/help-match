@@ -1,28 +1,34 @@
 part of 'message_bloc.dart';
 
 @immutable
-sealed class ChatState {}
+sealed class ChatState {
+  final List<MessageDto> messages;
+  const ChatState(this.messages);
+}
 
-final class ChatInitial extends ChatState {}
+final class ChatInitial extends ChatState {
+  const ChatInitial(super.messages);
+}
 
-final class ChatMessagesLoading extends ChatState {}
+final class ChatMessagesLoading extends ChatState {
+  const ChatMessagesLoading(super.messages);
+}
 
 final class ChatMessagesLoaded extends ChatState {
-  final List<MessageDto> messages;
-  ChatMessagesLoaded(this.messages);
+  const ChatMessagesLoaded(super.messages);
 }
 
-final class ChatMessagesLoadingFailed extends ChatState {
+class ChatError extends ChatState {
   final String error;
-  ChatMessagesLoadingFailed(this.error);
+  const ChatError(super.messages, this.error);
 }
 
-class NewMessageReceiveFailed extends ChatState {
+class MessageSendFailed extends ChatState {
   final String error;
-  NewMessageReceiveFailed(this.error);
+  const MessageSendFailed(this.error, super.messages);
 }
 
-class NewMessageReceiveSuccess extends ChatState {
-  final MessageDto message;
-  NewMessageReceiveSuccess(this.message);
+class MessageSendSuccess extends ChatState {
+  final MessageDto msg;
+  const MessageSendSuccess(super.messages, this.msg);
 }

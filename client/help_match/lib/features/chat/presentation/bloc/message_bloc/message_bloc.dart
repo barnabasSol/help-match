@@ -13,45 +13,51 @@ part 'message_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   StreamSubscription? newMessageSub;
-  List<MessageDto> _messages = [];
   final ChatRepository chatRepository;
   final UserRepo userRepo;
 
-  ChatBloc(this.chatRepository, this.userRepo) : super(ChatInitial()) {
+  ChatBloc(this.chatRepository, this.userRepo) : super(const ChatInitial([])) {
     on<ChatMessagesRequested>((event, emit) async {
-      emit(ChatMessagesLoading());
+      emit(ChatMessagesLoading(state.messages));
       try {
         final messages = await chatRepository.getMessages(event.roomId);
-        _messages = messages;
-        emit(ChatMessagesLoaded(_messages));
+        final sorted = [...messages]
+          ..sort((a, b) => b.sentTime.compareTo(a.sentTime));
+
+        emit(ChatMessagesLoaded(sorted));
       } catch (e) {
-        emit(ChatMessagesLoadingFailed(e.toString()));
+        emit(ChatError(state.messages, e.toString()));
       }
     });
 
-    on<NewMessageListening>((event, emit) async {
-      await emit.forEach(
-        chatRepository.messageStream.asyncMap((data) async {
-          try {
-            final user = await userRepo.getUserById(data.fromId);
-            if (user != null) {
-              if (user.role == "organization") {
-                return MessageDto(
-                  senderProfileIcon: user.orgInfo!.profileIcon,
-                  senderId: data.fromId,
-                  senderName: user.orgInfo!.name,
-                  senderUsername: user.username,
-                  isAdmin: user.role == "organization",
-                  roomId: data.toRoomId,
-                  message: data.message,
-                  sentTime: data.sentTime,
-                  isSeen: false,
-                );
-              }
+    on<NewMessageListening>(_listenToNewMessages);
+
+    on<NewMessageSent>((event, emit) {
+      try {
+        chatRepository.sendMessage(
+          WsEvent(
+            type: TypeSendMessage,
+            payload: event.message,
+          ),
+        );
+      } catch (e) {
+        emit(ChatError(state.messages,
+            "WebSocketInactive probably not active ${e.toString()}"));
+      }
+    });
+  }
+
+  FutureOr<void> _listenToNewMessages(event, emit) async {
+    await emit.forEach<MessageDto>(
+      chatRepository.messageStream.asyncMap<MessageDto>((data) async {
+        try {
+          final user = await userRepo.getUserById(data.fromId);
+          if (user != null) {
+            if (user.role == "organization") {
               return MessageDto(
-                senderProfileIcon: user.profilePicUrl,
+                senderProfileIcon: user.orgInfo!.profileIcon,
                 senderId: data.fromId,
-                senderName: user.name,
+                senderName: user.orgInfo!.name,
                 senderUsername: user.username,
                 isAdmin: user.role == "organization",
                 roomId: data.toRoomId,
@@ -59,35 +65,36 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
                 sentTime: data.sentTime,
                 isSeen: false,
               );
-            } else {
-              throw Exception('User not found');
             }
-          } catch (e) {
-            throw Exception("Failed to process message: ${e.toString()}");
+            return MessageDto(
+              senderProfileIcon: user.profilePicUrl,
+              senderId: data.fromId,
+              senderName: user.name,
+              senderUsername: user.username,
+              isAdmin: user.role == "organization",
+              roomId: data.toRoomId,
+              message: data.message,
+              sentTime: data.sentTime,
+              isSeen: false,
+            );
+          } else {
+            throw Exception('User not found');
           }
-        }),
-        onData: (messageDto) {
-          _messages.insert(0, messageDto);
-          emit(NewMessageReceiveSuccess(messageDto));
-          emit(ChatMessagesLoaded(_messages));
-          return state;
-        },
-        onError: (e, stackTrace) {
-          emit(
-              NewMessageReceiveFailed("Failed to listen for new messages: $e"));
-          return state;
-        },
-      );
-    });
-
-    on<NewMessageSent>((event, emit) {
-      try {
-        chatRepository.sendMessage(
-            WsEvent(type: TypeSendMessage, payload: event.message));
-      } catch (e) {
-        emit(NewMessageReceiveFailed(e.toString()));
-      }
-    });
+        } catch (e) {
+          throw Exception("Failed to process message: ${e.toString()}");
+        }
+      }),
+      onData: (MessageDto messageDto) {
+        final updatedMessages = [...state.messages, messageDto];
+        emit(MessageSendSuccess(updatedMessages, messageDto));
+        return state;
+      },
+      onError: (e, stackTrace) {
+        emit(MessageSendFailed(
+            "Failed to listen for new messages: $e", state.messages));
+        return state;
+      },
+    );
   }
 
   @override

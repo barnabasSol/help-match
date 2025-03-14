@@ -17,9 +17,12 @@ class AppDioInterceptor extends Interceptor {
       RequestOptions options, RequestInterceptorHandler handler) async {
     if (!options.path.contains('login') && !options.path.contains('signup')) {
       var token = await _secureStorage.read(key: 'access_token');
-      if (token != null) {
-        options.headers['Authorization'] = 'Bearer $token';
-      }
+      print("TOKENNNNNNNN");
+      print("TOKENNNNNNNN");
+      print("TOKENNNNNNNN");
+      print("TOKENNNNNNNN");
+      print(token);
+      options.headers['Authorization'] = 'Bearer $token';
     }
     options.sendTimeout = const Duration(seconds: 5);
     options.receiveTimeout = const Duration(seconds: 5);
@@ -54,7 +57,7 @@ class AppDioInterceptor extends Interceptor {
 
       final username = await _secureStorage.read(key: 'username');
       final response = await _dio.post(
-        '${Secrets.DOMAIN}/auth/renew',
+        '${Secrets.DOMAIN}/v1/auth/renew',
         data: {
           'username': username,
           'refresh_token': refreshToken,
@@ -65,6 +68,7 @@ class AppDioInterceptor extends Interceptor {
         return response.data['access_token'];
       }
     } catch (_) {
+      rethrow;
       // Log the error or handle it as needed
     }
     return null;
