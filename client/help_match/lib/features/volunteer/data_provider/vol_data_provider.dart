@@ -102,13 +102,13 @@ class VolunteerDataProvider {
     }
   }
 
-  Future<dynamic> fetchJobs(String org_id)async {
+  Future<dynamic> fetchOrg(String org_id)async {
     try{
          final response = await dio.get(
           '${Secrets.DOMAIN}/v1/org/$org_id',
            );
       if (response.statusCode == 200) { 
-        return response.data["data"]["jobs"];
+        return response.data;
       } else {
         throw Exception(
             'Failed to fetch jobs: ${response.statusMessage}');

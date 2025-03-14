@@ -14,6 +14,6 @@ final class JobApplicationFailed extends JobState {
 }
 
 final class JobsAppliedSuccessfully extends JobState {
-  List<String> job_ids;
+  final List<String> job_ids;
   JobsAppliedSuccessfully({required this.job_ids});
 }

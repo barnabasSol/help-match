@@ -8,7 +8,7 @@ final class VolunteerInitial extends VolunteerState {}
 final class OrgsLoading extends VolunteerState {}
 
 final class OrgsFetchedSuccessfully extends VolunteerState {
-  final List<OrgCardDto> organizations;
+  final List<OrgDto> organizations;
 
   OrgsFetchedSuccessfully({required this.organizations});
 }
@@ -18,4 +18,3 @@ final class OrgsFetchedFailed extends VolunteerState {
 
   OrgsFetchedFailed({required this.error});
 }
-

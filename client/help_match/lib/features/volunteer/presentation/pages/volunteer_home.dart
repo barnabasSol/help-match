@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/features/volunteer/bloc/load_more/load_more_cubit.dart';
 import 'package:help_match/features/volunteer/bloc/search_bloc/volunteer_bloc.dart';
-import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
+import 'package:help_match/features/volunteer/dto/org_dto.dart';
 import 'package:help_match/features/volunteer/dto/search_dto.dart';
 import 'package:help_match/features/volunteer/presentation/widgets/org_card.dart';
 
@@ -21,9 +19,8 @@ class _HomePageState extends State<VolunteerHome> {
   bool _hasMore = true;
   bool _isLoading = false;
   ScrollController _scrollController = ScrollController();
-  int _selectedIndex = 2; // Home is selected by default
   int _selectedCat = -1;
-  late List<OrgCardDto> _organizations;
+  late List<OrgDto> _organizations;
   final TextEditingController _searchController = TextEditingController();
   final List<Category> _categories = const [
     Category('Non-Profit', Icons.volunteer_activism),
@@ -55,9 +52,10 @@ class _HomePageState extends State<VolunteerHome> {
     if (_selectedCat > -1) {
       type = _categories[_selectedCat].label;
     }
-    await context.read<LoadMoreCubit>().fetchMore(SearchDto(
+    final loadMoreCubit= context.read<LoadMoreCubit>();
+    await loadMoreCubit.fetchMore(SearchDto(
         page: ++_page, org_name: _searchController.text, org_type: type));
-    List<OrgCardDto> orgs = context.read<LoadMoreCubit>().state;
+    List<OrgDto> orgs = loadMoreCubit.state;
     setState(() {
       if (orgs.length < 4) {
         _hasMore = false;
@@ -97,7 +95,6 @@ class _HomePageState extends State<VolunteerHome> {
   }
 
   Widget _buildHeader() {
-    String name = context.read<UserAuthCubit>().currentUser.username;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

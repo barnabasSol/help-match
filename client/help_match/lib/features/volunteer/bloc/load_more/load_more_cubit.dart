@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
+import 'package:help_match/features/volunteer/dto/org_dto.dart';
 import 'package:help_match/features/volunteer/dto/search_dto.dart';
 import 'package:help_match/features/volunteer/repository/volunteer_repository.dart';
 
-class LoadMoreCubit extends Cubit<List<OrgCardDto>> {
+class LoadMoreCubit extends Cubit<List<OrgDto>> {
   final VolunteerRepository _volunteerRepository;
   LoadMoreCubit({
     required volunteerRepository,
@@ -11,7 +11,7 @@ class LoadMoreCubit extends Cubit<List<OrgCardDto>> {
 
   Future<void> fetchMore(SearchDto dto) async {
     try {
-      final List<OrgCardDto> orgs = await _volunteerRepository.getOrgs(dto);
+      final List<OrgDto> orgs = await _volunteerRepository.getOrgs(dto);
       emit(orgs);
     } catch (e) {
       emit([]);
