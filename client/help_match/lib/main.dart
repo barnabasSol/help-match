@@ -34,7 +34,7 @@ import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
 import 'package:help_match/features/volunteer/bloc/apply_job_cubit/job_cubit.dart';
-import 'package:help_match/features/volunteer/bloc/job_bloc/jobs_bloc.dart';
+import 'package:help_match/features/volunteer/bloc/org_bloc/org_bloc.dart';
 import 'package:help_match/features/volunteer/bloc/load_more/load_more_cubit.dart';
 import 'package:help_match/features/volunteer/bloc/profile_bloc/profile_bloc.dart';
 import 'package:help_match/features/volunteer/bloc/search_bloc/volunteer_bloc.dart';
@@ -140,7 +140,7 @@ Future<void> main() async {
                       volunteerRepository:
                           context.read<VolunteerRepository>())),
               BlocProvider(
-                  create: (context) => JobsBloc(
+                  create: (context) => OrganizationBloc(
                       volunteerRepository:
                           context.read<VolunteerRepository>())),
               BlocProvider(

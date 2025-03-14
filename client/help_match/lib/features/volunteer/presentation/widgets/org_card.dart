@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
+import 'package:help_match/features/volunteer/dto/org_dto.dart';
 import 'package:help_match/features/volunteer/presentation/pages/org_details.dart';
 
 class OrganizationCard extends StatelessWidget {
-  final OrgCardDto _orgCardDto;
+  final OrgDto _OrgDto;
   final String baseURL = "https://hm.barney-host.site/";
-  const OrganizationCard(
-      {super.key,
-      required orgDto}):_orgCardDto=orgDto;
+  const OrganizationCard({super.key, required orgDto}) : _OrgDto = orgDto;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +13,8 @@ class OrganizationCard extends StatelessWidget {
       onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => OrgDetails(orgDto: _orgCardDto, 
+              builder: (context) => OrgDetails(
+                    orgId: _OrgDto.id,
                   ))),
       child: Scaffold(
         body: ClipRRect(
@@ -29,7 +28,7 @@ class OrganizationCard extends StatelessWidget {
                   width: double.infinity, // Ensures it respects the parent size
                   height: double.infinity,
                   child: Hero(
-                    tag: 'org ${_orgCardDto.name}',
+                    tag: 'org ${_OrgDto.name}',
                     child: Image.network(
                       'https://th.bing.com/th/id/OIP.uL9scGt9_A3laD6BiiUrFQAAAA?rs=1&pid=ImgDetMain',
                       headers: const {
@@ -66,7 +65,7 @@ class OrganizationCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 5, vertical: 3),
                         child: Text(
-                          _orgCardDto.type,
+                          _OrgDto.type,
                           style: const TextStyle(
                               color: Color.fromARGB(255, 248, 248, 248),
                               fontWeight: FontWeight.bold,
@@ -101,17 +100,22 @@ class OrganizationCard extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Text(
-                          _orgCardDto.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                        SizedBox(
+                          width: 100, // Adjust width as needed
+                          child: Text(
+                            _OrgDto.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines:
+                                1, // Ensure only one line with "..." if needed
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        const Icon(
-                          Icons.verified,
+                        Icon(
+                          _OrgDto.isVerified ? Icons.verified : null,
                           color: Colors.blue,
                           size: 12,
                         ),
