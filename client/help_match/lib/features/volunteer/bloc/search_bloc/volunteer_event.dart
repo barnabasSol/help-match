@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'volunteer_bloc.dart';
 
 @immutable
@@ -10,5 +11,10 @@ class SearchPressed extends VolunteerEvent {
 }
 
 class InitialFetch extends VolunteerEvent {}
+class FetchMore extends VolunteerEvent {
+  final SearchDto dto;
 
-class FiltersPressed extends VolunteerEvent {}
+  FetchMore({required this.dto});
+}
+
+

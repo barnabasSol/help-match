@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
-import 'package:help_match/features/volunteer/bloc/volunteer_bloc.dart';
+import 'package:help_match/features/volunteer/bloc/load_more/load_more_cubit.dart';
+import 'package:help_match/features/volunteer/bloc/search_bloc/volunteer_bloc.dart';
 import 'package:help_match/features/volunteer/dto/org_card_dto.dart';
 import 'package:help_match/features/volunteer/dto/search_dto.dart';
+import 'package:help_match/features/volunteer/presentation/widgets/org_card.dart';
 
 class VolunteerHome extends StatefulWidget {
+  //  final FlutterSecureStorage secureStorage;
   const VolunteerHome({super.key});
 
   @override
@@ -14,8 +17,13 @@ class VolunteerHome extends StatefulWidget {
 }
 
 class _HomePageState extends State<VolunteerHome> {
+  int _page = 1;
+  bool _hasMore = true;
+  bool _isLoading = false;
+  ScrollController _scrollController = ScrollController();
   int _selectedIndex = 2; // Home is selected by default
   int _selectedCat = -1;
+  late List<OrgCardDto> _organizations;
   final TextEditingController _searchController = TextEditingController();
   final List<Category> _categories = const [
     Category('Non-Profit', Icons.volunteer_activism),
@@ -31,33 +39,56 @@ class _HomePageState extends State<VolunteerHome> {
   void initState() {
     super.initState();
     context.read<VolunteerBloc>().add(InitialFetch());
+    _scrollController.addListener(() async {
+      if (_scrollController.position.maxScrollExtent ==
+          _scrollController.offset) {
+        if (_isLoading || !_hasMore) return;
+        _isLoading = true;
+        fetch();
+      }
+    });
+  }
+
+  Future<void> fetch() async {
+    String type = '';
+    if (_selectedCat > -1) {
+      type = _categories[_selectedCat].label;
+    }
+    await context.read<LoadMoreCubit>().fetchMore(SearchDto(
+        page: ++_page, org_name: _searchController.text, org_type: type));
+    List<OrgCardDto> orgs = context.read<LoadMoreCubit>().state;
+    setState(() {
+      if (orgs.length < 4) {
+        _hasMore = false;
+      }
+      _isLoading = false;
+      _organizations.addAll(orgs);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header Section
-              _buildHeader(),
-              const SizedBox(height: 24),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Section
+            _buildHeader(),
+            const SizedBox(height: 24),
 
-              // Search Bar
-              _buildSearchBar(),
-              const SizedBox(height: 32),
+            // Search Bar
+            _buildSearchBar(),
+            const SizedBox(height: 32),
 
-              // Categories
-              _buildCategorySection(),
-              const SizedBox(height: 32),
+            // Categories
+            _buildCategorySection(),
+            const SizedBox(height: 15),
 
-              // Organization Grid
-              _buildScrollableOrganizationGrid(),
-            ],
-          ),
+            // Organization Grid
+            Expanded(child: _buildScrollableOrganizationGrid()),
+          ],
         ),
       ),
       //  bottomNavigationBar: _buildBottomNavBar(),
@@ -69,13 +100,19 @@ class _HomePageState extends State<VolunteerHome> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'Welcome, Dear $name',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
+        const CircleAvatar(
+          radius: 24,
+          backgroundImage: NetworkImage(
+              "https://th.bing.com/th/id/OIP.YoTUWMoKovQT0gCYOYMwzwHaHa?rs=1&pid=ImgDetMain"),
+        ),
+        const SizedBox(
+          width: 52,
+        ),
+        Icon(
+          color: Theme.of(context).colorScheme.primary,
+          Theme.of(context).brightness == Brightness.light
+              ? Icons.light_mode
+              : Icons.dark_mode,
         ),
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           CircleAvatar(
@@ -102,22 +139,25 @@ class _HomePageState extends State<VolunteerHome> {
 
   Widget _buildSearchBar() {
     return TextField(
+      style: TextStyle(color: Theme.of(context).colorScheme.primary),
       controller: _searchController,
       decoration: InputDecoration(
         hintText: 'Search for Organization',
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.onSecondary,
+        fillColor: Theme.of(context).colorScheme.onTertiaryContainer,
         prefixIcon: IconButton(
             onPressed: () {
               String type = '';
               if (_selectedCat != -1) {
-                type = _categories[_selectedIndex].label;
+                type = _categories[_selectedCat].label;
               }
               context.read<VolunteerBloc>().add(SearchPressed(
                   dto: SearchDto(
                       org_name: _searchController.text, org_type: type)));
             },
-            icon: const Icon(Icons.search)),
+            icon: Icon(Icons.search,
+                color: Theme.of(context).colorScheme.primary)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -134,20 +174,20 @@ class _HomePageState extends State<VolunteerHome> {
         itemCount: _categories.length,
         separatorBuilder: (_, __) => const SizedBox(width: 20),
         itemBuilder: (context, index) {
+          final isSelected = _selectedCat == index;
           return GestureDetector(
               onTap: () {
                 setState(() {
                   _selectedCat = index;
                 });
-                print(_searchController.text +
-                    "Org type" +
-                    _categories[index].label);
+
                 context.read<VolunteerBloc>().add(SearchPressed(
                     dto: SearchDto(
                         org_name: _searchController.text,
                         org_type: _categories[index].label)));
               },
-              child: CategoryItem(category: _categories[index]));
+              child: CategoryItem(
+                  category: _categories[index], isSelected: isSelected));
         },
       ),
     );
@@ -161,24 +201,64 @@ class _HomePageState extends State<VolunteerHome> {
             child: Text(state.error),
           );
         } else if (state is OrgsFetchedSuccessfully) {
-          List<OrgCardDto> orgs = state.organizations;
-          return GridView.builder(
-            shrinkWrap: true,
-            physics: const ClampingScrollPhysics(), // Allow scrolling
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.8,
-            ),
-            itemCount: state.organizations.length,
-            itemBuilder: (context, index) {
-              return OrganizationCard(
-                index: index,
-                orgName: orgs[index].name,
-                orgType: orgs[index].type,
-              );
+          _organizations = state.organizations;
+          // return OrganizationCard(name: orgs[0].name, description: orgs[0].description, type: orgs[0].type, imageUrl: orgs[0].profileIcon);
+          return RefreshIndicator(
+            displacement: 20,
+            onRefresh: () async {
+              setState(() {
+                _hasMore = true;
+                _page = 1;
+              });
+              context.read<VolunteerBloc>().add(SearchPressed(
+                  dto: SearchDto(
+                      org_name: _searchController.text,
+                      org_type: _selectedCat > -1
+                          ? _categories[_selectedCat].label
+                          : "")));
             },
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.all(4),
+                  sliver: SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return OrganizationCard(
+                          orgDto: _organizations[index],
+                        );
+                      },
+                      childCount: _organizations.length,
+                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 200,
+                      crossAxisSpacing: 15,
+                      mainAxisSpacing: 10,
+                    ),
+                  ),
+                ),
+                if (_hasMore)
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+                if (!_hasMore)
+                  SliverToBoxAdapter(
+                    child: Center(
+                        child: Text(
+                      "That is all",
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onTertiaryContainer),
+                    )),
+                  ),
+              ],
+            ),
           );
         } else {
           return Center(
@@ -191,54 +271,7 @@ class _HomePageState extends State<VolunteerHome> {
     );
   }
 
-  Widget _buildBottomNavBar() {
-    return BottomNavigationBar(
-      currentIndex: _selectedIndex,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: Theme.of(context).colorScheme.primary,
-      unselectedItemColor: Theme.of(context).colorScheme.tertiary,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.location_on),
-          label: 'Location',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.notifications),
-          label: 'Alerts',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.chat),
-          label: 'Chat',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
-      onTap: (index) =>
-          setState(() => _selectedIndex = _change_to_pages(index)),
-    );
-  }
-
   // ignore: non_constant_identifier_names
-  _change_to_pages(int index) {
-    if (index == 4) {
-      return {
-        Navigator.pop(context),
-        Navigator.pushNamed(context, '/profilev')
-      };
-    } else if (index == 3) {
-      return {Navigator.pop(context), Navigator.pushNamed(context, '/homec')};
-    } else if (index == 0) {
-      return {Navigator.pop(context), Navigator.pushNamed(context, '/navv')};
-    } else if (index == 1) {
-      return {Navigator.pop(context), Navigator.pushNamed(context, '/homen')};
-    }
-  }
 }
 
 class Category {
@@ -250,8 +283,10 @@ class Category {
 
 class CategoryItem extends StatelessWidget {
   final Category category;
+  final bool isSelected;
 
-  const CategoryItem({super.key, required this.category});
+  const CategoryItem(
+      {super.key, required this.category, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -260,10 +295,15 @@ class CategoryItem extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSecondary,
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onSecondary,
             shape: BoxShape.circle,
           ),
-          child: Icon(category.icon, size: 32),
+          child: Icon(
+            category.icon,
+            size: 32,
+          ),
         ),
         const SizedBox(height: 8),
         Text(
@@ -271,79 +311,6 @@ class CategoryItem extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w500),
         ),
       ],
-    );
-  }
-}
-
-class OrganizationCard extends StatelessWidget {
-  final int index;
-  final String orgName;
-  final String orgType;
-
-  const OrganizationCard(
-      {super.key,
-      required this.index,
-      required this.orgName,
-      required this.orgType});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: IconButton(
-              // icon: const Icon(Icons.bookmark_border),
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                Navigator.pushNamed(context, '/joblist');
-              },
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSecondary,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    orgName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  Text(
-                    orgType,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

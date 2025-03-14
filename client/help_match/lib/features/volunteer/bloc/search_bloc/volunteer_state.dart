@@ -18,3 +18,4 @@ final class OrgsFetchedFailed extends VolunteerState {
 
   OrgsFetchedFailed({required this.error});
 }
+

@@ -13,8 +13,6 @@ final class AuthLoginFailure extends AuthState {
 }
 
 final class AuthLoginSuccess extends AuthState {
-  final String token;
-  AuthLoginSuccess(this.token);
 }
 
 final class AuthSignupLoading extends AuthState {}

@@ -61,7 +61,7 @@ class ChatInput extends StatelessWidget {
               onPressed: () {
                 context.read<ChatBloc>().add(NewMessageSent(MessageModel(
                       message: inputController.text,
-                      fromId: currentUser!.sub,
+                      fromId: currentUser.sub,
                       toRoomId: roomId,
                       sentTime: DateTime.now(),
                     )));

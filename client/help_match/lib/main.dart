@@ -33,9 +33,14 @@ import 'package:help_match/features/organization/cubit/org_cubit.dart';
 import 'package:help_match/features/organization/data_provider/org_remote.dart';
 import 'package:help_match/features/organization/presentation/pages/screen.dart';
 import 'package:help_match/features/organization/repository/org_repository.dart';
-import 'package:help_match/features/volunteer/bloc/volunteer_bloc.dart';
+import 'package:help_match/features/volunteer/bloc/apply_job_cubit/job_cubit.dart';
+import 'package:help_match/features/volunteer/bloc/job_bloc/jobs_bloc.dart';
+import 'package:help_match/features/volunteer/bloc/load_more/load_more_cubit.dart';
+import 'package:help_match/features/volunteer/bloc/profile_bloc/profile_bloc.dart';
+import 'package:help_match/features/volunteer/bloc/search_bloc/volunteer_bloc.dart';
 import 'package:help_match/features/volunteer/data_provider/vol_data_provider.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
+import 'package:help_match/features/volunteer/presentation/widgets/job_card.dart';
 import 'package:help_match/features/volunteer/repository/volunteer_repository.dart';
 import 'package:help_match/shared/widgets/loading_indicator.dart';
 
@@ -59,7 +64,6 @@ Future<void> main() async {
   dio.interceptors.add(AppDioInterceptor(secureStorage, userAuthCubit, dio));
 
   await initializeHive();
-
   // await secureStorage.deleteAll();
 
   final themeModeString = await secureStorage.read(key: "theme_mode");
@@ -107,6 +111,12 @@ Future<void> main() async {
             context.read<NotificationProvider>(),
           ),
         ),
+        RepositoryProvider(
+            create: (context) => const FlutterSecureStorage(
+                  aOptions: AndroidOptions(
+                    encryptedSharedPreferences: true,
+                  ),
+                )),
         RepositoryProvider(create: (context) => OrgDataProvider(dio: dio)),
         RepositoryProvider(
             create: (context) =>
@@ -116,7 +126,8 @@ Future<void> main() async {
             create: (context) =>
                 AuthRepository(context.read<AuthDataProvider>())),
         RepositoryProvider(
-            create: (context) => VolunteerDataProvider(dio: dio)),
+            create: (context) =>
+                VolunteerDataProvider(dio: dio, sec: secureStorage)),
         RepositoryProvider(
             create: (context) => VolunteerRepository(
                 dataProvider: context.read<VolunteerDataProvider>())),
@@ -125,6 +136,22 @@ Future<void> main() async {
         builder: (context) {
           return MultiBlocProvider(
             providers: [
+              BlocProvider(
+                  create: (context) => JobCubit(
+                      volunteerRepository:
+                          context.read<VolunteerRepository>())),
+              BlocProvider(
+                  create: (context) => JobsBloc(
+                      volunteerRepository:
+                          context.read<VolunteerRepository>())),
+              BlocProvider(
+                  create: (context) => LoadMoreCubit(
+                      volunteerRepository:
+                          context.read<VolunteerRepository>())),
+              BlocProvider(
+                  create: (context) => ProfileBloc(
+                      volRepo: context.read<VolunteerRepository>(),
+                      userRepo: context.read<UserRepo>())),
               BlocProvider(
                   create: (context) => VolunteerBloc(
                       volRepo: context.read<VolunteerRepository>())),
