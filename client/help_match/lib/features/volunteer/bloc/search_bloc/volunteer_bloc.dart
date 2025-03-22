@@ -20,7 +20,7 @@ class VolunteerBloc extends Bloc<VolunteerEvent, VolunteerState> {
     try {
       emit(OrgsLoading());
       final List<OrgDto> orgs =
-          await volRepo.getOrgs(SearchDto(org_name: "", org_type: ""));
+          await volRepo.getOrgs(SearchDto(org_name: "", org_type: "recommeded"));
       emit(OrgsFetchedSuccessfully(organizations: orgs));
     } catch (e) {
       emit(OrgsFetchedFailed(error: e.toString()));

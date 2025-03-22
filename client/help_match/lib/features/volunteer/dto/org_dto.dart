@@ -1,5 +1,4 @@
-import 'package:help_match/features/volunteer/dto/job_view_dto.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:help_match/features/volunteer/dto/job_view_dto.dart'; 
 
 class OrgDto {
   String? id;

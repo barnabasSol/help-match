@@ -117,9 +117,9 @@ class _JobCardState extends State<JobCard> {
                           },
                     child: Text(
                       isApplied||widget.jobViewDto.applicant_status=="pending" ? "Applied" : "Apply Now",
-                      style: isApplied
+                      style:    isApplied||widget.jobViewDto.applicant_status=="pending" 
                           ? Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Theme.of(context).colorScheme.onPrimary ,
                               fontSize: 12,
                               fontWeight: FontWeight.w600)
                           : Theme.of(context).textTheme.labelLarge?.copyWith(

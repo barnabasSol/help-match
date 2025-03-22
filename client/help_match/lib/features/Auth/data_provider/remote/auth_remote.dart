@@ -10,7 +10,11 @@ class AuthDataProvider {
           await _dio.post('${Secrets.DOMAIN}/v1/auth/login', data: json);
       if (response.statusCode == 200) {
         return response.data;
-      } else {
+      }
+      else if(response.statusCode == 400) {
+        throw Exception('Invalid Email or Password');
+      } 
+      else {
         throw Exception('Failed to log user: ${response.statusMessage}');
       }
     } on DioException catch (e) {
@@ -31,7 +35,11 @@ class AuthDataProvider {
           await _dio.post('${Secrets.DOMAIN}/v1/auth/signup', data: json);
       if (response.statusCode == 200) {
         return response.data;
-      } else {
+      } 
+        else if(response.statusCode == 400) {
+        throw Exception('Invalid Email or Password');
+      } 
+      else {
         throw Exception('Failed to signup : ${response.statusMessage}');
       }
     } on DioException catch (e) {

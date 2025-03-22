@@ -176,13 +176,13 @@ class _HomePageState extends State<VolunteerHome> {
           return GestureDetector(
               onTap: () {
                 setState(() {
-                  _selectedCat = index;
+                isSelected?_selectedCat = -1: _selectedCat = index;
                 });
 
                 context.read<VolunteerBloc>().add(SearchPressed(
                     dto: SearchDto(
                         org_name: _searchController.text,
-                        org_type: _categories[index].label)));
+                        org_type: isSelected?"":_categories[index].label)));
               },
               child: CategoryItem(
                   category: _categories[index], isSelected: isSelected));
