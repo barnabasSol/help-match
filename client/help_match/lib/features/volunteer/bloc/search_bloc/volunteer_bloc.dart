@@ -17,10 +17,10 @@ class VolunteerBloc extends Bloc<VolunteerEvent, VolunteerState> {
   }
 
   Future<void> _fetchRecommendations(event, emit) async {
-    try {
+    try  {
       emit(OrgsLoading());
       final List<OrgDto> orgs =
-          await volRepo.getOrgs(SearchDto(org_name: "", org_type: "recommeded"));
+          await volRepo.getOrgs(SearchDto(org_name: "", org_type: ""));
       emit(OrgsFetchedSuccessfully(organizations: orgs));
     } catch (e) {
       emit(OrgsFetchedFailed(error: e.toString()));

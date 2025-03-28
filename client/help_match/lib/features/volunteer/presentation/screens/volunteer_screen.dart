@@ -62,7 +62,7 @@ class _VolunteerScreen extends State<VolunteerScreen> {
           ),
         ),
         bottomNavigationBar: Container(
-          color: Theme.of(context).colorScheme.primary,
+          color: Theme.of(context).scaffoldBackgroundColor,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
             child: GNav(
@@ -72,10 +72,10 @@ class _VolunteerScreen extends State<VolunteerScreen> {
               selectedIndex: _selectedIndex,
               onTabChange: _onItemTapped,
               tabs: _bottomNavItems,
-              color: Theme.of(context).colorScheme.onSecondary,
+              color: Theme.of(context).colorScheme.onPrimary,
               activeColor: Theme.of(context).colorScheme.onPrimary,
               // unselectedItemColor: Theme.of(context).colorScheme.onPrimary,
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               tabBackgroundColor: Theme.of(context).colorScheme.secondary,
             ),
           ),

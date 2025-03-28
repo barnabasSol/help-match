@@ -106,45 +106,29 @@ class _HomePageState extends State<VolunteerHome> {
         const SizedBox(
           width: 52,
         ),
-        Icon(
+        IconButton(
+          icon: Theme.of(context).brightness == Brightness.light
+              ? const Icon(Icons.dark_mode)
+              : const Icon(Icons.light_mode),
+          onPressed: () {
+            context.read<ThemeCubit>().themeChange();
+          },
           color: Theme.of(context).colorScheme.primary,
-          Theme.of(context).brightness == Brightness.light
-              ? Icons.light_mode
-              : Icons.dark_mode,
         ),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            child: const Icon(Icons.person, size: 32),
-          ),
-          const SizedBox(
-            width: 52,
-          ),
-          IconButton(
-            icon: Theme.of(context).brightness == Brightness.light
-                ? const Icon(Icons.dark_mode)
-                : const Icon(Icons.light_mode),
-            onPressed: () {
-              context.read<ThemeCubit>().themeChange();
-            },
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ]),
       ],
     );
   }
 
   Widget _buildSearchBar() {
-    return TextField(
+    return TextField( 
       style: TextStyle(color: Theme.of(context).colorScheme.primary),
       controller: _searchController,
       decoration: InputDecoration(
         hintText: 'Search for Organization',
         hintStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.onTertiaryContainer,
-        prefixIcon: IconButton(
+        fillColor: Theme.of(context).colorScheme.onSecondary,
+        suffixIcon: IconButton(
             onPressed: () {
               String type = '';
               if (_selectedCat != -1) {
@@ -155,7 +139,7 @@ class _HomePageState extends State<VolunteerHome> {
                       org_name: _searchController.text, org_type: type)));
             },
             icon: Icon(Icons.search,
-                color: Theme.of(context).colorScheme.primary)),
+                size: 28, color: Theme.of(context).colorScheme.primary)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -176,13 +160,15 @@ class _HomePageState extends State<VolunteerHome> {
           return GestureDetector(
               onTap: () {
                 setState(() {
-                isSelected?_selectedCat = -1: _selectedCat = index;
+                  isSelected ? _hasMore = true : null;
+                  isSelected ? _page = 1 : null;
+                  isSelected ? _selectedCat = -1 : _selectedCat = index;
                 });
 
                 context.read<VolunteerBloc>().add(SearchPressed(
                     dto: SearchDto(
                         org_name: _searchController.text,
-                        org_type: isSelected?"":_categories[index].label)));
+                        org_type: isSelected ? "" : _categories[index].label)));
               },
               child: CategoryItem(
                   category: _categories[index], isSelected: isSelected));
@@ -200,7 +186,9 @@ class _HomePageState extends State<VolunteerHome> {
           );
         } else if (state is OrgsFetchedSuccessfully) {
           _organizations = state.organizations;
-          // return OrganizationCard(name: orgs[0].name, description: orgs[0].description, type: orgs[0].type, imageUrl: orgs[0].profileIcon);
+          if (_organizations.length < 4) {
+            _hasMore = false;
+          }
           return RefreshIndicator(
             displacement: 20,
             onRefresh: () async {
@@ -237,24 +225,27 @@ class _HomePageState extends State<VolunteerHome> {
                     ),
                   ),
                 ),
-                if (_hasMore)
+                if (_hasMore && _organizations.isNotEmpty)
                   const SliverToBoxAdapter(
                     child: Padding(
                       padding: EdgeInsets.all(20.0),
                       child: Center(child: CircularProgressIndicator()),
                     ),
                   ),
-                if (!_hasMore)
+                if (!_hasMore || _organizations.isEmpty)
                   SliverToBoxAdapter(
                     child: Center(
                         child: Text(
-                      "That is all",
+                      _organizations.isEmpty
+                          ? "No matches found"
+                          : "That is all",
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                           color: Theme.of(context)
                               .colorScheme
                               .onTertiaryContainer),
                     )),
-                  ),
+                  )
               ],
             ),
           );

@@ -22,7 +22,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await secureStorage.write(key: 'refresh_token', value: tokens['refresh_token']);
         emit(AuthLoginSuccess());
       } catch (e) {
-        emit(AuthLoginFailure(e.toString()));
+      emit(AuthLoginFailure(e is Exception ? (e as dynamic).message ?? e.toString() : e.toString()));
       }
     });
     on<UserAuthSignupPressed>((event, emit) async {
@@ -34,7 +34,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
         emit(AuthSignupSuccess());
       } catch (e) {
-        emit(AuthSignupFailure(e.toString()));
+           emit(AuthLoginFailure(e is Exception ? (e as dynamic).message ?? e.toString() : e.toString()));
+
       }
     });
     on<OrgAuthSignupPressed>((event, emit) async {
@@ -45,7 +46,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await secureStorage.write(key: 'refresh_token', value: tokens['refresh_token']);
         emit(AuthSignupSuccess());
       } catch (e) {
-        emit(AuthSignupFailure(e.toString()));
+           emit(AuthLoginFailure(e is Exception ? (e as dynamic).message ?? e.toString() : e.toString()));
+
       }
     });
   }
