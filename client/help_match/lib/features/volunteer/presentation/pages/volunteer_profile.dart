@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
 import 'package:help_match/core/image_picker.dart';
@@ -18,13 +19,13 @@ class VolunteerProfile extends StatefulWidget {
 }
 
 class _VolunteerProfileState extends State<VolunteerProfile> {
+  String? token = "";
   final _formKey_for_profile = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final List<String> _selectedCategories = [];
   final List<String> _previousSelectedCategories = [];
   Uint8List? _profile_image;
-  final String _remoteName = "https://hm.barney-host.site/";
   bool _isInitialized = false;
   final List<String> _categories = const [
     'Non Profit',
@@ -38,8 +39,18 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
   @override
   void initState() {
     super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
     final id = context.read<UserAuthCubit>().currentUser.sub;
     context.read<ProfileBloc>().add(ProfileInfoFetched(id));
+    final fetchedToken =
+        await context.read<FlutterSecureStorage>().read(key: 'access_token');
+
+    setState(() {
+      token = fetchedToken;
+    });
   }
 
   @override
@@ -142,7 +153,9 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
   }
 
   Widget _buildProfilePictureSection(String profileUrl) {
-    profileUrl = _remoteName+profileUrl;
+    if (token == "") {
+      return const CircularProgressIndicator();
+    }
     return Column(
       children: [
         const Align(
@@ -155,14 +168,15 @@ class _VolunteerProfileState extends State<VolunteerProfile> {
                 radius: 60,
                 backgroundImage: _profile_image != null
                     ? MemoryImage(_profile_image!)
-                    : NetworkImage(profileUrl)),
+                    : NetworkImage(profileUrl,
+                        headers: {"Authorization": "Bearer $token"})),
             Positioned(
               bottom: 10,
               // right: 0,
               child: GestureDetector(
                 onTap: _changeProfilePicture,
                 child: Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
                     shape: BoxShape.circle,
