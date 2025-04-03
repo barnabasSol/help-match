@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:help_match/core/current_user/cubit/user_auth_cubit.dart';
+import 'package:help_match/core/current_user/repository/user_repo.dart';
 import 'package:help_match/core/theme/cubit/theme_cubit.dart';
 import 'package:help_match/features/volunteer/bloc/load_more/load_more_cubit.dart';
 import 'package:help_match/features/volunteer/bloc/search_bloc/volunteer_bloc.dart';
@@ -16,6 +19,8 @@ class VolunteerHome extends StatefulWidget {
 }
 
 class _HomePageState extends State<VolunteerHome> {
+  String? profileUrl;
+  String? token = "";
   int _page = 1;
   bool _hasMore = true;
   bool _isLoading = false;
@@ -36,7 +41,14 @@ class _HomePageState extends State<VolunteerHome> {
   @override
   void initState() {
     super.initState();
+    _initializePage();
+  }
+
+  void _initializePage() async {
     context.read<VolunteerBloc>().add(InitialFetch());
+    final id = context.read<UserAuthCubit>().currentUser.sub;
+    var user = await context.read<UserRepo>().getUserById(id);
+    profileUrl = user!.profilePicUrl;
     _scrollController.addListener(() async {
       if (_scrollController.position.maxScrollExtent ==
           _scrollController.offset) {
@@ -44,6 +56,12 @@ class _HomePageState extends State<VolunteerHome> {
         _isLoading = true;
         fetch();
       }
+    });
+    final fetchedToken =
+        await context.read<FlutterSecureStorage>().read(key: 'access_token');
+
+    setState(() {
+      token = fetchedToken;
     });
   }
 
@@ -95,14 +113,14 @@ class _HomePageState extends State<VolunteerHome> {
   }
 
   Widget _buildHeader() {
+    String tempAvatar="https://static.vecteezy.com/system/resources/previews/024/183/502/original/male-avatar-portrait-of-a-young-man-with-a-beard-illustration-of-male-character-in-modern-color-style-vector.jpg";
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const CircleAvatar(
-          radius: 24,
-          backgroundImage: NetworkImage(
-              "https://th.bing.com/th/id/OIP.YoTUWMoKovQT0gCYOYMwzwHaHa?rs=1&pid=ImgDetMain"),
-        ),
+          CircleAvatar(
+            radius: 24,
+            backgroundImage: NetworkImage(profileUrl??tempAvatar,
+                headers: {"Authorization": "Bearer $token"})),
         const SizedBox(
           width: 52,
         ),
@@ -120,7 +138,7 @@ class _HomePageState extends State<VolunteerHome> {
   }
 
   Widget _buildSearchBar() {
-    return TextField( 
+    return TextField(
       style: TextStyle(color: Theme.of(context).colorScheme.primary),
       controller: _searchController,
       decoration: InputDecoration(

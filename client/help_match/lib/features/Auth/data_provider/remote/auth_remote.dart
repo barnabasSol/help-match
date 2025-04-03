@@ -37,8 +37,8 @@ class AuthDataProvider {
           await _dio.post('${Secrets.DOMAIN}/v1/auth/signup', data: json);
       if (response.statusCode == 200) {
         return response.data;
-      }   else {
-        throw Exception('Failed to signup : ${response.statusMessage}');
+      } else {
+        throw Exception('Error: ${response.statusMessage}');
       }
     } on DioException catch (e) {
       if (e.response != null) {
@@ -48,7 +48,8 @@ class AuthDataProvider {
         throw Exception('Error: ${e.message}');
       }
     } catch (e) {
-      throw Exception('Unexpected error: $e');
+        print("User was not registered.\n Exception thrown: $e");
+      throw Exception('Sorry ,you were not registered');
     }
   }
 }

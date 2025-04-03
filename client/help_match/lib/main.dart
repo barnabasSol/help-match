@@ -74,6 +74,7 @@ Future<void> main() async {
   runApp(
     MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<FlutterSecureStorage>.value(value:secureStorage),
         RepositoryProvider<WsManager>(
           create: (_) => WsManager(secureStorage),
         ),
