@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/features/volunteer/bloc/apply_job_cubit/job_cubit.dart';
-import 'package:help_match/features/volunteer/dto/job_view_dto.dart';
+import 'package:help_match/features/volunteer/dto/org_dto.dart'; 
 
 class JobCard extends StatefulWidget {
   final JobViewDto jobViewDto;

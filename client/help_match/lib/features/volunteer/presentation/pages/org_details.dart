@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:help_match/features/volunteer/bloc/org_bloc/org_bloc.dart';
-import 'package:help_match/features/volunteer/dto/job_view_dto.dart';
+import 'package:help_match/features/volunteer/dto/org_dto.dart';
+// import 'package:help_match/features/volunteer/dto/job_view_dto.dart';
 import 'package:help_match/features/volunteer/presentation/widgets/job_card.dart';
 import 'package:help_match/shared/widgets/map_ui.dart';
 import 'package:latlong2/latlong.dart';

@@ -1,16 +1,41 @@
-import 'package:help_match/features/volunteer/dto/job_view_dto.dart'; 
+// import 'package:help_match/features/volunteer/dto/job_view_dto.dart'; 
+import 'package:help_match/core/box_types/box_types.dart';
+import 'package:hive_ce/hive.dart';
 
+part './job_view_dto.dart';
+@HiveType(typeId: BoxTypes.ORG_DETAIL)
 class OrgDto {
+  @HiveField(0)
   String? id;
+
+  @HiveField(1)
   String name;
+
+  @HiveField(2)
   String? userId;
+
+  @HiveField(3)
   String profileIcon;
+
+  @HiveField(4)
   String? description;
+
+  @HiveField(5)
   double? proximity;
+
+  @HiveField(6)
   Location? location;
+
+  @HiveField(7)
   bool isVerified;
+
+  @HiveField(8)
   DateTime? createdAt;
+
+  @HiveField(9)
   String type;
+
+  @HiveField(10)
   List<JobViewDto>? jobs;
   // int version;
 
@@ -44,8 +69,9 @@ class OrgDto {
   }
   factory OrgDto.fromMap(Map<String, dynamic> json) {
     return OrgDto(
+      id: json['org_id'],
       name: json['org_result']['org_name'],
-      // userId: json['user_id'],
+      userId: json['user_id'],
       profileIcon: json['org_result']['profile_icon'],
       description: json['org_result']['description'],
       location: Location.fromJson(json['org_result']['location']),
@@ -59,26 +85,15 @@ class OrgDto {
     );
   }
 
-  // Convert OrgListResponse to JSON
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'org_id': id,
-  //     'org_name': name,
-  //     'user_id': userId,
-  //     'profile_icon': profileIcon,
-  //     'description': description,
-  //     'proximity': proximity,
-  //     'location': location.toJson(),
-  //     'is_verified': isVerified,
-  //     'created_at': createdAt.toIso8601String(),
-  //     'type': type,
-  //     'version': version,
-  //   };
-  // }
+ 
 }
 
+@HiveType(typeId: BoxTypes.LOCATIONS)
 class Location {
+  @HiveField(0)
   double latitude;
+
+  @HiveField(1)
   double longitude;
 
   Location({
@@ -86,17 +101,14 @@ class Location {
     required this.longitude,
   });
 
-  factory Location.fromJson(Map<String, dynamic> json) {
-    return Location(
-      latitude: json['latitude'].toDouble(),
-      longitude: json['longitude'].toDouble(),
-    );
-  }
+  factory Location.fromJson(Map<String, dynamic> json) => Location(
+        latitude: (json['latitude'] as num).toDouble(),
+        longitude: (json['longitude'] as num).toDouble(),
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'latitude': latitude,
-      'longitude': longitude,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'latitude': latitude,
+        'longitude': longitude,
+      };
+
 }

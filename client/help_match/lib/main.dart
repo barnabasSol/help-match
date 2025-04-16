@@ -39,6 +39,7 @@ import 'package:help_match/features/volunteer/bloc/load_more/load_more_cubit.dar
 import 'package:help_match/features/volunteer/bloc/profile_bloc/profile_bloc.dart';
 import 'package:help_match/features/volunteer/bloc/search_bloc/volunteer_bloc.dart';
 import 'package:help_match/features/volunteer/data_provider/vol_data_provider.dart';
+import 'package:help_match/features/volunteer/data_provider/vol_local_provider.dart';
 import 'package:help_match/features/volunteer/presentation/screens/volunteer_screen.dart';
 import 'package:help_match/features/volunteer/repository/volunteer_repository.dart';
 import 'package:help_match/shared/widgets/loading_indicator.dart';
@@ -128,8 +129,10 @@ Future<void> main() async {
         RepositoryProvider(
             create: (context) =>
                 VolunteerDataProvider(dio: dio, sec: secureStorage)),
+                RepositoryProvider(create: (context)=>VolLocalProvider()),
         RepositoryProvider(
             create: (context) => VolunteerRepository(
+              localProvider: context.read<VolLocalProvider>(),
                 dataProvider: context.read<VolunteerDataProvider>())),
       ],
       child: Builder(

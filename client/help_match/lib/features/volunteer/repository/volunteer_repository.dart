@@ -1,11 +1,13 @@
 import 'package:help_match/features/volunteer/data_provider/vol_data_provider.dart';
+import 'package:help_match/features/volunteer/data_provider/vol_local_provider.dart';
 import 'package:help_match/features/volunteer/dto/org_dto.dart';
 import 'package:help_match/features/volunteer/dto/search_dto.dart';
 import 'package:help_match/features/volunteer/dto/vol_profile_dto.dart';
 
 class VolunteerRepository {
   final VolunteerDataProvider dataProvider;
-  VolunteerRepository({required this.dataProvider});
+  final VolLocalProvider localProvider;
+  VolunteerRepository({required this.dataProvider,required this.localProvider});
 
   Future<List<OrgDto>> getOrgs(SearchDto sto) async {
     String queryParams = "";
@@ -22,8 +24,7 @@ class VolunteerRepository {
       final response = await dataProvider.fetchOrgs(sto, queryParams);
       final dynamic data = response["data"]["result"];
       if (data is List) {
-        List<OrgDto> orgs =
-            data.map((o) => OrgDto.fromJson(o)).toList();
+        List<OrgDto> orgs = data.map((o) => OrgDto.fromJson(o)).toList();
         return orgs;
       } else {
         return [];
@@ -47,10 +48,17 @@ class VolunteerRepository {
   Future<OrgDto> fetchOrgInfo(String org_id) async {
     try {
       OrgDto org;
-      var data = await dataProvider.fetchOrg(org_id); 
+var localOrg = localProvider.getOrg(org_id);
+      if (localOrg != null) {
+        return localOrg;
+      }
+
+      var data = await dataProvider.fetchOrg(org_id);
       var orgInfo = data['data'];
-      org=OrgDto.fromMap(orgInfo); 
-      return org; 
+      orgInfo['org_id']= org_id; 
+      org = OrgDto.fromMap(orgInfo);
+      await localProvider.addOrUpdateOrg(org);
+      return org;
     } catch (e) {
       rethrow;
     }
