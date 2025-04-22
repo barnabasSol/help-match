@@ -97,6 +97,8 @@ Future<void> main() async {
         ),
         RepositoryProvider<UserLocalProvider>(
           create: (_) => UserLocalProvider(),
+        ),RepositoryProvider<LocationLocalProvider>(
+          create: (_) => LocationLocalProvider(),
         ),
         RepositoryProvider<UserRepo>(
           create: (context) => UserRepo(
@@ -128,7 +130,7 @@ Future<void> main() async {
                 AuthRepository(context.read<AuthDataProvider>())),
         RepositoryProvider(
             create: (context) =>
-                VolunteerDataProvider(dio: dio, sec: secureStorage)),
+                VolunteerDataProvider(dio: dio, sec: secureStorage,locationLocalProvider: context.read<LocationLocalProvider>())),
                 RepositoryProvider(create: (context)=>VolLocalProvider()),
         RepositoryProvider(
             create: (context) => VolunteerRepository(

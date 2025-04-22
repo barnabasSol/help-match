@@ -50,8 +50,8 @@ class _HomePageState extends State<VolunteerHome> {
     var user = await context.read<UserRepo>().getUserById(id);
     profileUrl = user!.profilePicUrl;
     _scrollController.addListener(() async {
-      if (_scrollController.position.maxScrollExtent ==
-          _scrollController.offset) {
+      if (_scrollController.position.pixels >=
+      _scrollController.position.maxScrollExtent * 0.8) {
         if (_isLoading || !_hasMore) return;
         _isLoading = true;
         fetch();

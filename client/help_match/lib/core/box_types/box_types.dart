@@ -2,6 +2,7 @@
 
 const String userBox = "userBox";
 const String orgDetailBox = "orgsBox";
+const String locationBox = "locationBox";
 class BoxTypes {
   static const int USER = 1;
   static const int ORG_INFO = 2;
