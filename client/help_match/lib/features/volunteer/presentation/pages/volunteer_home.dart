@@ -230,6 +230,7 @@ class _HomePageState extends State<VolunteerHome> {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         return OrganizationCard(
+                          token: token!,
                           orgDto: _organizations[index],
                         );
                       },
