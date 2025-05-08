@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -34,11 +35,12 @@ type OrgRepository interface {
 }
 
 type Organization struct {
-	pgPool *pgxpool.Pool
+	pgPool      *pgxpool.Pool
+	redisClient *redis.Client
 }
 
-func NewOrganizationRepository(pgPool *pgxpool.Pool) *Organization {
-	return &Organization{pgPool}
+func NewOrganizationRepository(pgPool *pgxpool.Pool, redis *redis.Client) *Organization {
+	return &Organization{pgPool, redis}
 }
 
 func (or *Organization) WithTransaction(ctx context.Context, fn func(pgx.Tx) error) error {

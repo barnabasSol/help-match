@@ -19,7 +19,6 @@ func InitPostgres() (*pgxpool.Pool, error) {
 	if connectionString == "" {
 		return nil, fmt.Errorf("database connection string is missing")
 	}
-
 	maxIdleConnections, err := strconv.Atoi(maxIdleConnectionsStr)
 	if err != nil {
 		return nil, fmt.Errorf("invalid value for DATABASE_MAX_IDLE_CONNECTIONS: %w", err)

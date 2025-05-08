@@ -28,10 +28,8 @@ var validUploadTypes = map[string]struct{}{
 }
 
 func isValidUploadType(incommingType string) bool {
-	if _, found := validUploadTypes[incommingType]; found {
-		return true
-	}
-	return false
+	_, found := validUploadTypes[incommingType]
+	return found
 }
 
 func isValidFileType(file []byte) bool {

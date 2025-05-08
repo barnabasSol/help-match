@@ -8,7 +8,7 @@ type JobUpdateDto struct {
 	Status string `json:"status"`
 }
 
-func (j *JobUpdateDto) Validate() error {
+func (j JobUpdateDto) Validate() error {
 	if j.JobID == "" {
 		return errors.New("job_id is required")
 	}

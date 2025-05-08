@@ -55,7 +55,6 @@ func (as *Auth) RenewToken(
 	return &dto.Tokens{
 		AccessToken:  access_token,
 		RefreshToken: refresh_token,
-		OTP:          as.wsManager.Otps.NewOTP().Key,
 	}, nil
 
 }

@@ -11,20 +11,26 @@ import (
 )
 
 func main() {
-	// if err := godotenv.Load(); err != nil {
-	// 	log.Println(err)
-	// 	log.Fatal("Error loading .env file")
-	// }
 	pgPool, err := db.InitPostgres()
 	if err != nil {
 		log.Fatal("error initializing db")
 	}
 
+	log.Println("connected to postgres")
+
+	redisClient, err := db.InitRedis()
+
+	if err != nil {
+		log.Fatal("error initializing redis", err)
+	}
+
+	log.Println("connected to redis")
+
 	wg := &sync.WaitGroup{}
-	wsManager := ws.NewManager(context.Background())
+	wsManager := ws.NewManager(context.Background(), wg)
 
 	appServer := server.New()
-	if err := appServer.Serve(pgPool, wsManager, wg); err != nil {
+	if err := appServer.Serve(pgPool, redisClient, wsManager, wg); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }

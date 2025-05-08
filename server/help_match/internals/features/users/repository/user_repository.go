@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"hm.barney-host.site/internals/features/users/dto"
@@ -23,11 +24,12 @@ type UserRepository interface {
 }
 
 type User struct {
-	pgPool *pgxpool.Pool
+	pgPool      *pgxpool.Pool
+	redisClient *redis.Client
 }
 
-func NewUserRepository(pool *pgxpool.Pool) *User {
-	return &User{pool}
+func NewUserRepository(pool *pgxpool.Pool, redis *redis.Client) *User {
+	return &User{pool, redis}
 }
 
 func (ur *User) WithTransaction(ctx context.Context, fn func(pgx.Tx) error) error {

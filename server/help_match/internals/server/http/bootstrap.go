@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/go-redis/redis/v8"
 	"github.com/jackc/pgx/v5/pgxpool"
 	auth_h "hm.barney-host.site/internals/features/auth/handler"
 	auth_r "hm.barney-host.site/internals/features/auth/repository"
@@ -23,13 +24,13 @@ import (
 	user_s "hm.barney-host.site/internals/features/users/service"
 )
 
-func (as *AppServer) bootstrapHandlers(pool *pgxpool.Pool) {
+func (as *AppServer) bootstrapHandlers(pool *pgxpool.Pool, redisClient *redis.Client) {
 	//repository
-	userRepo := user_r.NewUserRepository(pool)
+	userRepo := user_r.NewUserRepository(pool, redisClient)
 	authRepo := auth_r.NewAuthRepository(pool)
-	orgRepo := org_r.NewOrganizationRepository(pool)
+	orgRepo := org_r.NewOrganizationRepository(pool, redisClient)
 	jobRepo := job_r.NewJobRepository(pool)
-	chatRepo := chat_r.NewMessageRepository(pool)
+	chatRepo := chat_r.NewMessageRepository(pool, redisClient)
 	fileRepo := filehandler.NewFileHandlerRepository(pool)
 	notifRepo := not_r.NewNotificationRepository(pool)
 	bootstrapEventRepository(as, chatRepo)

@@ -25,6 +25,7 @@ var (
 )
 
 type Manager struct {
+	wg *sync.WaitGroup
 	sync.RWMutex
 	Clients         ClientList
 	Handlers        map[string]EventHandler
@@ -32,8 +33,9 @@ type Manager struct {
 	EventRepository EventRepository
 }
 
-func NewManager(ctx context.Context) *Manager {
+func NewManager(ctx context.Context, wg *sync.WaitGroup) *Manager {
 	m := &Manager{
+		wg:       wg,
 		Clients:  make(ClientList),
 		Handlers: make(map[string]EventHandler),
 		Otps:     NewRetentionMap(ctx, 5*time.Second),

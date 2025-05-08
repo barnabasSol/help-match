@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"hm.barney-host.site/internals/config"
 	auth_h "hm.barney-host.site/internals/features/auth/handler"
@@ -31,8 +32,8 @@ type AppServer struct {
 	noitifHandler     *notif_h.Notification
 	chatHandler       *chat_h.Chat
 	FileUploadHandler *filehandler.FileUploadHandler
-	wsManager         *ws.Manager
 	userHandler       *user_h.User
+	wsManager         *ws.Manager
 }
 
 func New() *AppServer {
@@ -41,11 +42,12 @@ func New() *AppServer {
 
 func (as *AppServer) Serve(
 	pgPool *pgxpool.Pool,
+	redisClient *redis.Client,
 	ws *ws.Manager,
 	wg *sync.WaitGroup,
 ) error {
 	as.wsManager = ws
-	as.bootstrapHandlers(pgPool)
+	as.bootstrapHandlers(pgPool, redisClient)
 	port := config.GetEnv("PORT")
 	shutdownError := make(chan error)
 	srv := &http.Server{

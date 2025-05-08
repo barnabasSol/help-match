@@ -1,21 +1,25 @@
 services:
   helpmatch-app:
+    ports:
+      - 2000:2000
+    build:
+      context: . 
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
     depends_on:
       - db
       - cache
-    image: barnabasdoc22/helpmatch-app:1.5.7
-    ports:
-      - 2000:2000
     volumes:
       - ./public:/app/public
     networks:
       - back-tier
-    restart: always
     env_file:
       - ./.env
 
   db:
-    image: postgres:16.4
+    image: postgres:17.4
     environment:
       DATABASE_URL: ${DATABASE_CONNECTION_STRING}
       POSTGRES_DB: ${DB_NAME}

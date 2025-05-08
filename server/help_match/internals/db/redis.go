@@ -16,7 +16,11 @@ func InitRedis() (*redis.Client, error) {
 	redisDB := config.GetEnv("REDIS_DB")
 
 	if redisAddr == "" {
-		return nil, fmt.Errorf("Redis address is missing")
+		return nil, fmt.Errorf("redis address is missing")
+	}
+
+	if redisAddr == "" {
+		return nil, fmt.Errorf("redis address is missing")
 	}
 
 	db, err := strconv.Atoi(redisDB)
@@ -28,8 +32,6 @@ func InitRedis() (*redis.Client, error) {
 		Addr:         redisAddr,
 		Password:     redisPassword,
 		DB:           db,
-		PoolSize:     10,
-		MaxRetries:   3,
 		MinIdleConns: 5,
 		IdleTimeout:  30 * time.Second,
 	})

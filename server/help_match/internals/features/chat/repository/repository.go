@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"hm.barney-host.site/internals/features/chat/dto"
 )
@@ -17,17 +18,18 @@ type MessageRepository interface {
 	GetRoomIdByJobId(ctx context.Context, jobId string) (string, error)
 	GetMembersOfRoomByRoomId(ctx context.Context, roomId string) (*[]dto.MemberInRoom, error)
 	GetRoomsByUserId(ctx context.Context, userId string) (*[]dto.Room, error)
-	// GetRoomById(ctx context.Context, roomId string) (*dto.Room, error)
 	UpdateOnlineStatus(ctx context.Context, userId string, status bool) error
 	JobChatRoomExists(ctx context.Context, jobId string) (bool, error)
 }
 type Message struct {
-	pool *pgxpool.Pool
+	pool        *pgxpool.Pool
+	redisClient *redis.Client
 }
 
-func NewMessageRepository(pool *pgxpool.Pool) *Message {
-	return &Message{pool}
+func NewMessageRepository(pool *pgxpool.Pool, redis *redis.Client) *Message {
+	return &Message{pool, redis}
 }
+
 func (m *Message) InsertMessage(
 	ctx context.Context,
 	senderId, roomdId, message string,
