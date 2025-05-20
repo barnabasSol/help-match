@@ -1,6 +1,6 @@
 # Help Match
 
-**Help Match** is a platform that connects volunteers with organizations offering volunteering opportunities. It allows volunteers to explore, search, and apply for jobs, while organizations can manage and approve candidates. Once approved, a chat room is automatically created for seamless communication between the volunteer and the organization's account manager. The platform also plans to issue PDF certificates upon completion of volunteering tasks (feature in progress).
+**Help Match** is a platform that connects volunteers with organizations offering volunteering opportunities. It allows volunteers to explore, search, and apply for jobs, while organizations can manage and approve candidates. Once approved, a chat room is automatically created for seamless communication between the volunteer and the organization's account manager. The platform also issues certificates for volunteers after or great contribution.
 
 ---
 
