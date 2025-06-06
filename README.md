@@ -17,20 +17,12 @@
 - **Approve Candidates**: Review and approve volunteer applications.
 - **Chat Room**: Automatically create and join a chat room with approved candidates for seamless communication.
 
-### General:
-- **JWT Authentication**: Secured with JSON Web Tokens (JWT) for secure user authentication.
-- **Caching**: Uses Redis (soon) for caching to improve performance.
-- **Responsive UI**: Frontend built with Flutter, with ongoing improvements to make the UI more intuitive and visually appealing.
-
----
 
 ## Technologies Used
 
 ### Backend:
 - **Programming Language**: Go (Golang)
-- **Database**: PostgreSQL
-- **Caching**: Redis (soon)
-- **Authentication**: JWT (JSON Web Tokens)
+- **Database**: PostgreSQL, Redis
 
 ### Frontend:
 - **Framework**: Flutter
@@ -41,7 +33,5 @@
 
 ## Future Features
 - **PDF Certificate Generation**: Automatically generate and issue PDF certificates upon task completion.
-- **Redis Caching**: Implement Redis for caching to improve performance.
-- **Real-Time Notifications**: Notify users of new messages, approvals, or opportunities.
 - **Admin Dashboard**: A dashboard for admins to manage users, organizations, and opportunities.
 
