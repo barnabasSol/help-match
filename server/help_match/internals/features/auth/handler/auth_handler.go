@@ -126,5 +126,5 @@ func (ah *Auth) Refresh(
 		return
 	}
 
-	utils.CreateResponse(w, nil, tokens, http.StatusOK, "here are ur tokens bitch")
+	utils.CreateResponse(w, nil, tokens, http.StatusOK, "here are ur tokens")
 }

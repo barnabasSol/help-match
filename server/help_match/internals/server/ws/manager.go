@@ -29,7 +29,7 @@ type Manager struct {
 	sync.RWMutex
 	Clients         ClientList
 	Handlers        map[string]EventHandler
-	Otps            RetentionMap
+	Otps            *RetentionMap
 	EventRepository EventRepository
 }
 
@@ -50,9 +50,8 @@ func (m *Manager) RouteEvent(event Event, c *Client) error {
 			return err
 		}
 		return nil
-	} else {
-		return errors.New("event not supported")
 	}
+	return errors.New("event not supported")
 }
 
 func (m *Manager) ServeWS(

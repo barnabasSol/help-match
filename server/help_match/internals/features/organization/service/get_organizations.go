@@ -18,7 +18,6 @@ func (os *Organization) GetOrganizations(
 ) ([]*dto.OrgListResponse, utils.Metadata, error) {
 	result, metadata, err := os.orgRepo.GetOrganizations(
 		ctx,
-		userId,
 		model.Location(userLocation),
 		orgParams,
 	)

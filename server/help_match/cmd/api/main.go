@@ -5,15 +5,17 @@ import (
 	"log"
 	"sync"
 
+	"github.com/joho/godotenv"
 	"hm.barney-host.site/internals/db"
 	server "hm.barney-host.site/internals/server/http"
 	"hm.barney-host.site/internals/server/ws"
 )
 
 func main() {
+	godotenv.Load()
 	pgPool, err := db.InitPostgres()
 	if err != nil {
-		log.Fatal("error initializing db")
+		log.Fatal("error initializing db", err)
 	}
 
 	log.Println("connected to postgres")

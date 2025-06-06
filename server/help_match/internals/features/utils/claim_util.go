@@ -7,7 +7,9 @@ import (
 	"hm.barney-host.site/internals/config"
 )
 
-const ClaimsKey = "claimsKey"
+type claimKeyType string
+
+const ClaimsKey claimKeyType = "claimsKey"
 
 type Claims struct {
 	Username string `json:"username"`

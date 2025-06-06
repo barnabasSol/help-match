@@ -55,7 +55,6 @@ func (e *EventRepository) SendMessageHandler(event Event, c *Client) error {
 		sendEvent.Message,
 		sendEvent.SentTime,
 	)
-
 	if err != nil {
 		log.Println(err)
 		return errors.New("failed to store message")

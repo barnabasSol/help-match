@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/jackc/pgx/v5"
@@ -28,10 +29,12 @@ type OrgRepository interface {
 	) ([]*dto.OrgListResponse, utils.Metadata, error)
 	GetOrganizations(
 		ctx context.Context,
-		userId string,
 		userLocation model.Location,
 		orgParams dto.OrgParams,
 	) ([]*dto.OrgListResponse, utils.Metadata, error)
+	CacheIsEmpty(ctx context.Context) (bool, error)
+	AddToCache(ctx context.Context, org dto.OrgListResponse) error
+	GetCachedOrganizations(ctx context.Context, limit, offset int) ([]dto.OrgListResponse, error)
 }
 
 type Organization struct {
@@ -166,10 +169,29 @@ func (or *Organization) GetOrganizationByOwnerId(
 
 func (o *Organization) GetOrganizations(
 	ctx context.Context,
-	userId string,
 	userLocation model.Location,
 	orgParams dto.OrgParams,
 ) ([]*dto.OrgListResponse, utils.Metadata, error) {
+	is_empty, err := o.CacheIsEmpty(ctx)
+	if err != nil {
+		log.Println(err)
+	}
+	if !is_empty {
+		rslt, err := o.GetCachedOrganizations(
+			ctx,
+			orgParams.Filters.Limit(),
+			orgParams.Filters.Offset(),
+		)
+		if err != nil {
+			log.Println(err)
+		} else {
+			return rslt, utils.CalculateMetadata(
+				len(rslt),
+				orgParams.Filters.Offset(),
+				orgParams.Filters.Offset()+orgParams.Filters.Limit(),
+			), nil
+		}
+	}
 	var orgList []*dto.OrgListResponse
 	sortColumn := "organization_name"
 	sortDirection := "ASC"
@@ -177,7 +199,6 @@ func (o *Organization) GetOrganizations(
 		sortColumn = orgParams.Filters.SortColumn()
 		sortDirection = orgParams.Filters.SortDirection()
 	}
-
 	query := fmt.Sprintf(`
 		SELECT count(*) OVER() AS total_count, 
 		organizations.id, organization_name, profile_icon, 
@@ -230,6 +251,13 @@ func (o *Organization) GetOrganizations(
 		orgParams.Filters.Page,
 		orgParams.Filters.PageSize,
 	)
+	if is_empty {
+		go func() {
+			for _, v := range orgList {
+				o.AddToCache(ctx, *v)
+			}
+		}()
+	}
 	return orgList, metadata, nil
 }
 
@@ -265,6 +293,7 @@ func (o *Organization) GetRecommendedOrgs(
 		orgParams.Filters.Limit(),
 		orgParams.Filters.Offset(),
 	}
+
 	rows, err := o.pgPool.Query(ctx, query, args...)
 	if err != nil {
 		return nil, utils.Metadata{}, err

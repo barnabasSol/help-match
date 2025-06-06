@@ -33,7 +33,7 @@ func AuthMiddleware(next httprouter.Handle) httprouter.Handle {
 		}
 		claims, err := utils.ParseTokenClaims(tokenString)
 		if err != nil {
-			http.Error(w, "Maybe you gave some bullshit claims, you bad boy", http.StatusUnauthorized)
+			http.Error(w, "Unrecognized/Invalid claims", http.StatusUnauthorized)
 			return
 		}
 		ctx := context.WithValue(r.Context(), utils.ClaimsKey, *claims)
